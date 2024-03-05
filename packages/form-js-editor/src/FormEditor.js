@@ -250,6 +250,7 @@ export class FormEditor {
       modules = this._getModules(),
       additionalModules = [],
       renderer = {},
+      viewComponents,
       ...config
     } = options;
 
@@ -264,6 +265,7 @@ export class FormEditor {
     return createInjector([
       { config: [ 'value', enrichedConfig ] },
       { formEditor: [ 'value', this ] },
+      { viewComponents: ['value', viewComponents] },
       CoreModule,
       ...modules,
       ...additionalModules

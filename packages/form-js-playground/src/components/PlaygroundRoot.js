@@ -133,7 +133,8 @@ export function PlaygroundRoot(props) {
       additionalModules: [
         ...additionalModules,
         ...editorAdditionalModules
-      ]
+      ],
+      viewComponents: props.viewComponents
     });
 
     paletteRef.current = formEditor.get('palette');

@@ -50,6 +50,8 @@ export const PALETTE_GROUPS = [
 export function Palette(props) {
 
   const formFields = useService('formFields');
+  const injector = useService('injector');
+  const viewComponents = injector.get('viewComponents')
 
   const initialPaletteEntries = useRef(collectPaletteEntries(formFields));
 
@@ -59,7 +61,7 @@ export function Palette(props) {
 
   const inputRef = useRef();
 
-  const groups = groupEntries(paletteEntries);
+  const groups = viewComponents ? viewComponents : groupEntries(paletteEntries);
 
   const simplifyString = useCallback((str) => {
     return str

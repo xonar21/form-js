@@ -35,6 +35,7 @@ export function Playground(options) {
     container: parent,
     schema,
     data,
+    viewComponents,
     ...rest
   } = options;
 
@@ -88,6 +89,7 @@ export function Playground(options) {
       onInit={ onInit }
       onStateChanged={ (_state) => state = _state }
       schema={ schema }
+      viewComponents= { viewComponents }
       { ...rest }
     />,
     container

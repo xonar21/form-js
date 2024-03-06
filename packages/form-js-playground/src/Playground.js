@@ -23,6 +23,7 @@ import { PlaygroundRoot } from './components/PlaygroundRoot';
  *  schema: any
  *  viewerAdditionalModules?: Array<any>
  *  viewerProperties?: FormProperties
+ *  viewComponents?: { label: string; id: string; entries: { label: string; type: string; group: string; }[]; }[]
  * } } FormPlaygroundOptions
  */
 

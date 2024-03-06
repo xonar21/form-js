@@ -101,23 +101,23 @@ describe('playground', function() {
         schema,
         data,
         viewComponents: [{
-          "label": "Basic input",
-          "id": "basic-input",
-          "entries": [
+          label: "Basic input",
+          id: "basic-input",
+          entries: [
               {
-                  "label": "Number",
-                  "type": "number",
-                  "group": "basic-input"
+                  label: "Number",
+                  type: "number",
+                  group: "basic-input"
               },
               {
-                  "label": "Text field",
-                  "type": "textfield",
-                  "group": "basic-input"
+                  label: "Text field",
+                  type: "textfield",
+                  group: "basic-input"
               },
               {
-                  "label": "Text area",
-                  "type": "textarea",
-                  "group": "basic-input"
+                  label: "Text area",
+                  type: "textarea",
+                  group: "basic-input"
               }
           ]
       }]

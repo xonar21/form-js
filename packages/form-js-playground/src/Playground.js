@@ -37,6 +37,7 @@ export function Playground(options) {
     schema,
     data,
     viewComponents,
+    keyParameters,
     ...rest
   } = options;
 
@@ -91,6 +92,7 @@ export function Playground(options) {
       onStateChanged={ (_state) => state = _state }
       schema={ schema }
       viewComponents= { viewComponents }
+      keyParameters= { keyParameters }
       { ...rest }
     />,
     container

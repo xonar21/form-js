@@ -251,6 +251,7 @@ export class FormEditor {
       additionalModules = [],
       renderer = {},
       viewComponents,
+      keyParameters,
       ...config
     } = options;
 
@@ -266,6 +267,7 @@ export class FormEditor {
       { config: [ 'value', enrichedConfig ] },
       { formEditor: [ 'value', this ] },
       { viewComponents: ['value', viewComponents] },
+      { keyParameters: ['value', keyParameters] },
       CoreModule,
       ...modules,
       ...additionalModules

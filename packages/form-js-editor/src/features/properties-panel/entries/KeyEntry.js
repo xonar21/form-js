@@ -4,7 +4,7 @@ import { hasIntegerPathSegment, isValidDotPath } from '../Util';
 
 import { useService } from '../hooks';
 
-import { TextFieldEntry, isTextFieldEntryEdited } from '@bpmn-io/properties-panel';
+import { isSelectEntryEdited, SelectEntry } from '@bpmn-io/properties-panel';
 import { useCallback } from 'preact/hooks';
 
 
@@ -22,12 +22,7 @@ export function KeyEntry(props) {
     component: Key,
     editField: editField,
     field: field,
-    isEdited: isTextFieldEntryEdited,
-    isDefaultVisible: (field) => {
-      const formFields = getService('formFields');
-      const { config } = formFields.get(field.type);
-      return config.keyed;
-    }
+    isEdited: isSelectEntryEdited,
   });
 
   return entries;
@@ -87,18 +82,23 @@ function Key(props) {
     pathRegistry.unclaimPath(oldPath);
     const canClaim = pathRegistry.canClaimPath(newPath, { isClosed: true, claimerId: field.id });
     pathRegistry.claimPath(oldPath, { isClosed: true, claimerId: field.id });
-
+    console.log('fddfd')
     return canClaim ? null : 'Must not conflict with other key/path assignments.';
+   
   }, [ field, pathRegistry ]);
 
-  return TextFieldEntry({
+
+  const getOptions = () => {
+    return useService('keyParameters');
+  };
+
+  return SelectEntry({
     debounce,
-    description: 'Binds to a form variable',
     element: field,
-    getValue,
     id,
     label: 'Key',
-    tooltip: 'Use a unique "key" to link the form element and the related input/output data. When dealing with nested data, break it down in the user task\'s input mapping before using it.',
+    getOptions,
+    getValue,
     setValue,
     validate
   });

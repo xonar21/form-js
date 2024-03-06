@@ -134,7 +134,8 @@ export function PlaygroundRoot(props) {
         ...additionalModules,
         ...editorAdditionalModules
       ],
-      viewComponents: props.viewComponents
+      viewComponents: props.viewComponents,
+      keyParameters: props.keyParameters
     });
 
     paletteRef.current = formEditor.get('palette');

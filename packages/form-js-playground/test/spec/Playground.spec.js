@@ -120,7 +120,21 @@ describe('playground', function() {
                   group: "basic-input"
               }
           ]
-      }]
+        }],
+        keyParameters: [
+          {
+            label: 'Name',
+            value: 'name'
+          },
+          {
+            label: 'Description',
+            value: 'description'
+          },
+          {
+            label: 'LastName',
+            value: 'lastname'
+          },
+        ]
       });
     });
 

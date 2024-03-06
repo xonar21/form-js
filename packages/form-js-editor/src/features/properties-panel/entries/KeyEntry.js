@@ -89,7 +89,7 @@ function Key(props) {
 
 
   const getOptions = () => {
-    return useService('keyParameters');
+    return useService('keyParameters') ? useService('keyParameters') : [];
   };
 
   return SelectEntry({

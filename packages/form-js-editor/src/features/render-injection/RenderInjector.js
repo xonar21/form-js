@@ -1,4 +1,4 @@
-import { SectionModuleBase } from '../SectionModuleBase';
+import { SectionModuleBase } from "../SectionModuleBase";
 
 /**
  * Manages the rendering of visual plugins.
@@ -6,9 +6,8 @@ import { SectionModuleBase } from '../SectionModuleBase';
  * @param {Object} eventBus - Event bus for the application.
  */
 export class RenderInjector extends SectionModuleBase {
-
   constructor(eventBus) {
-    super(eventBus, 'renderInjector');
+    super(eventBus, "renderInjector");
     this._eventBus = eventBus;
     this.registeredRenderers = [];
   }
@@ -19,7 +18,7 @@ export class RenderInjector extends SectionModuleBase {
    * @param {Function} Renderer - The renderer function.
    */
   attachRenderer(identifier, Renderer) {
-    this.registeredRenderers = [ ...this.registeredRenderers, { identifier, Renderer } ];
+    this.registeredRenderers = [...this.registeredRenderers, { identifier, Renderer }];
   }
 
   /**
@@ -39,4 +38,4 @@ export class RenderInjector extends SectionModuleBase {
   }
 }
 
-RenderInjector.$inject = [ 'eventBus' ];
+RenderInjector.$inject = ["eventBus"];

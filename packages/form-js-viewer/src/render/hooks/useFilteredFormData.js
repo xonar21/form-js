@@ -1,5 +1,5 @@
-import { useService } from './useService.js';
-import { useMemo } from 'preact/hooks';
+import { useService } from "./useService.js";
+import { useMemo } from "preact/hooks";
 
 /**
  * Returns the conditionally filtered data of a form reactively.
@@ -8,12 +8,11 @@ import { useMemo } from 'preact/hooks';
  * Warning: costly operation, use with care
  */
 export function useFilteredFormData() {
-  const { initialData, data } = useService('form')._getState();
-  const conditionChecker = useService('conditionChecker', false);
+  const { initialData, data } = useService("form")._getState();
+  const conditionChecker = useService("conditionChecker", false);
 
   return useMemo(() => {
     const newData = conditionChecker ? conditionChecker.applyConditions(data, data) : data;
     return { ...initialData, ...newData };
-  }, [ conditionChecker, data, initialData ]);
-
+  }, [conditionChecker, data, initialData]);
 }

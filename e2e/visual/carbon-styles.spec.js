@@ -1,30 +1,28 @@
-const { expect } = require('@playwright/test');
+const { expect } = require("@playwright/test");
 
-const { test } = require('../test-fixtures');
+const { test } = require("../test-fixtures");
 
-const schema = require('./fixtures/complex.json');
+const schema = require("./fixtures/complex.json");
 
-test('carbon styles', async ({ page, makeAxeBuilder }) => {
-
+test("carbon styles", async ({ page, makeAxeBuilder }) => {
   // given
-  await page.route('/form', route => {
-
+  await page.route("/form", route => {
     route.fulfill({
       status: 200,
       body: JSON.stringify({
         data: {
           schema,
-          component: 'viewer'
-        }
-      })
+          component: "viewer",
+        },
+      }),
     });
   });
 
   // when
-  await page.goto('/carbon/');
+  await page.goto("/carbon/");
 
-  await page.waitForSelector('#container', {
-    state: 'visible'
+  await page.waitForSelector("#container", {
+    state: "visible",
   });
 
   // then

@@ -1,21 +1,21 @@
 export const form = {
-  type: 'default',
+  type: "default",
   components: [
     {
-      type: 'table',
+      type: "table",
       rowCount: true,
       columns: [],
-      dataSource: 'inputVariable'
-    }
-  ]
+      dataSource: "inputVariable",
+    },
+  ],
 };
 
 export const errors = [
   {
-    instancePath: '/components/0/rowCount',
-    schemaPath: '#/properties/components/items/properties/rowCount/type',
-    keyword: 'type',
-    params: { type: 'number' },
-    message: 'must be number'
-  }
+    instancePath: "/components/0/rowCount",
+    schemaPath: "#/properties/components/items/properties/rowCount/type",
+    keyword: "type",
+    params: { type: "number" },
+    message: "must be number",
+  },
 ];

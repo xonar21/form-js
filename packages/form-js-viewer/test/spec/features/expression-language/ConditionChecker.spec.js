@@ -1,26 +1,23 @@
-import { ConditionChecker } from '../../../../src/features/expressionLanguage/ConditionChecker';
-import { PathRegistry } from '../../../../src/core/PathRegistry';
-import { FormFields } from '../../../../src/render/FormFields';
+import { ConditionChecker } from "../../../../src/features/expressionLanguage/ConditionChecker";
+import { PathRegistry } from "../../../../src/core/PathRegistry";
+import { FormFields } from "../../../../src/render/FormFields";
 
-describe('ConditionChecker', function() {
-
+describe("ConditionChecker", function () {
   let conditionChecker,
-      form = {},
-      fireSpy;
+    form = {},
+    fireSpy;
 
-  beforeEach(function() {
+  beforeEach(function () {
     fireSpy = sinon.spy();
     conditionChecker = new ConditionChecker(
       { getForm: () => form },
       new PathRegistry({}, new FormFields(), { get: () => {} }),
-      { fire: fireSpy }
+      { fire: fireSpy },
     );
   });
 
-  describe('#check', function() {
-
-    it('should return null if there is no condition', function() {
-
+  describe("#check", function () {
+    it("should return null if there is no condition", function () {
       // when
       const result = conditionChecker.check();
 
@@ -28,9 +25,7 @@ describe('ConditionChecker', function() {
       expect(result).to.be.null;
     });
 
-
-    it('should return null for non-string condition', function() {
-
+    it("should return null for non-string condition", function () {
       // given
       const condition = 1;
 
@@ -41,11 +36,9 @@ describe('ConditionChecker', function() {
       expect(result).to.be.null;
     });
 
-
-    it('should return null if condition does not start with =', function() {
-
+    it("should return null if condition does not start with =", function () {
       // given
-      const condition = 'foo';
+      const condition = "foo";
 
       // when
       const result = conditionChecker.check(condition);
@@ -54,26 +47,22 @@ describe('ConditionChecker', function() {
       expect(result).to.be.null;
     });
 
-
-    it('should return null and report error if condition has syntax error', function() {
-
+    it("should return null and report error if condition has syntax error", function () {
       // given
-      const condition = '=foo-';
+      const condition = "=foo-";
 
       // when
       const result = conditionChecker.check(condition);
 
       // then
       expect(result).to.be.null;
-      expect(fireSpy).to.have.been.calledWith('error');
+      expect(fireSpy).to.have.been.calledWith("error");
       expect(fireSpy.args[0][1].error).to.be.instanceof(Error);
     });
 
-
-    it('should return false if condition is not met', function() {
-
+    it("should return false if condition is not met", function () {
       // given
-      const condition = '=2 + 2 = 5';
+      const condition = "=2 + 2 = 5";
 
       // when
       const result = conditionChecker.check(condition);
@@ -82,11 +71,9 @@ describe('ConditionChecker', function() {
       expect(result).to.be.false;
     });
 
-
-    it('should return false if condition is not met (with data)', function() {
-
+    it("should return false if condition is not met (with data)", function () {
       // given
-      const condition = '=2 + 2 = five';
+      const condition = "=2 + 2 = five";
 
       // when
       const result = conditionChecker.check(condition, { five: 5 });
@@ -95,11 +82,9 @@ describe('ConditionChecker', function() {
       expect(result).to.be.false;
     });
 
-
-    it('should return true if condition is met', function() {
-
+    it("should return true if condition is met", function () {
       // given
-      const condition = '=2 + 2 = 4';
+      const condition = "=2 + 2 = 4";
 
       // when
       const result = conditionChecker.check(condition);
@@ -108,11 +93,9 @@ describe('ConditionChecker', function() {
       expect(result).to.be.true;
     });
 
-
-    it('should return true if condition is met (with data)', function() {
-
+    it("should return true if condition is met (with data)", function () {
       // given
-      const condition = '=2 + 2 = four';
+      const condition = "=2 + 2 = four";
 
       // when
       const result = conditionChecker.check(condition, { four: 4 });
@@ -120,38 +103,34 @@ describe('ConditionChecker', function() {
       // then
       expect(result).to.be.true;
     });
-
   });
 
-
-  describe('#applyConditions', function() {
-
-    it('should filter out properties for which condition is not met', function() {
-
+  describe("#applyConditions", function () {
+    it("should filter out properties for which condition is not met", function () {
       // given
       form = {
-        type: 'default',
+        type: "default",
         components: [
           {
-            key: 'foo',
-            type: 'textfield',
+            key: "foo",
+            type: "textfield",
             conditional: {
-              hide: '=2 + 2 = 4'
-            }
+              hide: "=2 + 2 = 4",
+            },
           },
           {
-            key: 'bar',
-            type: 'textfield',
+            key: "bar",
+            type: "textfield",
             conditional: {
-              hide: '=2 + 2 = 5'
-            }
-          }
-        ]
+              hide: "=2 + 2 = 5",
+            },
+          },
+        ],
       };
 
       const properties = {
-        foo: 'FOO',
-        bar: 'BAR'
+        foo: "FOO",
+        bar: "BAR",
       };
 
       // when
@@ -159,43 +138,40 @@ describe('ConditionChecker', function() {
 
       // then
       expect(result).to.eql({
-        bar: 'BAR'
+        bar: "BAR",
       });
     });
 
-
-    it('should filter out properties for which condition is not met (with data)', function() {
-
+    it("should filter out properties for which condition is not met (with data)", function () {
       // given
-      form =
-      {
-        type: 'default',
+      form = {
+        type: "default",
         components: [
           {
-            key: 'foo',
-            type: 'textfield',
+            key: "foo",
+            type: "textfield",
             conditional: {
-              hide: '=2 + 2 = 4'
-            }
+              hide: "=2 + 2 = 4",
+            },
           },
           {
-            key: 'bar',
-            type: 'textfield',
+            key: "bar",
+            type: "textfield",
             conditional: {
-              hide: '=2 + 2 = 5'
-            }
-          }
-        ]
+              hide: "=2 + 2 = 5",
+            },
+          },
+        ],
       };
 
       const properties = {
-        foo: 'FOO',
-        bar: 'BAR'
+        foo: "FOO",
+        bar: "BAR",
       };
 
       const data = {
         five: 5,
-        four: 4
+        four: 4,
       };
 
       // when
@@ -203,7 +179,7 @@ describe('ConditionChecker', function() {
 
       // then
       expect(result).to.eql({
-        bar: 'BAR'
+        bar: "BAR",
       });
     });
   });

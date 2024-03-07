@@ -1,11 +1,11 @@
 export const form = {
-  type: 'default',
+  type: "default",
   components: [
     {
-      type: 'select',
-      key: 'select'
-    }
-  ]
+      type: "select",
+      key: "select",
+    },
+  ],
 };
 
 export const errors = null;

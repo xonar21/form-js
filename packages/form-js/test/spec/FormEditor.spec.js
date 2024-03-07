@@ -1,46 +1,34 @@
-import {
-  schemaVersion,
-  createFormEditor,
-  FormEditor
-} from '../../src';
+import { schemaVersion, createFormEditor, FormEditor } from "../../src";
 
-import schema from './form.json';
+import schema from "./form.json";
 
-import { insertStyles } from '../TestHelper';
+import { insertStyles } from "../TestHelper";
 
-import {
-  expect
-} from 'chai';
+import { expect } from "chai";
 
 insertStyles();
 
-
-describe('editor exports', function() {
-
+describe("editor exports", function () {
   let container;
 
-  beforeEach(function() {
-    container = document.createElement('div');
+  beforeEach(function () {
+    container = document.createElement("div");
 
     document.body.appendChild(container);
   });
 
-
-  it('should render', async function() {
-
+  it("should render", async function () {
     // when
     const formEditor = await createFormEditor({
       container,
-      schema
+      schema,
     });
 
     // then
     expect(formEditor).to.exist;
   });
 
-
-  it('should instantiate + render', async function() {
-
+  it("should instantiate + render", async function () {
     // when
     const formEditor = new FormEditor({ container });
 
@@ -50,35 +38,30 @@ describe('editor exports', function() {
     expect(formEditor).to.exist;
   });
 
-
-  it('should instantiate with additional options', async function() {
-
+  it("should instantiate with additional options", async function () {
     // when
     const formEditor = new FormEditor({
       container,
       foo: {
-        bar: true
-      }
+        bar: true,
+      },
     });
 
     // then
     expect(formEditor).to.exist;
   });
 
-
-  describe('export', function() {
-
-    it('should expose schema', async function() {
-
+  describe("export", function () {
+    it("should expose schema", async function () {
       // given
       const versionedSchema = {
         ...schema,
-        schemaVersion
+        schemaVersion,
       };
 
       const formEditor = await createFormEditor({
         container,
-        schema: versionedSchema
+        schema: versionedSchema,
       });
 
       // when
@@ -88,42 +71,38 @@ describe('editor exports', function() {
       expect(savedSchema).to.eql(versionedSchema);
     });
 
-
-    it('should export schemaVersion', async function() {
-
+    it("should export schemaVersion", async function () {
       // given
       const formEditor = await createFormEditor({
         container,
-        schema
+        schema,
       });
 
       // when
       const savedSchema = formEditor.getSchema();
 
       // then
-      expect(savedSchema).to.have.property('schemaVersion', schemaVersion);
+      expect(savedSchema).to.have.property("schemaVersion", schemaVersion);
     });
 
-
-    it('should keep IDs', async function() {
-
+    it("should keep IDs", async function () {
       // given
       const schema = {
-        id: 'FOOBAR',
-        type: 'default',
+        id: "FOOBAR",
+        type: "default",
         schemaVersion,
         components: [
           {
-            id: 'number',
-            type: 'number',
-            key: 'number'
-          }
-        ]
+            id: "number",
+            type: "number",
+            key: "number",
+          },
+        ],
       };
 
       const formEditor = await createFormEditor({
         container,
-        schema
+        schema,
       });
 
       // when
@@ -133,24 +112,22 @@ describe('editor exports', function() {
       expect(savedSchema).to.eql(schema);
     });
 
-
-    it('should assign IDs', async function() {
-
+    it("should assign IDs", async function () {
       // given
       const schema = {
-        type: 'default',
+        type: "default",
         schemaVersion,
         components: [
           {
-            type: 'number',
-            key: 'number'
-          }
-        ]
+            type: "number",
+            key: "number",
+          },
+        ],
       };
 
       const formEditor = await createFormEditor({
         container,
-        schema
+        schema,
       });
 
       // when
@@ -160,7 +137,5 @@ describe('editor exports', function() {
       expect(savedSchema.id).to.exist;
       expect(savedSchema.components[0].id).to.exist;
     });
-
   });
-
 });

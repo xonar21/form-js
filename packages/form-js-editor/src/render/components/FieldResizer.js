@@ -1,43 +1,34 @@
-import {
-  useRef
-} from 'preact/hooks';
+import { useRef } from "preact/hooks";
 
-import {
-  classes,
-  query as domQuery
-} from 'min-dom';
+import { classes, query as domQuery } from "min-dom";
 
-import { useService } from '../hooks';
+import { useService } from "../hooks";
 
-import { createDragger, throttle } from './Util';
+import { createDragger, throttle } from "./Util";
 
-import { DRAG_NO_MOVE_CLS } from '../../features/dragging/Dragging';
+import { DRAG_NO_MOVE_CLS } from "../../features/dragging/Dragging";
 
-import classNames from 'classnames';
+import classNames from "classnames";
 
 const COLUMNS_REGEX = /^cds--col(-lg)?/;
 
-const ELEMENT_RESIZING_CLS = 'fjs-element-resizing';
+const ELEMENT_RESIZING_CLS = "fjs-element-resizing";
 
 const GRID_OFFSET_PX = 16;
 
 export function FieldResizer(props) {
-
-  const {
-    field,
-    position
-  } = props;
+  const { field, position } = props;
 
   const ref = useRef(null);
 
-  const formLayoutValidator = useService('formLayoutValidator');
-  const modeling = useService('modeling');
+  const formLayoutValidator = useService("formLayoutValidator");
+  const modeling = useService("modeling");
 
   // we can't use state as we need to
   // manipulate this inside dragging events
   const context = useRef({
     startColumns: 0,
-    newColumns: 0
+    newColumns: 0,
   });
 
   const onResize = throttle((_, delta) => {
@@ -45,28 +36,21 @@ export function FieldResizer(props) {
 
     const { layout = {} } = field;
 
-    const newColumns = calculateNewColumns(
-      ref.current,
-      layout.columns || context.current.startColumns,
-      dx,
-      position
-    );
+    const newColumns = calculateNewColumns(ref.current, layout.columns || context.current.startColumns, dx, position);
 
     const errorMessage = formLayoutValidator.validateField(field, newColumns);
 
     if (!errorMessage) {
-
       context.current.newColumns = newColumns;
 
       // make visual updates to preview change
-      const columnNode = ref.current.closest('.fjs-layout-column');
+      const columnNode = ref.current.closest(".fjs-layout-column");
       removeMatching(columnNode, COLUMNS_REGEX);
       columnNode.classList.add(`cds--col-lg-${newColumns}`);
     }
   });
 
-  const onResizeStart = (event) => {
-
+  const onResizeStart = event => {
     const target = getElementNode(field);
     const parent = getParent(target);
 
@@ -87,9 +71,9 @@ export function FieldResizer(props) {
     const { layout = {} } = field;
 
     if (context.current.newColumns) {
-      modeling.editFormField(field, 'layout', {
+      modeling.editFormField(field, "layout", {
         ...layout,
-        columns: context.current.newColumns
+        columns: context.current.newColumns,
       });
     }
 
@@ -99,25 +83,20 @@ export function FieldResizer(props) {
     context.current.newColumns = null;
   };
 
-  if (field.type === 'default') {
+  if (field.type === "default") {
     return null;
   }
 
   return (
     <div
-      ref={ ref }
-      class={ classNames(
-        'fjs-field-resize-handle',
-        'fjs-field-resize-handle-' + position,
-        DRAG_NO_MOVE_CLS
-      ) }
+      ref={ref}
+      class={classNames("fjs-field-resize-handle", "fjs-field-resize-handle-" + position, DRAG_NO_MOVE_CLS)}
       draggable
-      onDragStart={ onResizeStart }
-      onDragEnd={ onResizeEnd }>
-    </div>
+      onDragStart={onResizeStart}
+      onDragEnd={onResizeEnd}
+    ></div>
   );
 }
-
 
 // helper //////
 
@@ -133,7 +112,7 @@ function calculateNewColumns(node, currentColumns, deltaX, position) {
   const parent = getParent(node);
 
   // invert delta if we are resizing from the left
-  if (position === 'left') {
+  if (position === "left") {
     deltaX = deltaX * -1;
   }
 
@@ -143,7 +122,7 @@ function calculateNewColumns(node, currentColumns, deltaX, position) {
 }
 
 function getParent(node) {
-  return node.closest('.fjs-layout-row');
+  return node.closest(".fjs-layout-row");
 }
 
 function removeMatching(node, regex) {
@@ -151,7 +130,7 @@ function removeMatching(node, regex) {
 }
 
 function getColumnNode(node) {
-  return node.closest('.fjs-layout-column');
+  return node.closest(".fjs-layout-column");
 }
 
 function getElementNode(field) {
@@ -159,9 +138,9 @@ function getElementNode(field) {
 }
 
 function setResizing(node, position) {
-  classes(node).add(ELEMENT_RESIZING_CLS + '-' + position);
+  classes(node).add(ELEMENT_RESIZING_CLS + "-" + position);
 }
 
 function unsetResizing(node, position) {
-  classes(node).remove(ELEMENT_RESIZING_CLS + '-' + position);
+  classes(node).remove(ELEMENT_RESIZING_CLS + "-" + position);
 }

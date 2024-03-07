@@ -1,29 +1,45 @@
-import { createContext } from 'preact';
+import { createContext } from "preact";
 
 export const FormRenderContext = createContext({
-  Empty: (props) => {
+  Empty: props => {
     return null;
   },
-  Hidden: (props) => {
+  Hidden: props => {
     return null;
   },
-  Children: (props) => {
-    return <div class={ props.class } style={ props.style }>{ props.children }</div>;
+  Children: props => {
+    return (
+      <div class={props.class} style={props.style}>
+        {props.children}
+      </div>
+    );
   },
-  Element: (props) => {
-    return <div class={ props.class } style={ props.style }>{ props.children }</div>;
+  Element: props => {
+    return (
+      <div class={props.class} style={props.style}>
+        {props.children}
+      </div>
+    );
   },
-  Row: (props) => {
-    return <div class={ props.class } style={ props.style }>{ props.children }</div>;
+  Row: props => {
+    return (
+      <div class={props.class} style={props.style}>
+        {props.children}
+      </div>
+    );
   },
-  Column: (props) => {
-    if (props.field.type === 'default') {
+  Column: props => {
+    if (props.field.type === "default") {
       return props.children;
     }
 
-    return <div class={ props.class } style={ props.style }>{ props.children }</div>;
+    return (
+      <div class={props.class} style={props.style}>
+        {props.children}
+      </div>
+    );
   },
   hoverInfo: {
-    cleanup: () => {}
+    cleanup: () => {},
   },
 });

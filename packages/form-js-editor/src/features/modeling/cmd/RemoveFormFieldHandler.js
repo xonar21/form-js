@@ -1,17 +1,10 @@
-import { get } from 'min-dash';
+import { get } from "min-dash";
 
-import {
-  arrayAdd,
-  arrayRemove,
-  updatePath
-} from './Util';
+import { arrayAdd, arrayRemove, updatePath } from "./Util";
 
-import {
-  runRecursively
-} from '@bpmn-io/form-js-viewer';
+import { runRecursively } from "@bpmn-io/form-js-viewer";
 
 export class RemoveFormFieldHandler {
-
   /**
    * @constructor
    * @param { import('../../../FormEditor').FormEditor } formEditor
@@ -23,16 +16,13 @@ export class RemoveFormFieldHandler {
   }
 
   execute(context) {
-    const {
-      sourceFormField,
-      sourceIndex
-    } = context;
+    const { sourceFormField, sourceIndex } = context;
 
     let { schema } = this._formEditor._getState();
 
-    const sourcePath = [ ...sourceFormField._path, 'components' ];
+    const sourcePath = [...sourceFormField._path, "components"];
 
-    const formField = context.formField = get(schema, [ ...sourcePath, sourceIndex ]);
+    const formField = (context.formField = get(schema, [...sourcePath, sourceIndex]));
 
     // (1) Remove form field
     arrayRemove(get(schema, sourcePath), sourceIndex);
@@ -41,22 +31,18 @@ export class RemoveFormFieldHandler {
     get(schema, sourcePath).forEach((formField, index) => updatePath(this._formFieldRegistry, formField, index));
 
     // (3) Remove form field and children from form field registry
-    runRecursively(formField, (formField) => this._formFieldRegistry.remove(formField));
+    runRecursively(formField, formField => this._formFieldRegistry.remove(formField));
 
     // TODO: Create updater/change support that automatically updates paths and schema on command execution
     this._formEditor._setState({ schema });
   }
 
   revert(context) {
-    const {
-      formField,
-      sourceFormField,
-      sourceIndex
-    } = context;
+    const { formField, sourceFormField, sourceIndex } = context;
 
     let { schema } = this._formEditor._getState();
 
-    const sourcePath = [ ...sourceFormField._path, 'components' ];
+    const sourcePath = [...sourceFormField._path, "components"];
 
     // (1) Add form field
     arrayAdd(get(schema, sourcePath), sourceIndex, formField);
@@ -65,11 +51,11 @@ export class RemoveFormFieldHandler {
     get(schema, sourcePath).forEach((formField, index) => updatePath(this._formFieldRegistry, formField, index));
 
     // (3) Add form field and children to form field registry
-    runRecursively(formField, (formField) => this._formFieldRegistry.add(formField));
+    runRecursively(formField, formField => this._formFieldRegistry.add(formField));
 
     // TODO: Create updater/change support that automatically updates paths and schema on command execution
     this._formEditor._setState({ schema });
   }
 }
 
-RemoveFormFieldHandler.$inject = [ 'formEditor', 'formFieldRegistry' ];
+RemoveFormFieldHandler.$inject = ["formEditor", "formFieldRegistry"];

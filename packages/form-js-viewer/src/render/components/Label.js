@@ -1,7 +1,6 @@
-import classNames from 'classnames';
+import classNames from "classnames";
 
-import { useSingleLineTemplateEvaluation } from '../hooks';
-
+import { useSingleLineTemplateEvaluation } from "../hooks";
 
 /**
  * @typedef Props
@@ -17,23 +16,23 @@ import { useSingleLineTemplateEvaluation } from '../hooks';
  * @returns {import("preact").JSX.Element}
  */
 export function Label(props) {
-  const {
-    id,
-    htmlFor,
-    label,
-    collapseOnEmpty = true,
-    required = false
-  } = props;
+  const { id, htmlFor, label, collapseOnEmpty = true, required = false } = props;
 
-  const evaluatedLabel = useSingleLineTemplateEvaluation(label || '', { debug: true });
+  const evaluatedLabel = useSingleLineTemplateEvaluation(label || "", { debug: true });
 
   return (
-    <label id={ id } for={ htmlFor } class={ classNames('fjs-form-field-label', { 'fjs-incollapsible-label': !collapseOnEmpty }, props['class']) }>
-      { props.children }
-      { evaluatedLabel }
-      {
-        required && <span class="fjs-asterix" aria-hidden>*</span>
-      }
+    <label
+      id={id}
+      for={htmlFor}
+      class={classNames("fjs-form-field-label", { "fjs-incollapsible-label": !collapseOnEmpty }, props["class"])}
+    >
+      {props.children}
+      {evaluatedLabel}
+      {required && (
+        <span class="fjs-asterix" aria-hidden>
+          *
+        </span>
+      )}
     </label>
   );
 }

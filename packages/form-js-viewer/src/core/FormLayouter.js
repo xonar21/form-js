@@ -1,7 +1,6 @@
-import Ids from 'ids';
+import Ids from "ids";
 
-import { groupBy } from 'min-dash';
-
+import { groupBy } from "min-dash";
 
 /**
  * @typedef { { id: String, components: Array<String> } } FormRow
@@ -22,12 +21,10 @@ import { groupBy } from 'min-dash';
  *
  */
 export class FormLayouter {
-
   constructor(eventBus) {
-
     /** @type Array<FormRows>  */
     this._rows = [];
-    this._ids = new Ids([ 32, 36, 1 ]);
+    this._ids = new Ids([32, 36, 1]);
 
     this._eventBus = eventBus;
   }
@@ -41,7 +38,7 @@ export class FormLayouter {
     if (!rowsPerComponent) {
       rowsPerComponent = {
         formFieldId,
-        rows: []
+        rows: [],
       };
 
       this._rows.push(rowsPerComponent);
@@ -89,32 +86,27 @@ export class FormLayouter {
    * @returns {string}
    */
   nextRowId() {
-    return this._ids.nextPrefixed('Row_');
+    return this._ids.nextPrefixed("Row_");
   }
 
   /**
    * @param {any} formField
    */
   calculateLayout(formField) {
+    const { type, components } = formField;
 
-    const {
-      type,
-      components
-    } = formField;
-
-    if (![ 'default', 'group', 'dynamiclist' ].includes(type) || !components) {
+    if (!["default", "group", "dynamiclist"].includes(type) || !components) {
       return;
     }
 
     // (1) calculate rows order (by component order)
     const rowsInOrder = groupByRow(components, this._ids);
 
-    Object.entries(rowsInOrder).forEach(([ id, components ]) => {
-
+    Object.entries(rowsInOrder).forEach(([id, components]) => {
       // (2) add fields to rows
       this.addRow(formField.id, {
         id: id,
-        components: components.map(c => c.id)
+        components: components.map(c => c.id),
       });
     });
 
@@ -122,7 +114,7 @@ export class FormLayouter {
     components.forEach(field => this.calculateLayout(field));
 
     // (4) fire event to notify interested parties
-    this._eventBus.fire('form.layoutCalculated', { rows: this._rows });
+    this._eventBus.fire("form.layoutCalculated", { rows: this._rows });
   }
 
   clear() {
@@ -130,23 +122,21 @@ export class FormLayouter {
     this._ids.clear();
 
     // fire event to notify interested parties
-    this._eventBus.fire('form.layoutCleared');
+    this._eventBus.fire("form.layoutCleared");
   }
 }
 
-FormLayouter.$inject = [ 'eventBus' ];
-
+FormLayouter.$inject = ["eventBus"];
 
 // helpers //////
 
 function groupByRow(components, ids) {
   return groupBy(components, c => {
-
     // mitigate missing row by creating new (handle legacy)
     const { layout } = c;
 
     if (!layout || !layout.row) {
-      return ids.nextPrefixed('Row_');
+      return ids.nextPrefixed("Row_");
     }
 
     return layout.row;

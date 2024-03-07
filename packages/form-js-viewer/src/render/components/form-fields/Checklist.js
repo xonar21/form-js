@@ -1,51 +1,34 @@
-import { useRef } from 'preact/hooks';
-import { useOptionsAsync, LOAD_STATES } from '../../hooks/useOptionsAsync';
-import { useCleanupMultiSelectValue } from '../../hooks/useCleanupMultiSelectValue';
-import classNames from 'classnames';
-import isEqual from 'lodash/isEqual';
+import { useRef } from "preact/hooks";
+import { useOptionsAsync, LOAD_STATES } from "../../hooks/useOptionsAsync";
+import { useCleanupMultiSelectValue } from "../../hooks/useCleanupMultiSelectValue";
+import classNames from "classnames";
+import isEqual from "lodash/isEqual";
 
-import { Description } from '../Description';
-import { Errors } from '../Errors';
-import { Label } from '../Label';
+import { Description } from "../Description";
+import { Errors } from "../Errors";
+import { Label } from "../Label";
 
-import { sanitizeMultiSelectValue, hasEqualValue } from '../util/sanitizerUtil';
+import { sanitizeMultiSelectValue, hasEqualValue } from "../util/sanitizerUtil";
 
-import { createEmptyOptions } from '../util/optionsUtil';
+import { createEmptyOptions } from "../util/optionsUtil";
 
-import {
-  formFieldClasses
-} from '../Util';
+import { formFieldClasses } from "../Util";
 
-const type = 'checklist';
-
+const type = "checklist";
 
 export function Checklist(props) {
-  const {
-    disabled,
-    errors = [],
-    domId,
-    onBlur,
-    onFocus,
-    field,
-    readonly,
-    value: values = [],
-  } = props;
+  const { disabled, errors = [], domId, onBlur, onFocus, field, readonly, value: values = [] } = props;
 
-  const {
-    description,
-    label,
-    validate = {}
-  } = field;
+  const { description, label, validate = {} } = field;
 
   const outerDivRef = useRef();
 
   const { required } = validate;
 
-  const toggleCheckbox = (toggledValue) => {
-
+  const toggleCheckbox = toggledValue => {
     const newValues = hasEqualValue(toggledValue, values)
       ? values.filter(value => !isEqual(value, toggledValue))
-      : [ ...values, toggledValue ];
+      : [...values, toggledValue];
 
     props.onChange({
       field,
@@ -53,8 +36,7 @@ export function Checklist(props) {
     });
   };
 
-  const onCheckboxBlur = (e) => {
-
+  const onCheckboxBlur = e => {
     if (outerDivRef.current.contains(e.relatedTarget)) {
       return;
     }
@@ -62,8 +44,7 @@ export function Checklist(props) {
     onBlur && onBlur();
   };
 
-  const onCheckboxFocus = (e) => {
-
+  const onCheckboxFocus = e => {
     if (outerDivRef.current.contains(e.relatedTarget)) {
       return;
     }
@@ -71,68 +52,65 @@ export function Checklist(props) {
     onFocus && onFocus();
   };
 
-  const {
-    loadState,
-    options
-  } = useOptionsAsync(field);
+  const { loadState, options } = useOptionsAsync(field);
 
   useCleanupMultiSelectValue({
     field,
     loadState,
     options,
     values,
-    onChange: props.onChange
+    onChange: props.onChange,
   });
 
   const descriptionId = `${domId}-description`;
   const errorMessageId = `${domId}-error-message`;
 
-  return <div class={ classNames(formFieldClasses(type, { errors, disabled, readonly })) } ref={ outerDivRef }>
-    <Label
-      label={ label }
-      required={ required } />
-    {
-      loadState == LOAD_STATES.LOADED && options.map((o, index) => {
+  return (
+    <div class={classNames(formFieldClasses(type, { errors, disabled, readonly }))} ref={outerDivRef}>
+      <Label label={label} required={required} />
+      {loadState == LOAD_STATES.LOADED &&
+        options.map((o, index) => {
+          const itemDomId = `${domId}-${index}`;
+          const isChecked = hasEqualValue(o.value, values);
 
-        const itemDomId = `${domId}-${index}`;
-        const isChecked = hasEqualValue(o.value, values);
-
-        return (
-          <Label
-            htmlFor={ itemDomId }
-            label={ o.label }
-            class={ classNames({
-              'fjs-checked': isChecked
-            }) }
-            required={ false }>
-            <input
-              checked={ isChecked }
-              class="fjs-input"
-              disabled={ disabled }
-              readOnly={ readonly }
-              id={ itemDomId }
-              type="checkbox"
-              onClick={ () => toggleCheckbox(o.value) }
-              onBlur={ onCheckboxBlur }
-              onFocus={ onCheckboxFocus }
-              required={ required }
-              aria-invalid={ errors.length > 0 }
-              aria-describedby={ [ descriptionId, errorMessageId ].join(' ') } />
-          </Label>
-        );
-      })
-    }
-    <Description id={ descriptionId } description={ description } />
-    <Errors id={ errorMessageId } errors={ errors } />
-  </div>;
+          return (
+            <Label
+              htmlFor={itemDomId}
+              label={o.label}
+              class={classNames({
+                "fjs-checked": isChecked,
+              })}
+              required={false}
+            >
+              <input
+                checked={isChecked}
+                class="fjs-input"
+                disabled={disabled}
+                readOnly={readonly}
+                id={itemDomId}
+                type="checkbox"
+                onClick={() => toggleCheckbox(o.value)}
+                onBlur={onCheckboxBlur}
+                onFocus={onCheckboxFocus}
+                required={required}
+                aria-invalid={errors.length > 0}
+                aria-describedby={[descriptionId, errorMessageId].join(" ")}
+              />
+            </Label>
+          );
+        })}
+      <Description id={descriptionId} description={description} />
+      <Errors id={errorMessageId} errors={errors} />
+    </div>
+  );
 }
 
 Checklist.config = {
   type,
   keyed: true,
-  label: 'Checkbox group',
-  group: 'selection',
+  label: "Checkbox group",
+  group: "selection",
   emptyValue: [],
   sanitizeValue: sanitizeMultiSelectValue,
-  create: createEmptyOptions
+  create: createEmptyOptions,
 };

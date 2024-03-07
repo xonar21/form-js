@@ -1,21 +1,20 @@
 // disable react hook rules as the linter is confusing the functional components within a class as class components
 /* eslint-disable react-hooks/rules-of-hooks */
 
-import { get } from 'min-dash';
-import { useContext, useMemo, useRef } from 'preact/hooks';
-import { LocalExpressionContext } from '../../render/context/LocalExpressionContext';
+import { get } from "min-dash";
+import { useContext, useMemo, useRef } from "preact/hooks";
+import { LocalExpressionContext } from "../../render/context/LocalExpressionContext";
 
-import ExpandSvg from '../../render/components/form-fields/icons/Expand.svg';
-import CollapseSvg from '../../render/components/form-fields/icons/Collapse.svg';
-import AddSvg from '../../render/components/form-fields/icons/Add.svg';
-import DeleteSvg from '../../render/components/form-fields/icons/Delete.svg';
+import ExpandSvg from "../../render/components/form-fields/icons/Expand.svg";
+import CollapseSvg from "../../render/components/form-fields/icons/Collapse.svg";
+import AddSvg from "../../render/components/form-fields/icons/Add.svg";
+import DeleteSvg from "../../render/components/form-fields/icons/Delete.svg";
 
-import { buildExpressionContext } from '../../util';
-import { useScrollIntoView } from '../../render/hooks';
-import classNames from 'classnames';
+import { buildExpressionContext } from "../../util";
+import { useScrollIntoView } from "../../render/hooks";
+import classNames from "classnames";
 
 export class RepeatRenderManager {
-
   constructor(form, formFields, formFieldRegistry, pathRegistry) {
     this._form = form;
     this._formFields = formFields;
@@ -32,7 +31,6 @@ export class RepeatRenderManager {
    * @returns {boolean} - True if repeatable, false otherwise
    */
   isFieldRepeating(id) {
-
     if (!id) {
       return false;
     }
@@ -43,10 +41,9 @@ export class RepeatRenderManager {
   }
 
   Repeater(props) {
-
     const { RowsRenderer, indexes, useSharedState, ...restProps } = props;
 
-    const [ sharedRepeatState ] = useSharedState;
+    const [sharedRepeatState] = useSharedState;
 
     const { data } = this._form._getState();
 
@@ -55,7 +52,7 @@ export class RepeatRenderManager {
     const values = get(data, dataPath) || [];
 
     const nonCollapsedItems = this._getNonCollapsedItems(repeaterField);
-    const collapseEnabled = !repeaterField.disableCollapse && (values.length > nonCollapsedItems);
+    const collapseEnabled = !repeaterField.disableCollapse && values.length > nonCollapsedItems;
     const isCollapsed = collapseEnabled && sharedRepeatState.isCollapsed;
 
     const hasChildren = repeaterField.components && repeaterField.components.length > 0;
@@ -63,15 +60,14 @@ export class RepeatRenderManager {
 
     const displayValues = isCollapsed ? values.slice(0, nonCollapsedItems) : values;
 
-    const onDeleteItem = (index) => {
-
+    const onDeleteItem = index => {
       const updatedValues = values.slice();
       updatedValues.splice(index, 1);
 
       props.onChange({
         field: repeaterField,
         value: updatedValues,
-        indexes
+        indexes,
       });
     };
 
@@ -79,28 +75,28 @@ export class RepeatRenderManager {
 
     return (
       <>
-        {displayValues.map((value, index) =>
+        {displayValues.map((value, index) => (
           <RepetitionScaffold
-            key={ index }
-            index={ index }
-            value={ value }
-            parentExpressionContextInfo={ parentExpressionContextInfo }
-            repeaterField={ repeaterField }
-            RowsRenderer={ RowsRenderer }
-            indexes={ indexes }
-            onDeleteItem={ onDeleteItem }
-            showRemove={ showRemove }
-            { ...restProps } />
-        )}
+            key={index}
+            index={index}
+            value={value}
+            parentExpressionContextInfo={parentExpressionContextInfo}
+            repeaterField={repeaterField}
+            RowsRenderer={RowsRenderer}
+            indexes={indexes}
+            onDeleteItem={onDeleteItem}
+            showRemove={showRemove}
+            {...restProps}
+          />
+        ))}
       </>
     );
   }
 
   RepeatFooter(props) {
-
     const addButtonRef = useRef(null);
     const { useSharedState, indexes, field: repeaterField, readonly, disabled } = props;
-    const [ sharedRepeatState, setSharedRepeatState ] = useSharedState;
+    const [sharedRepeatState, setSharedRepeatState] = useSharedState;
 
     const { data } = this._form._getState();
 
@@ -108,7 +104,7 @@ export class RepeatRenderManager {
     const values = get(data, dataPath) || [];
 
     const nonCollapsedItems = this._getNonCollapsedItems(repeaterField);
-    const collapseEnabled = !repeaterField.disableCollapse && (values.length > nonCollapsedItems);
+    const collapseEnabled = !repeaterField.disableCollapse && values.length > nonCollapsedItems;
     const isCollapsed = collapseEnabled && sharedRepeatState.isCollapsed;
 
     const hasChildren = repeaterField.components && repeaterField.components.length > 0;
@@ -124,7 +120,7 @@ export class RepeatRenderManager {
       const updatedValues = values.slice();
       const newItem = this._form._getInitializedFieldData(this._form._getState().data, {
         container: repeaterField,
-        indexes: { ...indexes, [ repeaterField.id ]: updatedValues.length }
+        indexes: { ...indexes, [repeaterField.id]: updatedValues.length },
       });
 
       updatedValues.push(newItem);
@@ -134,39 +130,58 @@ export class RepeatRenderManager {
       props.onChange({
         field: repeaterField,
         value: updatedValues,
-        indexes
+        indexes,
       });
 
       setSharedRepeatState(state => ({ ...state, isCollapsed: false }));
     };
 
-    useScrollIntoView(addButtonRef, [ values.length ], {
-      align: 'bottom',
-      behavior: 'auto',
-      offset: 20
-    }, [ shouldScroll ]);
+    useScrollIntoView(
+      addButtonRef,
+      [values.length],
+      {
+        align: "bottom",
+        behavior: "auto",
+        offset: 20,
+      },
+      [shouldScroll],
+    );
 
-    return <div
-      className={
-        classNames('fjs-repeat-render-footer', {
-          'fjs-remove-allowed':repeaterField.allowAddRemove
-        }) }
-    >
-      {
-        showAdd ? <button readOnly={ readonly } disabled={ disabled || readonly } class="fjs-repeat-render-add" type="button" ref={ addButtonRef } onClick={ onAddItem }>
-          <><AddSvg /> { 'Add new' }</>
-        </button> : null
-      }
-      {
-        collapseEnabled ? <button class="fjs-repeat-render-collapse" type="button" onClick={ toggle }>
-          {
-            isCollapsed
-              ? <><ExpandSvg /> { `Expand all (${values.length})` }</>
-              : <><CollapseSvg /> { 'Collapse' }</>
-          }
-        </button> : null
-      }
-    </div>;
+    return (
+      <div
+        className={classNames("fjs-repeat-render-footer", {
+          "fjs-remove-allowed": repeaterField.allowAddRemove,
+        })}
+      >
+        {showAdd ? (
+          <button
+            readOnly={readonly}
+            disabled={disabled || readonly}
+            class="fjs-repeat-render-add"
+            type="button"
+            ref={addButtonRef}
+            onClick={onAddItem}
+          >
+            <>
+              <AddSvg /> {"Add new"}
+            </>
+          </button>
+        ) : null}
+        {collapseEnabled ? (
+          <button class="fjs-repeat-render-collapse" type="button" onClick={toggle}>
+            {isCollapsed ? (
+              <>
+                <ExpandSvg /> {`Expand all (${values.length})`}
+              </>
+            ) : (
+              <>
+                <CollapseSvg /> {"Collapse"}
+              </>
+            )}
+          </button>
+        ) : null}
+      </div>
+    );
   }
 
   _getNonCollapsedItems(field) {
@@ -176,7 +191,6 @@ export class RepeatRenderManager {
 
     return nonCollapsedItems ? nonCollapsedItems : DEFAULT_NON_COLLAPSED_ITEMS;
   }
-
 }
 
 /**
@@ -193,8 +207,7 @@ export class RepeatRenderManager {
  * @param {boolean} props.showRemove
  */
 
-const RepetitionScaffold = (props) => {
-
+const RepetitionScaffold = props => {
   const {
     index,
     value,
@@ -207,35 +220,47 @@ const RepetitionScaffold = (props) => {
     ...restProps
   } = props;
 
-  const elementProps = useMemo(() => ({
-    ...restProps,
-    indexes: { ...(indexes || {}), [ repeaterField.id ]: index }
-  }), [ index, indexes, repeaterField.id, restProps ]);
+  const elementProps = useMemo(
+    () => ({
+      ...restProps,
+      indexes: { ...(indexes || {}), [repeaterField.id]: index },
+    }),
+    [index, indexes, repeaterField.id, restProps],
+  );
 
-  const localExpressionContextInfo = useMemo(() => ({
-    data: parentExpressionContextInfo.data,
-    this: value,
-    parent: buildExpressionContext(parentExpressionContextInfo),
-    i: [ ...parentExpressionContextInfo.i , index + 1 ]
-  }), [ index, parentExpressionContextInfo, value ]);
+  const localExpressionContextInfo = useMemo(
+    () => ({
+      data: parentExpressionContextInfo.data,
+      this: value,
+      parent: buildExpressionContext(parentExpressionContextInfo),
+      i: [...parentExpressionContextInfo.i, index + 1],
+    }),
+    [index, parentExpressionContextInfo, value],
+  );
 
-  return !showRemove ?
-    <LocalExpressionContext.Provider value={ localExpressionContextInfo }>
-      <RowsRenderer { ...elementProps } />
-    </LocalExpressionContext.Provider> :
+  return !showRemove ? (
+    <LocalExpressionContext.Provider value={localExpressionContextInfo}>
+      <RowsRenderer {...elementProps} />
+    </LocalExpressionContext.Provider>
+  ) : (
     <div class="fjs-repeat-row-container">
       <div class="fjs-repeat-row-rows">
-        <LocalExpressionContext.Provider value={ localExpressionContextInfo }>
-          <RowsRenderer { ...elementProps } />
+        <LocalExpressionContext.Provider value={localExpressionContextInfo}>
+          <RowsRenderer {...elementProps} />
         </LocalExpressionContext.Provider>
       </div>
-      <button class="fjs-repeat-row-remove" type="button" aria-label={ `Remove list item ${index + 1}` } onClick={ () => onDeleteItem(index) }>
+      <button
+        class="fjs-repeat-row-remove"
+        type="button"
+        aria-label={`Remove list item ${index + 1}`}
+        onClick={() => onDeleteItem(index)}
+      >
         <div class="fjs-repeat-row-remove-icon-container">
           <DeleteSvg />
         </div>
       </button>
-    </div>;
-
+    </div>
+  );
 };
 
-RepeatRenderManager.$inject = [ 'form', 'formFields', 'formFieldRegistry', 'pathRegistry' ];
+RepeatRenderManager.$inject = ["form", "formFields", "formFieldRegistry", "pathRegistry"];

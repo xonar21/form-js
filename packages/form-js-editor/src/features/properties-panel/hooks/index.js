@@ -1,2 +1,2 @@
-export { useVariables } from './useVariables';
-export { useService } from './usePropertiesPanelService';
+export { useVariables } from "./useVariables";
+export { useService } from "./usePropertiesPanelService";

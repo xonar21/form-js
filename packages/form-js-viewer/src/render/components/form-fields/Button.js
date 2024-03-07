@@ -1,36 +1,34 @@
-import { formFieldClasses } from '../Util';
+import { formFieldClasses } from "../Util";
 
-const type = 'button';
+const type = "button";
 
 export function Button(props) {
-  const {
-    disabled,
-    onFocus,
-    onBlur,
-    field
-  } = props;
+  const { disabled, onFocus, onBlur, field } = props;
 
-  const { action = 'submit' } = field;
+  const { action = "submit" } = field;
 
-  return <div class={ formFieldClasses(type) }>
-    <button
-      class="fjs-button"
-      type={ action }
-      disabled={ disabled }
-      onFocus={ () => onFocus && onFocus() }
-      onBlur={ () => onBlur && onBlur() }>
-      { field.label }
-    </button>
-  </div>;
+  return (
+    <div class={formFieldClasses(type)}>
+      <button
+        class="fjs-button"
+        type={action}
+        disabled={disabled}
+        onFocus={() => onFocus && onFocus()}
+        onBlur={() => onBlur && onBlur()}
+      >
+        {field.label}
+      </button>
+    </div>
+  );
 }
 
 Button.config = {
   type,
   keyed: false,
-  label: 'Button',
-  group: 'action',
+  label: "Button",
+  group: "action",
   create: (options = {}) => ({
-    action: 'submit',
-    ...options
-  })
+    action: "submit",
+    ...options,
+  }),
 };

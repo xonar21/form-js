@@ -2,36 +2,28 @@ const coverage = process.env.COVERAGE;
 
 // configures browsers to run test against
 // any of [ 'ChromeHeadless', 'Chrome', 'Firefox', 'IE', 'PhantomJS' ]
-const browsers = (process.env.TEST_BROWSERS || 'ChromeHeadless').split(',');
+const browsers = (process.env.TEST_BROWSERS || "ChromeHeadless").split(",");
 
 const singleStart = process.env.SINGLE_START;
 
 // use puppeteer provided Chrome for testing
-process.env.CHROME_BIN = require('puppeteer').executablePath();
+process.env.CHROME_BIN = require("puppeteer").executablePath();
 
-const suite = coverage ? 'test/coverageBundle.js' : 'test/testBundle.js';
+const suite = coverage ? "test/coverageBundle.js" : "test/testBundle.js";
 
-module.exports = function(karma) {
-
+module.exports = function (karma) {
   const config = {
+    basePath: "../../",
 
-    basePath: '../../',
+    frameworks: ["webpack", "mocha", "sinon-chai"],
 
-    frameworks: [
-      'webpack',
-      'mocha',
-      'sinon-chai'
-    ],
-
-    files: [
-      suite
-    ],
+    files: [suite],
 
     preprocessors: {
-      [ suite ]: [ 'webpack', 'env' ]
+      [suite]: ["webpack", "env"],
     },
 
-    reporters: [ 'spec' ].concat(coverage ? 'coverage' : []),
+    reporters: ["spec"].concat(coverage ? "coverage" : []),
 
     specReporter: {
       maxLogLines: 10,
@@ -42,13 +34,11 @@ module.exports = function(karma) {
       suppressSkipped: true,
       showBrowser: false,
       showSpecTiming: false,
-      failFast: false
+      failFast: false,
     },
 
     coverageReporter: {
-      reporters: [
-        { type: 'lcov', subdir: '.' }
-      ]
+      reporters: [{ type: "lcov", subdir: "." }],
     },
 
     browsers,
@@ -57,51 +47,50 @@ module.exports = function(karma) {
     autoWatch: false,
 
     webpack: {
-      mode: 'development',
+      mode: "development",
       module: {
         rules: [
           {
             test: /\.js$/,
-            enforce: 'pre',
-            use: [ 'source-map-loader' ]
+            enforce: "pre",
+            use: ["source-map-loader"],
           },
           {
             test: /\.css$/,
-            use: 'raw-loader'
-          }
+            use: "raw-loader",
+          },
         ].concat(
-          coverage ? {
-            test: /\.js$/,
-            exclude: /node_modules/,
-            use: {
-              loader: 'babel-loader',
-              options: {
-                plugins: [
-                  [ 'istanbul', {
-                    include: [
-                      'src/**'
-                    ]
-                  } ]
-                ],
+          coverage
+            ? {
+                test: /\.js$/,
+                exclude: /node_modules/,
+                use: {
+                  loader: "babel-loader",
+                  options: {
+                    plugins: [
+                      [
+                        "istanbul",
+                        {
+                          include: ["src/**"],
+                        },
+                      ],
+                    ],
+                  },
+                },
               }
-            }
-          } : []
-        )
+            : [],
+        ),
       },
       resolve: {
-        mainFields: [
-          'browser',
-          'module',
-          'main'
-        ]
+        mainFields: ["browser", "module", "main"],
       },
-      devtool: 'eval-source-map'
-    }
+      devtool: "eval-source-map",
+    },
   };
 
   if (singleStart) {
-    config.browsers = [].concat(config.browsers, 'Debug');
-    config.envPreprocessor = [].concat(config.envPreprocessor || [], 'SINGLE_START');
+    config.browsers = [].concat(config.browsers, "Debug");
+    config.envPreprocessor = [].concat(config.envPreprocessor || [], "SINGLE_START");
   }
 
   karma.set(config);

@@ -1,61 +1,49 @@
-import {
-  createForm,
-  schemaVersion,
-  Form
-} from '../../src';
+import { createForm, schemaVersion, Form } from "../../src";
 
-import schema from './form.json';
+import schema from "./form.json";
 
-import {
-  insertStyles,
-  isSingleStart
-} from '../TestHelper';
+import { insertStyles, isSingleStart } from "../TestHelper";
 
-import {
-  expect
-} from 'chai';
-
+import { expect } from "chai";
 
 insertStyles();
 
-const singleStart = isSingleStart('basic');
+const singleStart = isSingleStart("basic");
 
-describe('viewer exports', function() {
-
+describe("viewer exports", function () {
   let container;
 
-  beforeEach(function() {
-    container = document.createElement('div');
+  beforeEach(function () {
+    container = document.createElement("div");
 
     document.body.appendChild(container);
   });
 
-  !singleStart && afterEach(function() {
-    document.body.removeChild(container);
-  });
+  !singleStart &&
+    afterEach(function () {
+      document.body.removeChild(container);
+    });
 
-
-  (singleStart ? it.only : it)('should render', async function() {
-
+  (singleStart ? it.only : it)("should render", async function () {
     // given
     const data = {
-      creditor: 'John Doe Company',
+      creditor: "John Doe Company",
       amount: 456,
-      invoiceNumber: 'C-123',
+      invoiceNumber: "C-123",
       approved: true,
-      approvedBy: 'John Doe',
-      approverComments: 'Please review this approval in the next quarter',
-      mailto: [ 'regional-manager', 'approver' ],
-      product: 'camunda-cloud',
-      tags: [ 'tag1', 'tag2', 'tag3' ],
-      language: 'english'
+      approvedBy: "John Doe",
+      approverComments: "Please review this approval in the next quarter",
+      mailto: ["regional-manager", "approver"],
+      product: "camunda-cloud",
+      tags: ["tag1", "tag2", "tag3"],
+      language: "english",
     };
 
     // when
     const form = await createForm({
       container,
       schema,
-      data
+      data,
     });
 
     // then
@@ -65,21 +53,19 @@ describe('viewer exports', function() {
     expect(form._update).to.exist;
   });
 
-
-  it('should instantiate + render', async function() {
-
+  it("should instantiate + render", async function () {
     // given
     const data = {
-      creditor: 'John Doe Company',
+      creditor: "John Doe Company",
       amount: 456,
-      invoiceNumber: 'C-123',
+      invoiceNumber: "C-123",
       approved: true,
-      approvedBy: 'John Doe',
-      approverComments: 'Please review this approval in the next quarter',
-      mailto: [ 'regional-manager', 'approver' ],
-      product: 'camunda-cloud',
-      tags: [ 'tag1', 'tag2', 'tag3' ],
-      language: 'english'
+      approvedBy: "John Doe",
+      approverComments: "Please review this approval in the next quarter",
+      mailto: ["regional-manager", "approver"],
+      product: "camunda-cloud",
+      tags: ["tag1", "tag2", "tag3"],
+      language: "english",
     };
 
     // when
@@ -94,19 +80,17 @@ describe('viewer exports', function() {
     expect(form._update).to.exist;
   });
 
-
-  it('should import schema without IDs', async function() {
-
+  it("should import schema without IDs", async function () {
     // given
     const schema = {
-      type: 'default',
+      type: "default",
       schemaVersion,
       components: [
         {
-          type: 'number',
-          key: 'number'
-        }
-      ]
+          type: "number",
+          key: "number",
+        },
+      ],
     };
 
     const form = new Form({ container });
@@ -115,45 +99,41 @@ describe('viewer exports', function() {
     await form.importSchema(schema);
 
     // then
-    const fieldRegistry = form.get('formFieldRegistry');
+    const fieldRegistry = form.get("formFieldRegistry");
 
     expect(fieldRegistry.getAll()).to.have.length(2);
 
-    fieldRegistry.forEach(function(field) {
-      expect(field).to.have.property('id');
+    fieldRegistry.forEach(function (field) {
+      expect(field).to.have.property("id");
     });
   });
 
-
-  it('should expose schemaVersion', function() {
-    expect(typeof schemaVersion).to.eql('number');
+  it("should expose schemaVersion", function () {
+    expect(typeof schemaVersion).to.eql("number");
 
     expect(schemaVersion).to.eql(15);
   });
 
-
-  it('should generate unique ID for every instance', async function() {
-
+  it("should generate unique ID for every instance", async function () {
     // given
     const schema = {
       components: [
         {
-          id: 'Text_1',
-          type: 'textfield'
-        }
+          id: "Text_1",
+          type: "textfield",
+        },
       ],
-      id: 'Form_1',
-      type: 'default'
+      id: "Form_1",
+      type: "default",
     };
 
     // when
     const form = await createForm({
       container,
-      schema
+      schema,
     });
 
     // then
     expect(form._id).to.exist;
   });
-
 });

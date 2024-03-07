@@ -1,51 +1,42 @@
-import { get } from 'min-dash';
+import { get } from "min-dash";
 
-import { INPUTS } from '../Util';
+import { INPUTS } from "../Util";
 
-import { useService, useVariables } from '../hooks';
+import { useService, useVariables } from "../hooks";
 
-import { FeelTemplatingEntry, isFeelEntryEdited } from '@bpmn-io/properties-panel';
-
+import { FeelTemplatingEntry, isFeelEntryEdited } from "@bpmn-io/properties-panel";
 
 export function DescriptionEntry(props) {
-  const {
-    editField,
-    field
-  } = props;
+  const { editField, field } = props;
 
   const entries = [];
 
   entries.push({
-    id: 'description',
+    id: "description",
     component: Description,
     editField: editField,
     field: field,
     isEdited: isFeelEntryEdited,
-    isDefaultVisible: (field) => INPUTS.includes(field.type)
+    isDefaultVisible: field => INPUTS.includes(field.type),
   });
 
   return entries;
 }
 
-
 function Description(props) {
-  const {
-    editField,
-    field,
-    id
-  } = props;
+  const { editField, field, id } = props;
 
-  const debounce = useService('debounce');
+  const debounce = useService("debounce");
 
   const variables = useVariables().map(name => ({ name }));
 
-  const path = [ 'description' ];
+  const path = ["description"];
 
   const getValue = () => {
-    return get(field, path, '');
+    return get(field, path, "");
   };
 
-  const setValue = (value) => {
+  const setValue = value => {
     return editField(field, path, value);
   };
 
@@ -54,9 +45,9 @@ function Description(props) {
     element: field,
     getValue,
     id,
-    label: 'Field description',
+    label: "Field description",
     singleLine: true,
     setValue,
-    variables
+    variables,
   });
 }

@@ -1,6 +1,5 @@
-import { useMemo } from 'preact/hooks';
-import DOMPurify from 'dompurify';
-
+import { useMemo } from "preact/hooks";
+import DOMPurify from "dompurify";
 
 /**
  * Wrap HTML content in a configuration object for dangerouslySetInnerHTML
@@ -10,26 +9,23 @@ import DOMPurify from 'dompurify';
  * @param {boolean} [props.sanitize = true]
  * @param {boolean} [props.sanitizeStyleTags = true]
  */
-const useDangerousHTMLWrapper = (props) => {
+const useDangerousHTMLWrapper = props => {
+  const { html, transform = html => html, sanitize = true, sanitizeStyleTags = true } = props;
 
-  const {
-    html,
-    transform = (html) => html,
-    sanitize = true,
-    sanitizeStyleTags = true
-  } = props;
-
-  const sanitizedHtml = useMemo(() => sanitize ? DOMPurify.sanitize(html, getDOMPurifyConfig(sanitizeStyleTags)) : html, [ html, sanitize, sanitizeStyleTags ]);
-  const transformedHtml = useMemo(() => transform(sanitizedHtml), [ sanitizedHtml, transform ]);
+  const sanitizedHtml = useMemo(
+    () => (sanitize ? DOMPurify.sanitize(html, getDOMPurifyConfig(sanitizeStyleTags)) : html),
+    [html, sanitize, sanitizeStyleTags],
+  );
+  const transformedHtml = useMemo(() => transform(sanitizedHtml), [sanitizedHtml, transform]);
 
   // Return the configuration object for dangerouslySetInnerHTML
   return { __html: transformedHtml };
 };
 
-const getDOMPurifyConfig = (sanitizeStyleTags) => {
+const getDOMPurifyConfig = sanitizeStyleTags => {
   return {
     FORCE_BODY: true,
-    FORBID_TAGS: (sanitizeStyleTags ? [ 'style' ] : [])
+    FORBID_TAGS: sanitizeStyleTags ? ["style"] : [],
   };
 };
 

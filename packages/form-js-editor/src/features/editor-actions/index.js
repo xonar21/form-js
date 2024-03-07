@@ -1,10 +1,8 @@
-import BaseEditorActionsModule from 'diagram-js/lib/features/editor-actions';
+import BaseEditorActionsModule from "diagram-js/lib/features/editor-actions";
 
-import { FormEditorActions } from './FormEditorActions';
+import { FormEditorActions } from "./FormEditorActions";
 
 export const EditorActionsModule = {
-  __depends__: [
-    BaseEditorActionsModule
-  ],
-  editorActions: [ 'type', FormEditorActions ]
+  __depends__: [BaseEditorActionsModule],
+  editorActions: ["type", FormEditorActions],
 };

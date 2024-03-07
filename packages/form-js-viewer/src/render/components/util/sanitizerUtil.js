@@ -1,30 +1,36 @@
-import isEqual from 'lodash/isEqual';
-import { DATETIME_SUBTYPES } from '../../../util/constants/DatetimeConstants';
-import { isDateInputInformationMatching, isDateTimeInputInformationSufficient, isInvalidDateString, parseIsoTime } from './dateTimeUtil';
-import { getSimpleOptionsData, normalizeOptionsData } from './optionsUtil';
+import isEqual from "lodash/isEqual";
+import { DATETIME_SUBTYPES } from "../../../util/constants/DatetimeConstants";
+import {
+  isDateInputInformationMatching,
+  isDateTimeInputInformationSufficient,
+  isInvalidDateString,
+  parseIsoTime,
+} from "./dateTimeUtil";
+import { getSimpleOptionsData, normalizeOptionsData } from "./optionsUtil";
 
 const ALLOWED_IMAGE_SRC_PATTERN = /^(https?|data):.*/i; // eslint-disable-line no-useless-escape
 const ALLOWED_IFRAME_SRC_PATTERN = /^(https):\/\/*/i; // eslint-disable-line no-useless-escape
 
 export function sanitizeDateTimePickerValue(options) {
-  const {
-    formField,
-    value
-  } = options;
+  const { formField, value } = options;
 
   const { subtype } = formField;
 
-  if (typeof value !== 'string') return null;
+  if (typeof value !== "string") return null;
 
-  if (subtype === DATETIME_SUBTYPES.DATE && (isInvalidDateString(value) || !isDateInputInformationMatching(value))) return null;
+  if (subtype === DATETIME_SUBTYPES.DATE && (isInvalidDateString(value) || !isDateInputInformationMatching(value)))
+    return null;
   if (subtype === DATETIME_SUBTYPES.TIME && parseIsoTime(value) === null) return null;
-  if (subtype === DATETIME_SUBTYPES.DATETIME && (isInvalidDateString(value) || !isDateTimeInputInformationSufficient(value))) return null;
+  if (
+    subtype === DATETIME_SUBTYPES.DATETIME &&
+    (isInvalidDateString(value) || !isDateTimeInputInformationSufficient(value))
+  )
+    return null;
 
   return value;
 }
 
 export function hasEqualValue(value, array) {
-
   if (!Array.isArray(array)) {
     return false;
   }
@@ -33,18 +39,11 @@ export function hasEqualValue(value, array) {
 }
 
 export function sanitizeSingleSelectValue(options) {
-  const {
-    formField,
-    data,
-    value
-  } = options;
+  const { formField, data, value } = options;
 
-  const {
-    valuesExpression: optionsExpression
-  } = formField;
+  const { valuesExpression: optionsExpression } = formField;
 
   try {
-
     // if options are expression evaluated, we don't need to sanitize the value against the options
     // and defer to the field's internal validation
     if (optionsExpression) {
@@ -54,7 +53,6 @@ export function sanitizeSingleSelectValue(options) {
     const validValues = normalizeOptionsData(getSimpleOptionsData(formField, data)).map(v => v.value);
     return hasEqualValue(value, validValues) ? value : null;
   } catch (error) {
-
     // use default value in case of formatting error
     // TODO(@Skaiir): log a warning when this happens - https://github.com/bpmn-io/form-js/issues/289
     return null;
@@ -62,18 +60,11 @@ export function sanitizeSingleSelectValue(options) {
 }
 
 export function sanitizeMultiSelectValue(options) {
-  const {
-    formField,
-    data,
-    value
-  } = options;
+  const { formField, data, value } = options;
 
-  const {
-    valuesExpression: optionsExpression
-  } = formField;
+  const { valuesExpression: optionsExpression } = formField;
 
   try {
-
     // if options are expression evaluated, we don't need to sanitize the values against the options
     // and defer to the field's internal validation
     if (optionsExpression) {
@@ -83,7 +74,6 @@ export function sanitizeMultiSelectValue(options) {
     const validValues = normalizeOptionsData(getSimpleOptionsData(formField, data)).map(v => v.value);
     return value.filter(v => hasEqualValue(v, validValues));
   } catch (error) {
-
     // use default value in case of formatting error
     // TODO(@Skaiir): log a warning when this happens - https://github.com/bpmn-io/form-js/issues/289
     return [];
@@ -102,7 +92,7 @@ export function sanitizeMultiSelectValue(options) {
 export function sanitizeImageSource(src) {
   const valid = ALLOWED_IMAGE_SRC_PATTERN.test(src);
 
-  return valid ? src : '';
+  return valid ? src : "";
 }
 
 /**
@@ -115,7 +105,7 @@ export function sanitizeImageSource(src) {
 export function sanitizeIFrameSource(src) {
   const valid = ALLOWED_IFRAME_SRC_PATTERN.test(src);
 
-  return valid ? src : '';
+  return valid ? src : "";
 }
 
 /**
@@ -125,15 +115,15 @@ export function sanitizeIFrameSource(src) {
  */
 export function escapeHTML(html) {
   const escapeMap = {
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#039;',
-    '{': '&#123;',
-    '}': '&#125;',
-    ':': '&#58;',
-    ';': '&#59;'
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;",
+    "{": "&#123;",
+    "}": "&#125;",
+    ":": "&#58;",
+    ";": "&#59;",
   };
 
   return html.replace(/[&<>"'{};:]/g, match => escapeMap[match]);

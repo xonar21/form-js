@@ -1,25 +1,23 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from "@playwright/test";
 
-import schema from './fixtures/empty.json';
+import schema from "./fixtures/empty.json";
 
-test('empty playground', async ({ page }) => {
-
+test("empty playground", async ({ page }) => {
   // given
-  await page.route('/form', route => {
-
+  await page.route("/form", route => {
     route.fulfill({
       status: 200,
       body: JSON.stringify({
         data: {
           schema,
-          component: 'playground'
-        }
-      })
+          component: "playground",
+        },
+      }),
     });
   });
 
   // when
-  await page.goto('/');
+  await page.goto("/");
 
   // then
   await expect(page).toHaveScreenshot();

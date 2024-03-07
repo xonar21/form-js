@@ -1,4 +1,4 @@
-import { createContext } from 'preact';
+import { createContext } from "preact";
 
 /**
  * @param {string} type
@@ -10,5 +10,5 @@ function getService(type, strict) {}
 
 export const FormContext = createContext({
   getService,
-  formId: null
+  formId: null,
 });

@@ -1,48 +1,41 @@
-import { get } from 'min-dash';
+import { get } from "min-dash";
 
-import { useService, useVariables } from '../hooks';
+import { useService, useVariables } from "../hooks";
 
-import { FeelTemplatingEntry, isFeelEntryEdited } from '@bpmn-io/properties-panel';
+import { FeelTemplatingEntry, isFeelEntryEdited } from "@bpmn-io/properties-panel";
 
 export function TextEntry(props) {
-  const {
-    editField,
-    field
-  } = props;
+  const { editField, field } = props;
 
   const entries = [
     {
-      id: 'text',
+      id: "text",
       component: Text,
       editField: editField,
       field: field,
       isEdited: isFeelEntryEdited,
-      isDefaultVisible: (field) => field.type === 'text'
-    }
+      isDefaultVisible: field => field.type === "text",
+    },
   ];
 
   return entries;
 }
 
 function Text(props) {
-  const {
-    editField,
-    field,
-    id
-  } = props;
+  const { editField, field, id } = props;
 
-  const debounce = useService('debounce');
+  const debounce = useService("debounce");
 
   const variables = useVariables().map(name => ({ name }));
 
-  const path = [ 'text' ];
+  const path = ["text"];
 
   const getValue = () => {
-    return get(field, path, '');
+    return get(field, path, "");
   };
 
-  const setValue = (value) => {
-    return editField(field, path, value || '');
+  const setValue = value => {
+    return editField(field, path, value || "");
   };
 
   return FeelTemplatingEntry({
@@ -51,11 +44,21 @@ function Text(props) {
     element: field,
     getValue,
     id,
-    label: 'Text',
-    hostLanguage: 'markdown',
+    label: "Text",
+    hostLanguage: "markdown",
     setValue,
-    variables
+    variables,
   });
 }
 
-const description = <>Supports markdown and templating. <a href="https://docs.camunda.io/docs/components/modeler/forms/form-element-library/forms-element-library-text/" target="_blank">Learn more</a></>;
+const description = (
+  <>
+    Supports markdown and templating.{" "}
+    <a
+      href="https://docs.camunda.io/docs/components/modeler/forms/form-element-library/forms-element-library-text/"
+      target="_blank"
+    >
+      Learn more
+    </a>
+  </>
+);

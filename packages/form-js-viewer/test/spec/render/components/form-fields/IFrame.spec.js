@@ -1,265 +1,236 @@
-import { render } from '@testing-library/preact/pure';
+import { render } from "@testing-library/preact/pure";
 
-import { IFrame } from '../../../../../src/render/components/form-fields/IFrame';
+import { IFrame } from "../../../../../src/render/components/form-fields/IFrame";
 
-import { SECURITY_ATTRIBUTES_DEFINITIONS } from '../../../../../src';
+import { SECURITY_ATTRIBUTES_DEFINITIONS } from "../../../../../src";
 
-import {
-  createFormContainer,
-  expectNoViolations
-} from '../../../../TestHelper';
+import { createFormContainer, expectNoViolations } from "../../../../TestHelper";
 
-import { MockFormContext } from '../helper';
+import { MockFormContext } from "../helper";
 
-const IFRAME_URL = 'https://bpmn.io/';
+const IFRAME_URL = "https://bpmn.io/";
 
 let container;
 
-
-describe('IFrame', function() {
-
-  beforeEach(function() {
+describe("IFrame", function () {
+  beforeEach(function () {
     container = createFormContainer();
   });
 
-  afterEach(function() {
+  afterEach(function () {
     container.remove();
   });
 
-
-  it('should render', function() {
-
+  it("should render", function () {
     // when
     const { container } = createIFrame();
 
     // then
-    const formField = container.querySelector('.fjs-form-field');
+    const formField = container.querySelector(".fjs-form-field");
 
     expect(formField).to.exist;
-    expect(formField.classList.contains('fjs-form-field-iframe')).to.be.true;
+    expect(formField.classList.contains("fjs-form-field-iframe")).to.be.true;
 
-    expect(container.querySelector('iframe')).to.exist;
+    expect(container.querySelector("iframe")).to.exist;
   });
 
-
-  it('should render iframe (url)', function() {
-
+  it("should render iframe (url)", function () {
     // when
     const { container } = createIFrame();
 
     // then
-    const formField = container.querySelector('.fjs-form-field');
+    const formField = container.querySelector(".fjs-form-field");
 
-    const iframe = formField.querySelector('.fjs-iframe');
+    const iframe = formField.querySelector(".fjs-iframe");
 
     expect(iframe).to.exist;
     expect(iframe.src).to.eql(IFRAME_URL);
   });
 
-
-  it('should render iframe (expression)', function() {
-
+  it("should render iframe (expression)", function () {
     // when
     const { container } = createIFrame({
       initialData: {
-        foo: IFRAME_URL
+        foo: IFRAME_URL,
       },
       field: {
         ...defaultField,
-        url: '=foo'
-      }
+        url: "=foo",
+      },
     });
 
     // then
-    const formField = container.querySelector('.fjs-form-field');
+    const formField = container.querySelector(".fjs-form-field");
 
-    const iframe = formField.querySelector('.fjs-iframe');
+    const iframe = formField.querySelector(".fjs-iframe");
 
     expect(iframe).to.exist;
     expect(iframe.src).to.eql(IFRAME_URL);
   });
 
-
-  it('should render iframe (template)', function() {
-
+  it("should render iframe (template)", function () {
     // when
     const { container } = createIFrame({
       initialData: {
-        foo: IFRAME_URL
+        foo: IFRAME_URL,
       },
       field: {
         ...defaultField,
-        source: '{{ foo }}'
-      }
+        source: "{{ foo }}",
+      },
     });
 
     // then
-    const formField = container.querySelector('.fjs-form-field');
+    const formField = container.querySelector(".fjs-form-field");
 
-    const iframe = formField.querySelector('.fjs-iframe');
+    const iframe = formField.querySelector(".fjs-iframe");
 
     expect(iframe).to.exist;
     expect(iframe.src).to.eql(IFRAME_URL);
   });
 
-
-  it('should render placeholder (no url)', function() {
-
+  it("should render placeholder (no url)", function () {
     // when
     const { container } = createIFrame({
       field: {
         ...defaultField,
-        url: null
-      }
+        url: null,
+      },
     });
 
     // then
-    const formField = container.querySelector('.fjs-form-field');
+    const formField = container.querySelector(".fjs-form-field");
 
-    const iframe = formField.querySelector('.fjs-iframe');
-    const placeholder = formField.querySelector('.fjs-iframe-placeholder');
+    const iframe = formField.querySelector(".fjs-iframe");
+    const placeholder = formField.querySelector(".fjs-iframe-placeholder");
 
     expect(iframe).to.not.exist;
     expect(placeholder).to.exist;
   });
 
-
-  it('should render placeholder (malformed content)', function() {
-
+  it("should render placeholder (malformed content)", function () {
     // when
     const { container } = createIFrame({
       field: {
         ...defaultField,
-        url: 'foo'
-      }
+        url: "foo",
+      },
     });
 
     // then
-    const formField = container.querySelector('.fjs-form-field');
+    const formField = container.querySelector(".fjs-form-field");
 
-    const iframe = formField.querySelector('.fjs-iframe');
-    const placeholder = formField.querySelector('.fjs-iframe-placeholder');
+    const iframe = formField.querySelector(".fjs-iframe");
+    const placeholder = formField.querySelector(".fjs-iframe-placeholder");
 
     expect(iframe).to.not.exist;
     expect(placeholder).to.exist;
   });
 
-
-  it('should render placeholder (http)', function() {
-
+  it("should render placeholder (http)", function () {
     // when
     const { container } = createIFrame({
       field: {
         ...defaultField,
-        url: 'http://example.png'
-      }
+        url: "http://example.png",
+      },
     });
 
     // then
-    const formField = container.querySelector('.fjs-form-field');
+    const formField = container.querySelector(".fjs-form-field");
 
-    const iframe = formField.querySelector('.fjs-iframe');
-    const placeholder = formField.querySelector('.fjs-iframe-placeholder');
+    const iframe = formField.querySelector(".fjs-iframe");
+    const placeholder = formField.querySelector(".fjs-iframe-placeholder");
 
     expect(iframe).to.not.exist;
     expect(placeholder).to.exist;
   });
 
-
-  it('should render iframe title', function() {
-
+  it("should render iframe title", function () {
     // when
-    const label = 'foo';
+    const label = "foo";
 
     const { container } = createIFrame({
       field: {
         ...defaultField,
-        label
-      }
+        label,
+      },
     });
 
     // then
-    const formField = container.querySelector('.fjs-form-field');
+    const formField = container.querySelector(".fjs-form-field");
 
-    const iframe = formField.querySelector('.fjs-iframe');
+    const iframe = formField.querySelector(".fjs-iframe");
 
     expect(iframe).to.exist;
     expect(iframe.title).to.eql(label);
   });
 
-
-  it('should set <sandbox> attribute', function() {
-
+  it("should set <sandbox> attribute", function () {
     // when
     const { container } = createIFrame();
 
     // then
-    const formField = container.querySelector('.fjs-form-field');
+    const formField = container.querySelector(".fjs-form-field");
 
-    const iframe = formField.querySelector('.fjs-iframe');
+    const iframe = formField.querySelector(".fjs-iframe");
 
     expect(iframe.sandbox).to.exist;
-    expect(iframe.sandbox.item(0)).to.equal('allow-scripts');
+    expect(iframe.sandbox.item(0)).to.equal("allow-scripts");
   });
 
-
-  it('should render iframe title (expression)', function() {
-
+  it("should render iframe title (expression)", function () {
     // when
-    const label = 'foo';
+    const label = "foo";
 
     const { container } = createIFrame({
       initialData: {
-        label
+        label,
       },
       field: {
         ...defaultField,
-        label: '=label'
-      }
+        label: "=label",
+      },
     });
 
     // then
-    const formField = container.querySelector('.fjs-form-field');
+    const formField = container.querySelector(".fjs-form-field");
 
-    const iframe = formField.querySelector('.fjs-iframe');
+    const iframe = formField.querySelector(".fjs-iframe");
 
     expect(iframe).to.exist;
     expect(iframe.title).to.eql(label);
   });
 
-
-  it('should render iframe alt text (template)', function() {
-
+  it("should render iframe alt text (template)", function () {
     // when
-    const label = 'foo';
+    const label = "foo";
 
     const { container } = createIFrame({
       initialData: {
-        label
+        label,
       },
       field: {
         ...defaultField,
-        label: '{{ label }}'
-      }
+        label: "{{ label }}",
+      },
     });
 
     // then
-    const formField = container.querySelector('.fjs-form-field');
+    const formField = container.querySelector(".fjs-form-field");
 
-    const iframe = formField.querySelector('.fjs-iframe');
+    const iframe = formField.querySelector(".fjs-iframe");
 
     expect(iframe).to.exist;
     expect(iframe.title).to.eql(label);
   });
 
-
-  it('#create', function() {
-
+  it("#create", function () {
     // assume
     const { config } = IFrame;
-    expect(config.type).to.eql('iframe');
-    expect(config.label).to.eql('iFrame');
-    expect(config.group).to.eql('container');
+    expect(config.type).to.eql("iframe");
+    expect(config.label).to.eql("iFrame");
+    expect(config.group).to.eql("container");
     expect(config.keyed).to.be.false;
 
     // when
@@ -270,59 +241,48 @@ describe('IFrame', function() {
 
     // but when
     const customField = config.create({
-      custom: true
+      custom: true,
     });
 
     // then
     expect(customField).to.contain({
-      custom: true
+      custom: true,
     });
   });
 
-
-  describe('security attributes', function() {
-
+  describe("security attributes", function () {
     SECURITY_ATTRIBUTES_DEFINITIONS.forEach(definition => {
+      const { attribute, directive, property } = definition;
 
-      const {
-        attribute,
-        directive,
-        property
-      } = definition;
-
-      it(`should render ${ property }`, function() {
-
+      it(`should render ${property}`, function () {
         // when
         const { container } = createIFrame({
           field: {
             ...defaultField,
-            security : {
-              [ property ]: true
-            }
-          }
+            security: {
+              [property]: true,
+            },
+          },
         });
 
         // then
-        const formField = container.querySelector('.fjs-form-field');
-        const iframe = formField.querySelector('.fjs-iframe');
+        const formField = container.querySelector(".fjs-form-field");
+        const iframe = formField.querySelector(".fjs-iframe");
 
-        if (attribute === 'sandbox') {
+        if (attribute === "sandbox") {
           expect(iframe.sandbox.item(0)).to.eql(directive);
         } else {
           expect(iframe.allow).to.eql(directive);
         }
       });
-
     });
 
-
-    it('should render multiple security attributes', function() {
-
+    it("should render multiple security attributes", function () {
       // when
       const { container } = createIFrame({
         field: {
           ...defaultField,
-          security : {
+          security: {
             allowSameOrigin: true,
             fullscreen: true,
             geolocation: true,
@@ -331,29 +291,25 @@ describe('IFrame', function() {
             allowForms: false,
             allowModals: true,
             allowPopups: false,
-            allowTopNavigation: true
-          }
-        }
+            allowTopNavigation: true,
+          },
+        },
       });
 
       // then
-      const formField = container.querySelector('.fjs-form-field');
-      const iframe = formField.querySelector('.fjs-iframe');
+      const formField = container.querySelector(".fjs-form-field");
+      const iframe = formField.querySelector(".fjs-iframe");
 
       expect(iframe.sandbox.length).to.eql(3);
-      expect(iframe.sandbox.item(0)).to.eql('allow-same-origin');
-      expect(iframe.sandbox.item(1)).to.eql('allow-modals');
-      expect(iframe.sandbox.item(2)).to.eql('allow-top-navigation');
-      expect(iframe.allow).to.eql('fullscreen; geolocation; microphone');
+      expect(iframe.sandbox.item(0)).to.eql("allow-same-origin");
+      expect(iframe.sandbox.item(1)).to.eql("allow-modals");
+      expect(iframe.sandbox.item(2)).to.eql("allow-top-navigation");
+      expect(iframe.allow).to.eql("fullscreen; geolocation; microphone");
     });
-
   });
 
-
-  describe('a11y', function() {
-
-    it('should have no violations', async function() {
-
+  describe("a11y", function () {
+    it("should have no violations", async function () {
       // given
       this.timeout(10000);
 
@@ -363,16 +319,14 @@ describe('IFrame', function() {
       await expectNoViolations(container);
     });
 
-
-    it('should have no violations - security attributes', async function() {
-
+    it("should have no violations - security attributes", async function () {
       // given
       this.timeout(5000);
 
       const { container } = createIFrame({
         field: {
           ...defaultField,
-          security : {
+          security: {
             allowSameOrigin: true,
             fullscreen: true,
             geolocation: true,
@@ -381,48 +335,42 @@ describe('IFrame', function() {
             allowForms: true,
             allowModals: true,
             allowPopups: true,
-            allowTopNavigation: true
-          }
-        }
+            allowTopNavigation: true,
+          },
+        },
       });
 
       // then
       await expectNoViolations(container);
     });
-
   });
-
 });
 
 // helpers //////////
 
 const defaultField = {
-  label: 'An external document',
+  label: "An external document",
   url: IFRAME_URL,
-  type: 'iframe',
+  type: "iframe",
   security: {
-    allowScripts: true
-  }
+    allowScripts: true,
+  },
 };
 
 function createIFrame({ services, ...restOptions } = {}) {
-
   const options = {
-    domId: 'test-iframe',
+    domId: "test-iframe",
     field: defaultField,
     container,
-    ...restOptions
+    ...restOptions,
   };
 
   return render(
-    <MockFormContext
-      services={ services }
-      options={ options }>
-      <IFrame
-        domId={ options.domId }
-        field={ options.field } />
-    </MockFormContext>, {
-      container: options.container || container.querySelector('.fjs-form')
-    }
+    <MockFormContext services={services} options={options}>
+      <IFrame domId={options.domId} field={options.field} />
+    </MockFormContext>,
+    {
+      container: options.container || container.querySelector(".fjs-form"),
+    },
   );
 }

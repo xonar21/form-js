@@ -1,31 +1,28 @@
-import { autocompletion } from '@codemirror/autocomplete';
-import { variablesFacet } from './VariablesFacet';
+import { autocompletion } from "@codemirror/autocomplete";
+import { variablesFacet } from "./VariablesFacet";
 
-import { syntaxTree } from '@codemirror/language';
+import { syntaxTree } from "@codemirror/language";
 
 export function autocompletionExtension() {
   return [
     autocompletion({
-      override: [
-        completions
-      ]
-    })
+      override: [completions],
+    }),
   ];
 }
 
 function completions(context) {
-
   const variables = context.state.facet(variablesFacet)[0];
 
   const options = variables.map(v => ({
     label: v,
-    type: 'variable'
+    type: "variable",
   }));
 
   let nodeBefore = syntaxTree(context.state).resolve(context.pos, -1);
 
   // handle inside property name as explicit call
-  if (nodeBefore.type.name === 'PropertyName') {
+  if (nodeBefore.type.name === "PropertyName") {
     context.explicit = true;
   }
 
@@ -37,6 +34,6 @@ function completions(context) {
 
   return {
     from: word.from,
-    options
+    options,
   };
 }

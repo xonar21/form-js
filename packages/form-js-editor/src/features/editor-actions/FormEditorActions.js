@@ -1,41 +1,38 @@
-import EditorActions from 'diagram-js/lib/features/editor-actions/EditorActions';
-
+import EditorActions from "diagram-js/lib/features/editor-actions/EditorActions";
 
 export class FormEditorActions extends EditorActions {
   constructor(eventBus, injector) {
     super(eventBus, injector);
 
-    eventBus.on('form.init', () => {
+    eventBus.on("form.init", () => {
       this._registerDefaultActions(injector);
 
-      eventBus.fire('editorActions.init', {
-        editorActions: this
+      eventBus.fire("editorActions.init", {
+        editorActions: this,
       });
     });
   }
 
   _registerDefaultActions(injector) {
-    const commandStack = injector.get('commandStack', false),
-          formFieldRegistry = injector.get('formFieldRegistry', false),
-          selection = injector.get('selection', false);
+    const commandStack = injector.get("commandStack", false),
+      formFieldRegistry = injector.get("formFieldRegistry", false),
+      selection = injector.get("selection", false);
 
     if (commandStack) {
-
       // @ts-ignore
-      this.register('undo', () => {
+      this.register("undo", () => {
         commandStack.undo();
       });
 
       // @ts-ignore
-      this.register('redo', () => {
+      this.register("redo", () => {
         commandStack.redo();
       });
     }
 
     if (formFieldRegistry && selection) {
-
       // @ts-ignore
-      this.register('selectFormField', (options = {}) => {
+      this.register("selectFormField", (options = {}) => {
         const { id } = options;
 
         if (!id) {
@@ -52,7 +49,4 @@ export class FormEditorActions extends EditorActions {
   }
 }
 
-FormEditorActions.$inject = [
-  'eventBus',
-  'injector'
-];
+FormEditorActions.$inject = ["eventBus", "injector"];

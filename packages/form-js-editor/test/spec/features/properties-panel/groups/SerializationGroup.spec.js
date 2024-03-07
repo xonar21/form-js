@@ -1,167 +1,155 @@
-import {
-  cleanup,
-  fireEvent,
-  render
-} from '@testing-library/preact/pure';
+import { cleanup, fireEvent, render } from "@testing-library/preact/pure";
 
-import { SerializationGroup } from '../../../../../src/features/properties-panel/groups';
+import { SerializationGroup } from "../../../../../src/features/properties-panel/groups";
 
-import { TestPropertiesPanel, MockPropertiesPanelContext } from '../helper';
+import { TestPropertiesPanel, MockPropertiesPanelContext } from "../helper";
 
-import { set } from 'min-dash';
+import { set } from "min-dash";
 
-describe('SerializationGroup', function() {
-
+describe("SerializationGroup", function () {
   afterEach(() => cleanup());
 
-  it('should NOT render for most types', function() {
-
+  it("should NOT render for most types", function () {
     // given
-    const types = [ 'default', 'textfield', 'textarea', 'checkbox', 'checklist', 'taglist', 'radio', 'select', 'text', 'image', 'button' ];
+    const types = [
+      "default",
+      "textfield",
+      "textarea",
+      "checkbox",
+      "checklist",
+      "taglist",
+      "radio",
+      "select",
+      "text",
+      "image",
+      "button",
+    ];
 
     // then
     for (const type of types) {
-      renderSerializationGroup({ field : { type } });
-      expect(findGroup('serialization', document.body)).to.be.null;
+      renderSerializationGroup({ field: { type } });
+      expect(findGroup("serialization", document.body)).to.be.null;
     }
   });
 
-  it('should NOT render for datetime(date)', function() {
-
+  it("should NOT render for datetime(date)", function () {
     // given
-    const field = { type: 'datetime', subtype: 'date' };
+    const field = { type: "datetime", subtype: "date" };
 
     // then
     renderSerializationGroup({ field });
-    expect(findGroup('serialization', document.body)).to.be.null;
+    expect(findGroup("serialization", document.body)).to.be.null;
   });
 
-
-  describe('time format', function() {
-
-    it('should render for datetime (time)', function() {
-
+  describe("time format", function () {
+    it("should render for datetime (time)", function () {
       // given
-      const field = { type: 'datetime', subtype: 'time' };
+      const field = { type: "datetime", subtype: "time" };
 
       // when
       const { container } = renderSerializationGroup({ field });
 
       // then
-      const timeFormatSelect = findSelect('time-format', container);
+      const timeFormatSelect = findSelect("time-format", container);
 
       expect(timeFormatSelect).to.exist;
     });
 
-
-    it('should render for datetime (datetime)', function() {
-
+    it("should render for datetime (datetime)", function () {
       // given
-      const field = { type: 'datetime', subtype: 'datetime' };
+      const field = { type: "datetime", subtype: "datetime" };
 
       // when
       const { container } = renderSerializationGroup({ field });
 
       // then
-      const timeFormatSelect = findSelect('time-format', container);
+      const timeFormatSelect = findSelect("time-format", container);
 
       expect(timeFormatSelect).to.exist;
     });
 
-
-    it('should read', function() {
-
+    it("should read", function () {
       // given
       const field = {
-        type: 'datetime',
-        subtype: 'time',
-        timeSerializingFormat: 'utc_offset'
+        type: "datetime",
+        subtype: "time",
+        timeSerializingFormat: "utc_offset",
       };
 
       // when
       const { container } = renderSerializationGroup({ field });
-      const timeFormatSelect = findSelect('time-format', container);
+      const timeFormatSelect = findSelect("time-format", container);
 
       // then
       expect(timeFormatSelect).to.exist;
-      expect(timeFormatSelect.value).to.equal('utc_offset');
+      expect(timeFormatSelect.value).to.equal("utc_offset");
     });
 
-
-    it('should write', function() {
-
+    it("should write", function () {
       // given
       const field = {
-        type: 'datetime',
-        subtype: 'time',
-        timeSerializingFormat: 'utc_offset'
+        type: "datetime",
+        subtype: "time",
+        timeSerializingFormat: "utc_offset",
       };
 
       const editFieldSpy = sinon.spy((field, path, value) => set(field, path, value));
 
       const { container } = renderSerializationGroup({ field, editField: editFieldSpy });
 
-      const timeFormatSelect = findSelect('time-format', container);
+      const timeFormatSelect = findSelect("time-format", container);
 
       // when
-      fireEvent.input(timeFormatSelect, { target: { value: 'utc_normalized' } });
+      fireEvent.input(timeFormatSelect, { target: { value: "utc_normalized" } });
 
       // then
       expect(editFieldSpy).to.have.been.calledOnce;
-      expect(field.timeSerializingFormat).to.equal('utc_normalized');
+      expect(field.timeSerializingFormat).to.equal("utc_normalized");
     });
-
   });
 
-
-  describe('serialize to string', function() {
-
-    it('should render for number', function() {
-
+  describe("serialize to string", function () {
+    it("should render for number", function () {
       // given
-      const field = { type: 'number' };
+      const field = { type: "number" };
 
       // when
       const { container } = renderSerializationGroup({ field });
-      const serializeToStringInput = findInput('serialize-to-string', container);
+      const serializeToStringInput = findInput("serialize-to-string", container);
 
       // then
 
       expect(serializeToStringInput).to.exist;
     });
 
-
-    it('should read', function() {
-
+    it("should read", function () {
       // given
       const field = {
-        type: 'number',
-        serializeToString: true
+        type: "number",
+        serializeToString: true,
       };
 
       // when
       const { container } = renderSerializationGroup({ field });
-      const serializeToStringInput = findInput('serialize-to-string', container);
+      const serializeToStringInput = findInput("serialize-to-string", container);
 
       // then
       expect(serializeToStringInput).to.exist;
       expect(serializeToStringInput.checked).to.equal(true);
     });
 
-
-    it('should write', function() {
-
+    it("should write", function () {
       // given
       const field = {
-        type: 'number',
-        serializeToString: true
+        type: "number",
+        serializeToString: true,
       };
 
       const editFieldSpy = sinon.spy((field, path, value) => set(field, path, value));
 
       const { container } = renderSerializationGroup({ field, editField: editFieldSpy });
 
-      const serializeToStringInput = findInput('serialize-to-string', container);
+      const serializeToStringInput = findInput("serialize-to-string", container);
 
       // when
       fireEvent.click(serializeToStringInput);
@@ -170,28 +158,20 @@ describe('SerializationGroup', function() {
       expect(editFieldSpy).to.have.been.calledOnce;
       expect(field.serializeToString).to.equal(false);
     });
-
   });
-
 });
-
 
 // helper ///////////////
 
 function renderSerializationGroup(options) {
-  const {
-    editField,
-    field
-  } = options;
+  const { editField, field } = options;
 
-  const groups = [ SerializationGroup(field, editField) ];
+  const groups = [SerializationGroup(field, editField)];
 
   return render(
     <MockPropertiesPanelContext>
-      <TestPropertiesPanel
-        field={ field }
-        groups={ groups } />
-    </MockPropertiesPanelContext>
+      <TestPropertiesPanel field={field} groups={groups} />
+    </MockPropertiesPanelContext>,
   );
 }
 

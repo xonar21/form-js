@@ -7,7 +7,7 @@
  * @returns {HTMLElement}
  */
 function wrapCSSStyles(rootNode, prefix) {
-  const styleTags = rootNode.querySelectorAll('style');
+  const styleTags = rootNode.querySelectorAll("style");
   styleTags.forEach(styleTag => {
     const topLevelRules = extractTopLevelRules(styleTag.textContent);
     const scopedCss = topLevelRules
@@ -16,7 +16,7 @@ function wrapCSSStyles(rootNode, prefix) {
         const scopedSelector = scopeSelector(selector, prefix);
         return `${scopedSelector} ${styles}`;
       })
-      .join(' ');
+      .join(" ");
     styleTag.textContent = scopedCss;
   });
 
@@ -30,11 +30,11 @@ function extractTopLevelRules(cssString) {
   const topLevelRules = [];
 
   while (cursor < cssString.length) {
-    if (cssString[cursor] === '{') {
+    if (cssString[cursor] === "{") {
       level++;
     }
 
-    if (cssString[cursor] === '}') {
+    if (cssString[cursor] === "}") {
       level--;
       if (level === 0) {
         topLevelRules.push(cssString.substring(start, cursor + 1));
@@ -49,7 +49,7 @@ function extractTopLevelRules(cssString) {
 }
 
 function splitRule(rule) {
-  const firstBracket = rule.indexOf('{');
+  const firstBracket = rule.indexOf("{");
   const selector = rule.substring(0, firstBracket);
   const styles = rule.substring(firstBracket);
   return { selector, styles };
@@ -57,9 +57,9 @@ function splitRule(rule) {
 
 function scopeSelector(selector, prefix) {
   return selector
-    .split(',')
+    .split(",")
     .map(sel => `${prefix} ${sel.trim()}`)
-    .join(', ');
+    .join(", ");
 }
 
 export { wrapCSSStyles };

@@ -1,11 +1,10 @@
-import { formFieldClasses } from '../Util';
+import { formFieldClasses } from "../Util";
 
-const type = 'separator';
+const type = "separator";
 
 export function Separator() {
-
   return (
-    <div class={ formFieldClasses(type) }>
+    <div class={formFieldClasses(type)}>
       <hr />
     </div>
   );
@@ -14,9 +13,9 @@ export function Separator() {
 Separator.config = {
   type,
   keyed: false,
-  label: 'Separator',
-  group: 'presentation',
+  label: "Separator",
+  group: "presentation",
   create: (options = {}) => ({
-    ...options
-  })
+    ...options,
+  }),
 };

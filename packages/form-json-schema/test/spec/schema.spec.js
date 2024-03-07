@@ -1,12 +1,10 @@
-const { default: Ajv } = require('ajv');
-const { expect } = require('chai');
+const { default: Ajv } = require("ajv");
+const { expect } = require("chai");
 
-const schema = require('../../resources/schema.json');
+const schema = require("../../resources/schema.json");
 
-describe('schema validation', function() {
-
-  it('should be valid', function() {
-
+describe("schema validation", function () {
+  it("should be valid", function () {
     // given
     const ajv = new Ajv();
 
@@ -17,5 +15,4 @@ describe('schema validation', function() {
     expect(valid).to.be.true;
     expect(valid.errors).to.not.exist;
   });
-
 });

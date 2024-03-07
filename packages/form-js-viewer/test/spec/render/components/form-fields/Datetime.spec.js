@@ -1,387 +1,334 @@
-import { fireEvent, render } from '@testing-library/preact/pure';
+import { fireEvent, render } from "@testing-library/preact/pure";
 
-import { Datetime } from '../../../../../src/render/components/form-fields/Datetime';
+import { Datetime } from "../../../../../src/render/components/form-fields/Datetime";
 
-import {
-  createFormContainer,
-  expectNoViolations
-} from '../../../../TestHelper';
+import { createFormContainer, expectNoViolations } from "../../../../TestHelper";
 
-import { MockFormContext } from '../helper';
+import { MockFormContext } from "../helper";
 
 let container;
 
 const spy = sinon.spy;
 
-describe('Datetime', function() {
-
-  beforeEach(function() {
+describe("Datetime", function () {
+  beforeEach(function () {
     container = createFormContainer();
   });
 
-  afterEach(function() {
+  afterEach(function () {
     container.remove();
   });
 
-  describe('(date)', function() {
-
-    it('should render', function() {
-
+  describe("(date)", function () {
+    it("should render", function () {
       // when
       const { container } = createDatetime();
 
       // then
-      const formField = container.querySelector('.fjs-form-field');
+      const formField = container.querySelector(".fjs-form-field");
       expect(formField).to.exist;
-      expect(formField.classList.contains('fjs-form-field-datetime')).to.be.true;
+      expect(formField.classList.contains("fjs-form-field-datetime")).to.be.true;
 
-      const dateLabel = formField.querySelector('label');
+      const dateLabel = formField.querySelector("label");
       expect(dateLabel).to.exist;
-      expect(dateLabel.textContent).to.equal('Date');
+      expect(dateLabel.textContent).to.equal("Date");
 
       const dateInput = formField.querySelector('input[type="text"]');
       expect(dateInput).to.exist;
       expect(dateInput.value).to.be.empty;
 
-      expect(dateInput.placeholder).to.include('mm');
-      expect(dateInput.placeholder).to.include('dd');
-      expect(dateInput.placeholder).to.include('yyyy');
+      expect(dateInput.placeholder).to.include("mm");
+      expect(dateInput.placeholder).to.include("dd");
+      expect(dateInput.placeholder).to.include("yyyy");
 
-      const adornment = formField.querySelector('.fjs-input-adornment');
+      const adornment = formField.querySelector(".fjs-input-adornment");
       expect(adornment).to.exist;
-
     });
 
-
-    it('should render required label', function() {
-
+    it("should render required label", function () {
       // when
       const { container } = createDatetime({
         field: {
           ...dateField,
-          dateLabel: 'Required',
+          dateLabel: "Required",
           validate: {
-            required: true
-          }
-        }
+            required: true,
+          },
+        },
       });
 
-      const dateLabel = container.querySelector('label');
+      const dateLabel = container.querySelector("label");
       expect(dateLabel).to.exist;
-      expect(dateLabel.textContent).to.equal('Required*');
+      expect(dateLabel.textContent).to.equal("Required*");
     });
 
-
-    it('should render value', function() {
-
+    it("should render value", function () {
       // when
-      const { container } = createDatetime({ field: dateField, value: '1996-11-13' });
+      const { container } = createDatetime({ field: dateField, value: "1996-11-13" });
 
       // then
       const dateInput = container.querySelector('input[type="text"]');
       expect(dateInput).to.exist;
-      expect(dateInput.value).to.be.equal('11/13/1996');
-
+      expect(dateInput.value).to.be.equal("11/13/1996");
     });
 
-
-    it('should render disabled', function() {
-
+    it("should render disabled", function () {
       // when
-      const { container } = createDatetime({ disabled: true, value: '1996-11-13' });
+      const { container } = createDatetime({ disabled: true, value: "1996-11-13" });
 
       // then
       const dateInput = container.querySelector('input[type="text"]');
       expect(dateInput).to.exist;
-      expect(dateInput.value).to.be.equal('11/13/1996');
+      expect(dateInput.value).to.be.equal("11/13/1996");
       expect(dateInput.disabled).to.be.true;
-
     });
 
-
-    it('should render readonly', function() {
-
+    it("should render readonly", function () {
       // when
-      const { container } = createDatetime({ readonly: true, value: '1996-11-13' });
+      const { container } = createDatetime({ readonly: true, value: "1996-11-13" });
 
       // then
       const dateInput = container.querySelector('input[type="text"]');
       expect(dateInput).to.exist;
-      expect(dateInput.value).to.be.equal('11/13/1996');
+      expect(dateInput.value).to.be.equal("11/13/1996");
       expect(dateInput.readOnly).to.be.true;
-
     });
 
-
-    it('should render custom label', function() {
-
+    it("should render custom label", function () {
       // when
-      const { container } = createDatetime({ field: { ...dateField, dateLabel: 'Birthday' } });
+      const { container } = createDatetime({ field: { ...dateField, dateLabel: "Birthday" } });
 
-      const dateLabel = container.querySelector('label');
+      const dateLabel = container.querySelector("label");
       expect(dateLabel).to.exist;
-      expect(dateLabel.textContent).to.equal('Birthday');
-
+      expect(dateLabel.textContent).to.equal("Birthday");
     });
 
-
-    it('should render calendar', function() {
-
+    it("should render calendar", function () {
       // when
       const { container } = createDatetime({ field: { ...dateField } });
 
       // then
-      const calendar = container.querySelector('.flatpickr-calendar');
+      const calendar = container.querySelector(".flatpickr-calendar");
       expect(calendar).to.exist;
-
     });
 
-
-    describe('change handling', function() {
-
-      it('should change date (keyboard)', function() {
-
+    describe("change handling", function () {
+      it("should change date (keyboard)", function () {
         // given
         const onChangeSpy = spy();
 
         const { container } = createDatetime({
           onChange: onChangeSpy,
-          value: '1996-11-13'
+          value: "1996-11-13",
         });
 
         // when
         const dateInput = container.querySelector('input[type="text"]');
 
-        fireEvent.input(dateInput, { target: { value: '01/01/2000' } });
+        fireEvent.input(dateInput, { target: { value: "01/01/2000" } });
         fireEvent.blur(dateInput);
 
         // then
         expect(onChangeSpy).to.have.been.calledWith({
           field: dateField,
-          value: '2000-01-01'
+          value: "2000-01-01",
         });
       });
 
-
-      it('should change date (mouse)', function() {
-
+      it("should change date (mouse)", function () {
         // given
         const onChangeSpy = spy();
 
         const { container } = createDatetime({
           onChange: onChangeSpy,
-          value: '1996-11-13'
+          value: "1996-11-13",
         });
 
         // when
         const dateInput = container.querySelector('input[type="text"]');
         fireEvent.focus(dateInput);
 
-        const firstDayNode = container.querySelectorAll('.flatpickr-day')[0];
+        const firstDayNode = container.querySelectorAll(".flatpickr-day")[0];
         fireEvent.click(firstDayNode);
 
         // then
         expect(onChangeSpy).to.have.been.calledWith({
           field: dateField,
-          value: '1996-10-27'
+          value: "1996-10-27",
         });
       });
 
-
-      it('should clear date', function() {
-
+      it("should clear date", function () {
         // given
         const onChangeSpy = spy();
 
         const { container } = createDatetime({
           onChange: onChangeSpy,
-          value: '1996-11-13'
+          value: "1996-11-13",
         });
 
         // when
         const dateInput = container.querySelector('input[type="text"]');
 
-        fireEvent.input(dateInput, { target: { value: '' } });
+        fireEvent.input(dateInput, { target: { value: "" } });
         fireEvent.blur(dateInput);
 
         // then
         expect(onChangeSpy).to.have.been.calledWith({
           field: dateField,
-          value: null
+          value: null,
         });
       });
     });
 
-
-    describe('interaction', function() {
-
-      it('should navigate to next month and select date', function() {
-
+    describe("interaction", function () {
+      it("should navigate to next month and select date", function () {
         // given
         const onChangeSpy = spy();
 
         const { container } = createDatetime({
           onChange: onChangeSpy,
-          value: '1996-11-13'
+          value: "1996-11-13",
         });
 
         // when
         const dateInput = container.querySelector('input[type="text"]');
         fireEvent.focus(dateInput);
 
-        const nextMonthButton = container.querySelector('.flatpickr-next-month');
+        const nextMonthButton = container.querySelector(".flatpickr-next-month");
         fireEvent.click(nextMonthButton);
 
-        const firstDayNode = container.querySelectorAll('.flatpickr-day')[0];
+        const firstDayNode = container.querySelectorAll(".flatpickr-day")[0];
         fireEvent.click(firstDayNode);
 
         // then
         expect(onChangeSpy).to.have.been.calledWith({
           field: dateField,
-          value: '1996-12-01'
+          value: "1996-12-01",
         });
       });
 
-
-      it('should navigate to previous month and select date', function() {
-
+      it("should navigate to previous month and select date", function () {
         // given
         const onChangeSpy = spy();
 
         const { container } = createDatetime({
           onChange: onChangeSpy,
-          value: '1996-11-13'
+          value: "1996-11-13",
         });
 
         // when
         const dateInput = container.querySelector('input[type="text"]');
         fireEvent.focus(dateInput);
 
-        const prevMonthButton = container.querySelector('.flatpickr-prev-month');
+        const prevMonthButton = container.querySelector(".flatpickr-prev-month");
         fireEvent.click(prevMonthButton);
 
-        const firstDayNode = container.querySelectorAll('.flatpickr-day')[0];
+        const firstDayNode = container.querySelectorAll(".flatpickr-day")[0];
         fireEvent.click(firstDayNode);
 
         // then
         expect(onChangeSpy).to.have.been.calledWith({
           field: dateField,
-          value: '1996-09-29'
+          value: "1996-09-29",
         });
       });
 
-
-      it('should navigate to specific month and select date', function() {
-
+      it("should navigate to specific month and select date", function () {
         // given
         const onChangeSpy = spy();
 
         const { container } = createDatetime({
           onChange: onChangeSpy,
-          value: '1996-11-13'
+          value: "1996-11-13",
         });
 
         // when
         const dateInput = container.querySelector('input[type="text"]');
         fireEvent.focus(dateInput);
 
-        const monthSelect = container.querySelector('.flatpickr-monthDropdown-months');
+        const monthSelect = container.querySelector(".flatpickr-monthDropdown-months");
         fireEvent.change(monthSelect, { target: { value: 0 } });
 
-        const firstDayNode = container.querySelectorAll('.flatpickr-day')[0];
+        const firstDayNode = container.querySelectorAll(".flatpickr-day")[0];
         fireEvent.click(firstDayNode);
 
         // then
         expect(onChangeSpy).to.have.been.calledWith({
           field: dateField,
-          value: '1995-12-31'
+          value: "1995-12-31",
         });
       });
-
     });
 
-
-    describe('configuration', function() {
-
-      it('should disable past dates', function() {
-
+    describe("configuration", function () {
+      it("should disable past dates", function () {
         // given
         const { container } = createDatetime({
-          value: '1996-11-13',
+          value: "1996-11-13",
           field: {
             ...dateField,
-            disallowPassedDates: true
-          }
+            disallowPassedDates: true,
+          },
         });
 
         // when
         const dateInput = container.querySelector('input[type="text"]');
         fireEvent.focus(dateInput);
 
-        const previousMonthButton = container.querySelector('.flatpickr-prev-month');
+        const previousMonthButton = container.querySelector(".flatpickr-prev-month");
 
         // then
         expect(dateInput.value).to.be.empty;
-        expect([ ...previousMonthButton.classList ]).to.include('flatpickr-disabled');
+        expect([...previousMonthButton.classList]).to.include("flatpickr-disabled");
       });
-
     });
 
-
-    it('should disable dates prior to 1900', function() {
-
+    it("should disable dates prior to 1900", function () {
       // given
       const { container } = createDatetime({
-        value: '1900-01-01',
+        value: "1900-01-01",
         field: {
           ...dateField,
-          disallowPassedDates: false
-        }
+          disallowPassedDates: false,
+        },
       });
 
       // when
       const dateInput = container.querySelector('input[type="text"]');
       fireEvent.focus(dateInput);
 
-      const previousMonthButton = container.querySelector('.flatpickr-prev-month');
+      const previousMonthButton = container.querySelector(".flatpickr-prev-month");
 
       // then
-      expect([ ...previousMonthButton.classList ]).to.include('flatpickr-disabled');
+      expect([...previousMonthButton.classList]).to.include("flatpickr-disabled");
     });
-
   });
 
-
-  describe('(time)', function() {
-
-    it('should render', function() {
-
+  describe("(time)", function () {
+    it("should render", function () {
       // when
       const { container } = createDatetime({ field: timeField });
 
       // then
-      const formField = container.querySelector('.fjs-form-field');
+      const formField = container.querySelector(".fjs-form-field");
       expect(formField).to.exist;
-      expect(formField.classList.contains('fjs-form-field-datetime')).to.be.true;
+      expect(formField.classList.contains("fjs-form-field-datetime")).to.be.true;
 
-      const timeLabel = formField.querySelector('label');
+      const timeLabel = formField.querySelector("label");
       expect(timeLabel).to.exist;
-      expect(timeLabel.textContent).to.equal('Time');
+      expect(timeLabel.textContent).to.equal("Time");
 
       const timeInput = formField.querySelector('input[type="text"]');
       expect(timeInput).to.exist;
       expect(timeInput.value).to.be.empty;
-      expect(timeInput.placeholder).to.equal('hh:mm ?m');
+      expect(timeInput.placeholder).to.equal("hh:mm ?m");
 
-
-      const adornment = formField.querySelector('.fjs-input-adornment');
+      const adornment = formField.querySelector(".fjs-input-adornment");
       expect(adornment).to.exist;
-
     });
 
-
-    it('should render when time interval is undefined', function() {
-
+    it("should render when time interval is undefined", function () {
       // when
       const { container } = createDatetime({ field: { ...timeField, timeInterval: undefined } });
 
@@ -389,31 +336,27 @@ describe('Datetime', function() {
       const timeInput = container.querySelector('input[type="text"]');
       expect(timeInput).to.exist;
       expect(timeInput.value).to.be.empty;
-      expect(timeInput.placeholder).to.equal('hh:mm ?m');
-
+      expect(timeInput.placeholder).to.equal("hh:mm ?m");
     });
 
-    it('should render required label', function() {
-
+    it("should render required label", function () {
       // when
       const { container } = createDatetime({
         field: {
           ...timeField,
-          timeLabel: 'Required',
+          timeLabel: "Required",
           validate: {
-            required: true
-          }
-        }
+            required: true,
+          },
+        },
       });
 
-      const dateLabel = container.querySelector('label');
+      const dateLabel = container.querySelector("label");
       expect(dateLabel).to.exist;
-      expect(dateLabel.textContent).to.equal('Required*');
+      expect(dateLabel.textContent).to.equal("Required*");
     });
 
-
-    it('should render 24h placeholder', function() {
-
+    it("should render 24h placeholder", function () {
       // when
       const { container } = createDatetime({ field: { ...timeField, use24h: true } });
 
@@ -421,92 +364,70 @@ describe('Datetime', function() {
       const timeInput = container.querySelector('input[type="text"]');
       expect(timeInput).to.exist;
       expect(timeInput.value).to.be.empty;
-      expect(timeInput.placeholder).to.equal('hh:mm');
-
+      expect(timeInput.placeholder).to.equal("hh:mm");
     });
 
-
-    it('should render value', function() {
-
+    it("should render value", function () {
       // when
-      const { container } = createDatetime({ field: timeField, value: '13:00' });
+      const { container } = createDatetime({ field: timeField, value: "13:00" });
 
       // then
       const timeInput = container.querySelector('input[type="text"]');
       expect(timeInput).to.exist;
-      expect(timeInput.value).to.equal('01:00 PM');
-
+      expect(timeInput.value).to.equal("01:00 PM");
     });
 
-
-    it('should render 24h value', function() {
-
+    it("should render 24h value", function () {
       // when
-      const { container } = createDatetime({ field: { ...timeField, use24h: true }, value: '13:00' });
+      const { container } = createDatetime({ field: { ...timeField, use24h: true }, value: "13:00" });
 
       // then
       const timeInput = container.querySelector('input[type="text"]');
       expect(timeInput).to.exist;
-      expect(timeInput.value).to.equal('13:00');
-
+      expect(timeInput.value).to.equal("13:00");
     });
 
-
-    it('should render disabled', function() {
-
+    it("should render disabled", function () {
       // when
-      const { container } = createDatetime({ field: { ...timeField, use24h: true }, disabled: true, value: '13:00' });
+      const { container } = createDatetime({ field: { ...timeField, use24h: true }, disabled: true, value: "13:00" });
 
       // then
       const timeInput = container.querySelector('input[type="text"]');
       expect(timeInput).to.exist;
-      expect(timeInput.value).to.equal('13:00');
+      expect(timeInput.value).to.equal("13:00");
       expect(timeInput.disabled).to.be.true;
-
     });
 
-
-    it('should render readonly', function() {
-
+    it("should render readonly", function () {
       // when
-      const { container } = createDatetime({ field: { ...timeField, use24h: true }, readonly: true, value: '13:00' });
+      const { container } = createDatetime({ field: { ...timeField, use24h: true }, readonly: true, value: "13:00" });
 
       // then
       const timeInput = container.querySelector('input[type="text"]');
       expect(timeInput).to.exist;
-      expect(timeInput.value).to.equal('13:00');
+      expect(timeInput.value).to.equal("13:00");
       expect(timeInput.readOnly).to.be.true;
-
     });
 
-
-    it('should render custom label', function() {
-
+    it("should render custom label", function () {
       // when
-      const { container } = createDatetime({ field: { ...timeField, timeLabel: 'Alarm time' } });
+      const { container } = createDatetime({ field: { ...timeField, timeLabel: "Alarm time" } });
 
-      const timeLabel = container.querySelector('label');
+      const timeLabel = container.querySelector("label");
       expect(timeLabel).to.exist;
-      expect(timeLabel.textContent).to.equal('Alarm time');
-
+      expect(timeLabel.textContent).to.equal("Alarm time");
     });
 
-
-    describe('dropdown', function() {
-
-      it('should not render by default', function() {
-
+    describe("dropdown", function () {
+      it("should not render by default", function () {
         // when
         const { container } = createDatetime({ field: { ...timeField } });
 
-        const dropdown = container.querySelector('fjs-dropdownlist');
+        const dropdown = container.querySelector("fjs-dropdownlist");
         expect(dropdown).to.not.exist;
-
       });
 
-
-      it('should render on input focus', function() {
-
+      it("should render on input focus", function () {
         // when
         const { container } = createDatetime({ field: timeField });
 
@@ -514,28 +435,25 @@ describe('Datetime', function() {
         fireEvent.focus(timeInput);
 
         // then
-        const dropdown = container.querySelector('.fjs-dropdownlist');
+        const dropdown = container.querySelector(".fjs-dropdownlist");
         expect(dropdown).to.exist;
 
-        const dropdownValues = dropdown.querySelectorAll('.fjs-dropdownlist-item');
+        const dropdownValues = dropdown.querySelectorAll(".fjs-dropdownlist-item");
         expect(dropdownValues.length).to.equal(4 * 24);
 
-        const focusedItem = dropdown.querySelector('.fjs-dropdownlist-item.focused');
+        const focusedItem = dropdown.querySelector(".fjs-dropdownlist-item.focused");
         const firstItem = dropdownValues[0];
         const secondItem = dropdownValues[1];
         const midItem = dropdownValues[48];
 
-        expect(firstItem.innerText).to.equal('12:00 AM');
-        expect(secondItem.innerText).to.equal('12:15 AM');
-        expect(midItem.innerText).to.equal('12:00 PM');
+        expect(firstItem.innerText).to.equal("12:00 AM");
+        expect(secondItem.innerText).to.equal("12:15 AM");
+        expect(midItem.innerText).to.equal("12:00 PM");
 
         expect(midItem).to.equal(focusedItem);
-
       });
 
-
-      it('should render custom increment', function() {
-
+      it("should render custom increment", function () {
         // when
         const { container } = createDatetime({ field: { ...timeField, timeInterval: 30 } });
 
@@ -543,23 +461,20 @@ describe('Datetime', function() {
         fireEvent.focus(timeInput);
 
         // then
-        const dropdown = container.querySelector('.fjs-dropdownlist');
+        const dropdown = container.querySelector(".fjs-dropdownlist");
         expect(dropdown).to.exist;
 
-        const dropdownValues = dropdown.querySelectorAll('.fjs-dropdownlist-item');
+        const dropdownValues = dropdown.querySelectorAll(".fjs-dropdownlist-item");
         expect(dropdownValues.length).to.equal(48);
 
         const firstItem = dropdownValues[0];
         const secondItem = dropdownValues[1];
 
-        expect(firstItem.innerText).to.equal('12:00 AM');
-        expect(secondItem.innerText).to.equal('12:30 AM');
-
+        expect(firstItem.innerText).to.equal("12:00 AM");
+        expect(secondItem.innerText).to.equal("12:30 AM");
       });
 
-
-      it('should default to 15 increment with invalid intervals', function() {
-
+      it("should default to 15 increment with invalid intervals", function () {
         // when
         const { container } = createDatetime({ field: { ...timeField, timeInterval: -72 } });
 
@@ -567,23 +482,20 @@ describe('Datetime', function() {
         fireEvent.focus(timeInput);
 
         // then
-        const dropdown = container.querySelector('.fjs-dropdownlist');
+        const dropdown = container.querySelector(".fjs-dropdownlist");
         expect(dropdown).to.exist;
 
-        const dropdownValues = dropdown.querySelectorAll('.fjs-dropdownlist-item');
+        const dropdownValues = dropdown.querySelectorAll(".fjs-dropdownlist-item");
         expect(dropdownValues.length).to.equal(96);
 
         const firstItem = dropdownValues[0];
         const secondItem = dropdownValues[1];
 
-        expect(firstItem.innerText).to.equal('12:00 AM');
-        expect(secondItem.innerText).to.equal('12:15 AM');
-
+        expect(firstItem.innerText).to.equal("12:00 AM");
+        expect(secondItem.innerText).to.equal("12:15 AM");
       });
 
-
-      it('should default to 15 increment with no interval', function() {
-
+      it("should default to 15 increment with no interval", function () {
         // when
         const { container } = createDatetime({ field: { ...timeField, timeInterval: undefined } });
 
@@ -591,23 +503,20 @@ describe('Datetime', function() {
         fireEvent.focus(timeInput);
 
         // then
-        const dropdown = container.querySelector('.fjs-dropdownlist');
+        const dropdown = container.querySelector(".fjs-dropdownlist");
         expect(dropdown).to.exist;
 
-        const dropdownValues = dropdown.querySelectorAll('.fjs-dropdownlist-item');
+        const dropdownValues = dropdown.querySelectorAll(".fjs-dropdownlist-item");
         expect(dropdownValues.length).to.equal(96);
 
         const firstItem = dropdownValues[0];
         const secondItem = dropdownValues[1];
 
-        expect(firstItem.innerText).to.equal('12:00 AM');
-        expect(secondItem.innerText).to.equal('12:15 AM');
-
+        expect(firstItem.innerText).to.equal("12:00 AM");
+        expect(secondItem.innerText).to.equal("12:15 AM");
       });
 
-
-      it('should render 24h', function() {
-
+      it("should render 24h", function () {
         // when
         const { container } = createDatetime({ field: { ...timeField, use24h: true } });
 
@@ -615,23 +524,20 @@ describe('Datetime', function() {
         fireEvent.focus(timeInput);
 
         // then
-        const dropdown = container.querySelector('.fjs-dropdownlist');
+        const dropdown = container.querySelector(".fjs-dropdownlist");
         expect(dropdown).to.exist;
 
-        const dropdownValues = dropdown.querySelectorAll('.fjs-dropdownlist-item');
+        const dropdownValues = dropdown.querySelectorAll(".fjs-dropdownlist-item");
         expect(dropdownValues.length).to.equal(4 * 24);
 
         const firstItem = dropdownValues[0];
         const secondItem = dropdownValues[1];
 
-        expect(firstItem.innerText).to.equal('00:00');
-        expect(secondItem.innerText).to.equal('00:15');
-
+        expect(firstItem.innerText).to.equal("00:00");
+        expect(secondItem.innerText).to.equal("00:15");
       });
 
-
-      it('should not render for 1m increments', function() {
-
+      it("should not render for 1m increments", function () {
         // when
         const { container } = createDatetime({ field: { ...timeField, timeInterval: 1 } });
 
@@ -639,127 +545,111 @@ describe('Datetime', function() {
         fireEvent.focus(timeInput);
 
         // then
-        const dropdown = container.querySelector('.fjs-dropdownlist');
+        const dropdown = container.querySelector(".fjs-dropdownlist");
         expect(dropdown).to.not.exist;
-
       });
 
-
-      it('should focus current value on open', function() {
-
+      it("should focus current value on open", function () {
         // when
-        const { container } = createDatetime({ field: { ...timeField, use24h: true }, value: '11:00' });
+        const { container } = createDatetime({ field: { ...timeField, use24h: true }, value: "11:00" });
 
         const timeInput = container.querySelector('input[type="text"]');
         fireEvent.focus(timeInput);
 
         // then
-        const dropdown = container.querySelector('.fjs-dropdownlist');
-        const focusedItem = dropdown.querySelector('.fjs-dropdownlist-item.focused');
+        const dropdown = container.querySelector(".fjs-dropdownlist");
+        const focusedItem = dropdown.querySelector(".fjs-dropdownlist-item.focused");
 
-        expect(focusedItem.innerText).to.equal('11:00');
-
-      });
-
-    });
-
-
-    describe('change handling', function() {
-
-      it('should change time (24h)', function() {
-
-        // given
-        const onChangeSpy = spy();
-
-        const { container } = createDatetime({
-          field: timeField,
-          onChange: onChangeSpy,
-          value: '11:00'
-        });
-
-        // when
-        const dateInput = container.querySelector('input[type="text"]');
-
-        fireEvent.input(dateInput, { target: { value: '13:00' } });
-        fireEvent.blur(dateInput);
-
-        // then
-        expect(onChangeSpy).to.have.been.calledWith({
-          field: timeField,
-          value: '13:00'
-        });
-      });
-
-
-      it('should change time (AM/PM)', function() {
-
-        // given
-        const onChangeSpy = spy();
-
-        const { container } = createDatetime({
-          field: timeField,
-          onChange: onChangeSpy,
-          value: '11:00'
-        });
-
-        // when
-        const dateInput = container.querySelector('input[type="text"]');
-
-        fireEvent.input(dateInput, { target: { value: '1PM' } });
-        fireEvent.blur(dateInput);
-
-        // then
-        expect(onChangeSpy).to.have.been.calledWith({
-          field: timeField,
-          value: '13:00'
-        });
-      });
-
-
-      it('should clear time', function() {
-
-        // given
-        const onChangeSpy = spy();
-
-        const { container } = createDatetime({
-          field: timeField,
-          onChange: onChangeSpy,
-          value: '11:00'
-        });
-
-        // when
-        const dateInput = container.querySelector('input[type="text"]');
-
-        fireEvent.input(dateInput, { target: { value: '' } });
-        fireEvent.blur(dateInput);
-
-        // then
-        expect(onChangeSpy).to.have.been.calledWith({
-          field: timeField,
-          value: null
-        });
+        expect(focusedItem.innerText).to.equal("11:00");
       });
     });
 
+    describe("change handling", function () {
+      it("should change time (24h)", function () {
+        // given
+        const onChangeSpy = spy();
+
+        const { container } = createDatetime({
+          field: timeField,
+          onChange: onChangeSpy,
+          value: "11:00",
+        });
+
+        // when
+        const dateInput = container.querySelector('input[type="text"]');
+
+        fireEvent.input(dateInput, { target: { value: "13:00" } });
+        fireEvent.blur(dateInput);
+
+        // then
+        expect(onChangeSpy).to.have.been.calledWith({
+          field: timeField,
+          value: "13:00",
+        });
+      });
+
+      it("should change time (AM/PM)", function () {
+        // given
+        const onChangeSpy = spy();
+
+        const { container } = createDatetime({
+          field: timeField,
+          onChange: onChangeSpy,
+          value: "11:00",
+        });
+
+        // when
+        const dateInput = container.querySelector('input[type="text"]');
+
+        fireEvent.input(dateInput, { target: { value: "1PM" } });
+        fireEvent.blur(dateInput);
+
+        // then
+        expect(onChangeSpy).to.have.been.calledWith({
+          field: timeField,
+          value: "13:00",
+        });
+      });
+
+      it("should clear time", function () {
+        // given
+        const onChangeSpy = spy();
+
+        const { container } = createDatetime({
+          field: timeField,
+          onChange: onChangeSpy,
+          value: "11:00",
+        });
+
+        // when
+        const dateInput = container.querySelector('input[type="text"]');
+
+        fireEvent.input(dateInput, { target: { value: "" } });
+        fireEvent.blur(dateInput);
+
+        // then
+        expect(onChangeSpy).to.have.been.calledWith({
+          field: timeField,
+          value: null,
+        });
+      });
+    });
   });
 
-
-  describe('(datetime)', function() {
-
-    it('should render both date and time', function() {
-
+  describe("(datetime)", function () {
+    it("should render both date and time", function () {
       // when
       const { container } = createDatetime({ field: datetimeField });
 
       // then
-      const formField = container.querySelector('.fjs-form-field');
+      const formField = container.querySelector(".fjs-form-field");
       expect(formField).to.exist;
-      expect(formField.classList.contains('fjs-form-field-datetime')).to.be.true;
+      expect(formField.classList.contains("fjs-form-field-datetime")).to.be.true;
 
-      const dateTimeLabels = formField.querySelectorAll('label');
+      const dateTimeLabels = formField.querySelectorAll("label");
       expect(dateTimeLabels.length).to.equal(2);
-      expect(dateTimeLabels[0].textContent).to.equal('Date');
-      expect(dateTimeLabels[1].textContent).to.equal('Time');
+      expect(dateTimeLabels[0].textContent).to.equal("Date");
+      expect(dateTimeLabels[1].textContent).to.equal("Time");
 
       const dateTimeInputs = formField.querySelectorAll('input[type="text"]');
       expect(dateTimeInputs.length).to.equal(2);
@@ -769,48 +659,44 @@ describe('Datetime', function() {
 
       expect(dateInput).to.exist;
       expect(dateInput.value).to.be.empty;
-      expect(dateInput.placeholder).to.include('mm');
-      expect(dateInput.placeholder).to.include('dd');
-      expect(dateInput.placeholder).to.include('yyyy');
+      expect(dateInput.placeholder).to.include("mm");
+      expect(dateInput.placeholder).to.include("dd");
+      expect(dateInput.placeholder).to.include("yyyy");
 
       expect(timeInput).to.exist;
       expect(timeInput.value).to.be.empty;
-      expect(timeInput.placeholder).to.equal('hh:mm ?m');
+      expect(timeInput.placeholder).to.equal("hh:mm ?m");
 
-      const adornments = formField.querySelectorAll('.fjs-input-adornment');
+      const adornments = formField.querySelectorAll(".fjs-input-adornment");
       expect(adornments.length).to.equal(2);
-
     });
 
-
-    it('should render required labels', function() {
-
+    it("should render required labels", function () {
       // when
       const { container } = createDatetime({
-        label: 'Required',
+        label: "Required",
         field: {
           ...datetimeField,
-          dateLabel: 'Required_date',
-          timeLabel: 'Required_time',
+          dateLabel: "Required_date",
+          timeLabel: "Required_time",
           validate: {
-            required: true
-          }
-        }
+            required: true,
+          },
+        },
       });
 
-      const dateTimeLabels = container.querySelectorAll('label');
+      const dateTimeLabels = container.querySelectorAll("label");
       expect(dateTimeLabels.length).to.equal(2);
-      expect(dateTimeLabels[0].textContent).to.equal('Required_date*');
-      expect(dateTimeLabels[1].textContent).to.equal('Required_time*');
+      expect(dateTimeLabels[0].textContent).to.equal("Required_date*");
+      expect(dateTimeLabels[1].textContent).to.equal("Required_time*");
     });
 
-    it('should render date label with height when time label is not empty', () => {
-
+    it("should render date label with height when time label is not empty", () => {
       // when
       const { container } = createDatetime({ field: { ...datetimeField, dateLabel: undefined } });
 
       // then
-      const dateTimeLabels = container.querySelectorAll('label');
+      const dateTimeLabels = container.querySelectorAll("label");
       expect(dateTimeLabels.length).to.equal(2);
 
       const dateLabel = dateTimeLabels[0];
@@ -820,14 +706,12 @@ describe('Datetime', function() {
       expect(dateLabel.offsetHeight).to.equal(16);
     });
 
-
-    it('should render time label with height when date label is not empty', () => {
-
+    it("should render time label with height when date label is not empty", () => {
       // when
       const { container } = createDatetime({ field: { ...datetimeField, timeLabel: undefined } });
 
       // then
-      const dateTimeLabels = container.querySelectorAll('label');
+      const dateTimeLabels = container.querySelectorAll("label");
       expect(dateTimeLabels.length).to.equal(2);
 
       const dateLabel = dateTimeLabels[0];
@@ -837,14 +721,12 @@ describe('Datetime', function() {
       expect(timeLabel.offsetHeight).to.equal(16);
     });
 
-
-    it('should render labels without height when both are empty', () => {
-
+    it("should render labels without height when both are empty", () => {
       // when
       const { container } = createDatetime({ field: { ...datetimeField, dateLabel: undefined, timeLabel: undefined } });
 
       // then
-      const dateTimeLabels = container.querySelectorAll('label');
+      const dateTimeLabels = container.querySelectorAll("label");
       expect(dateTimeLabels.length).to.equal(2);
 
       const dateLabel = dateTimeLabels[0];
@@ -854,16 +736,14 @@ describe('Datetime', function() {
       expect(timeLabel.offsetHeight).to.equal(0);
     });
 
-
-    it('should render value', function() {
-
+    it("should render value", function () {
       // when
       const { container } = createDatetime({
         field: {
           ...datetimeField,
-          use24h: true
+          use24h: true,
         },
-        value: '1996-11-13T10:00'
+        value: "1996-11-13T10:00",
       });
 
       const inputs = container.querySelectorAll('input[type="text"]');
@@ -876,36 +756,30 @@ describe('Datetime', function() {
       // then
       expect(dateInput).to.exist;
       expect(timeInput).to.exist;
-      expect(dateInput.value).to.be.equal('11/13/1996');
-      expect(timeInput.value).to.be.equal('10:00');
-
+      expect(dateInput.value).to.be.equal("11/13/1996");
+      expect(timeInput.value).to.be.equal("10:00");
     });
 
-
-    it('should display an error state if only date is set', function() {
-
+    it("should display an error state if only date is set", function () {
       // given
       const { container } = createDatetime({ field: datetimeField });
       const dateInput = container.querySelectorAll('input[type="text"]')[0];
 
       // when
-      fireEvent.input(dateInput, { target: { value: '01/01/2000' } });
+      fireEvent.input(dateInput, { target: { value: "01/01/2000" } });
       fireEvent.blur(dateInput);
 
       // then
-      const errorGroup = container.querySelector('.fjs-form-field-error');
+      const errorGroup = container.querySelector(".fjs-form-field-error");
       expect(errorGroup).to.exist;
 
-      const errorItem = errorGroup.querySelector('li');
+      const errorItem = errorGroup.querySelector("li");
 
       expect(errorItem).to.exist;
-      expect(errorItem.innerText).to.equal('Date and time must both be entered.');
-
+      expect(errorItem.innerText).to.equal("Date and time must both be entered.");
     });
 
-
-    it('should display an error state if only time is set', function() {
-
+    it("should display an error state if only time is set", function () {
       // given
       const { container } = createDatetime({ field: datetimeField });
 
@@ -914,132 +788,119 @@ describe('Datetime', function() {
       const timeInput = container.querySelectorAll('input[type="text"]')[1];
 
       // when
-      fireEvent.input(timeInput, { target: { value: '10:00' } });
+      fireEvent.input(timeInput, { target: { value: "10:00" } });
       fireEvent.blur(timeInput);
 
       // then
-      const errorGroup = container.querySelector('.fjs-form-field-error');
+      const errorGroup = container.querySelector(".fjs-form-field-error");
       expect(errorGroup).to.exist;
 
-      const errorItem = errorGroup.querySelector('li');
+      const errorItem = errorGroup.querySelector("li");
       expect(errorItem).to.exist;
-      expect(errorItem.innerText).to.equal('Date and time must both be entered.');
-
+      expect(errorItem.innerText).to.equal("Date and time must both be entered.");
     });
 
-
-    describe('change handling', function() {
-
-      it('should change date', function() {
-
+    describe("change handling", function () {
+      it("should change date", function () {
         // given
         const onChangeSpy = spy();
 
         const { container } = createDatetime({
           field: datetimeField,
           onChange: onChangeSpy,
-          value: '1996-11-13T11:00'
+          value: "1996-11-13T11:00",
         });
 
         // when
         const dateInput = container.querySelectorAll('input[type="text"]')[0];
 
-        fireEvent.input(dateInput, { target: { value: '01/01/2000' } });
+        fireEvent.input(dateInput, { target: { value: "01/01/2000" } });
         fireEvent.blur(dateInput);
 
         // then
         expect(onChangeSpy).to.have.been.calledWith({
           field: datetimeField,
-          value: '2000-01-01T11:00'
+          value: "2000-01-01T11:00",
         });
       });
 
-
-      it('should change time', function() {
-
+      it("should change time", function () {
         // given
         const onChangeSpy = spy();
 
         const { container } = createDatetime({
           field: { ...datetimeField, use24h: true },
           onChange: onChangeSpy,
-          value: '1996-11-13T11:00'
+          value: "1996-11-13T11:00",
         });
 
         // when
         const timeInput = container.querySelectorAll('input[type="text"]')[1];
 
-        fireEvent.input(timeInput, { target: { value: '12:00' } });
+        fireEvent.input(timeInput, { target: { value: "12:00" } });
         fireEvent.blur(timeInput);
 
         // then
         expect(onChangeSpy).to.have.been.calledWith({
           field: { ...datetimeField, use24h: true },
-          value: '1996-11-13T12:00'
+          value: "1996-11-13T12:00",
         });
       });
 
-
-      it('should clear from date', function() {
-
+      it("should clear from date", function () {
         // given
         const onChangeSpy = spy();
 
         const { container } = createDatetime({
           field: datetimeField,
           onChange: onChangeSpy,
-          value: '1996-11-13T10:00'
+          value: "1996-11-13T10:00",
         });
 
         // when
         const dateInput = container.querySelectorAll('input[type="text"]')[0];
 
-        fireEvent.input(dateInput, { target: { value: '' } });
+        fireEvent.input(dateInput, { target: { value: "" } });
         fireEvent.blur(dateInput);
 
         // then
         expect(onChangeSpy).to.have.been.calledWith({
           field: datetimeField,
-          value: null
+          value: null,
         });
       });
 
-
-      it('should clear from time', function() {
-
+      it("should clear from time", function () {
         // given
         const onChangeSpy = spy();
 
         const { container } = createDatetime({
           field: datetimeField,
           onChange: onChangeSpy,
-          value: '1996-11-13T10:00'
+          value: "1996-11-13T10:00",
         });
 
         // when
         const dateInput = container.querySelectorAll('input[type="text"]')[1];
 
-        fireEvent.input(dateInput, { target: { value: '' } });
+        fireEvent.input(dateInput, { target: { value: "" } });
         fireEvent.blur(dateInput);
 
         // then
         expect(onChangeSpy).to.have.been.calledWith({
           field: datetimeField,
-          value: null
+          value: null,
         });
       });
     });
-
   });
 
-
-  it('#create', function() {
-
+  it("#create", function () {
     // assume
     const { config } = Datetime;
-    expect(config.type).to.eql('datetime');
-    expect(config.label).to.eql('Date time');
-    expect(config.group).to.eql('basic-input');
+    expect(config.type).to.eql("datetime");
+    expect(config.label).to.eql("Date time");
+    expect(config.group).to.eql("basic-input");
     expect(config.keyed).to.be.true;
 
     // when
@@ -1047,26 +908,23 @@ describe('Datetime', function() {
 
     // then
     expect(field).to.eql({
-      subtype: 'date',
-      dateLabel: 'Date',
+      subtype: "date",
+      dateLabel: "Date",
     });
 
     // but when
     const customField = config.create({
-      custom: true
+      custom: true,
     });
 
     // then
     expect(customField).to.contain({
-      custom: true
+      custom: true,
     });
   });
 
-
-  describe('a11y', function() {
-
-    it('should have no violations - date', async function() {
-
+  describe("a11y", function () {
+    it("should have no violations - date", async function () {
       // given
       this.timeout(10000);
 
@@ -1076,9 +934,7 @@ describe('Datetime', function() {
       await expectNoViolations(container);
     });
 
-
-    it('should have no violations for readonly - date', async function() {
-
+    it("should have no violations for readonly - date", async function () {
       // given
       this.timeout(10000);
 
@@ -1088,167 +944,150 @@ describe('Datetime', function() {
       await expectNoViolations(container);
     });
 
-
-    it('should have no violations for errors - date', async function() {
-
+    it("should have no violations for errors - date", async function () {
       // given
       this.timeout(10000);
 
       const { container } = createDatetime({
-        errors: [ 'Something went wrong' ]
+        errors: ["Something went wrong"],
       });
 
       // then
       await expectNoViolations(container);
     });
 
-
-    it('should have no violations - time', async function() {
-
-      // given
-      this.timeout(10000);
-
-      const { container } = createDatetime({
-        field: timeField
-      });
-
-      // then
-      await expectNoViolations(container);
-    });
-
-
-    it('should have no violations for readonly - time', async function() {
-
+    it("should have no violations - time", async function () {
       // given
       this.timeout(10000);
 
       const { container } = createDatetime({
         field: timeField,
-        readonly: true
       });
 
       // then
       await expectNoViolations(container);
     });
 
-
-    it('should have no violations for errors - time', async function() {
-
+    it("should have no violations for readonly - time", async function () {
       // given
       this.timeout(10000);
 
       const { container } = createDatetime({
         field: timeField,
-        errors: [ 'Something went wrong' ]
+        readonly: true,
       });
 
       // then
       await expectNoViolations(container);
     });
 
-
-    it('should have no violations - datetime', async function() {
-
+    it("should have no violations for errors - time", async function () {
       // given
       this.timeout(10000);
 
       const { container } = createDatetime({
-        field: datetimeField
+        field: timeField,
+        errors: ["Something went wrong"],
       });
 
       // then
       await expectNoViolations(container);
     });
 
-
-    it('should have no violations for readonly - datetime', async function() {
-
-      // given
-      this.timeout(10000);
-
-      const { container } = createDatetime({
-        field: datetimeField,
-        readonly: true
-      });
-
-      // then
-      await expectNoViolations(container);
-    });
-
-
-    it('should have no violations for errors - datetime', async function() {
-
+    it("should have no violations - datetime", async function () {
       // given
       this.timeout(10000);
 
       const { container } = createDatetime({
         field: datetimeField,
-        errors: [ 'Something went wrong' ]
       });
 
       // then
       await expectNoViolations(container);
     });
 
+    it("should have no violations for readonly - datetime", async function () {
+      // given
+      this.timeout(10000);
+
+      const { container } = createDatetime({
+        field: datetimeField,
+        readonly: true,
+      });
+
+      // then
+      await expectNoViolations(container);
+    });
+
+    it("should have no violations for errors - datetime", async function () {
+      // given
+      this.timeout(10000);
+
+      const { container } = createDatetime({
+        field: datetimeField,
+        errors: ["Something went wrong"],
+      });
+
+      // then
+      await expectNoViolations(container);
+    });
   });
-
 });
 
 // helpers //////////
 
 const dateField = {
-  id: 'Field_1lkciix',
-  subtype: 'date',
-  dateLabel: 'Date',
-  type: 'datetime',
-  key: 'field_00rtqsi'
+  id: "Field_1lkciix",
+  subtype: "date",
+  dateLabel: "Date",
+  type: "datetime",
+  key: "field_00rtqsi",
 };
 
 const timeField = {
-  subtype: 'time',
-  type: 'datetime',
-  id: 'Field_1lkciix',
-  key: 'field_00rtqsi',
-  timeLabel: 'Time',
-  timeSerializingFormat: 'no_timezone',
-  timeInterval: 15
+  subtype: "time",
+  type: "datetime",
+  id: "Field_1lkciix",
+  key: "field_00rtqsi",
+  timeLabel: "Time",
+  timeSerializingFormat: "no_timezone",
+  timeInterval: 15,
 };
 
 const datetimeField = {
-  subtype: 'datetime',
-  dateLabel: 'Date',
-  type: 'datetime',
-  id: 'Field_1lkciix',
-  key: 'field_00rtqsi',
-  timeLabel: 'Time',
-  timeSerializingFormat: 'no_timezone',
-  timeInterval: 15
+  subtype: "datetime",
+  dateLabel: "Date",
+  type: "datetime",
+  id: "Field_1lkciix",
+  key: "field_00rtqsi",
+  timeLabel: "Time",
+  timeSerializingFormat: "no_timezone",
+  timeInterval: 15,
 };
 
 function createDatetime({ services, ...restOptions } = {}) {
-
   const options = {
-    domId: 'test-datetime',
+    domId: "test-datetime",
     field: dateField,
     onChange: () => {},
-    ...restOptions
+    ...restOptions,
   };
 
   return render(
-    <MockFormContext
-      services={ services }
-      options={ options }>
+    <MockFormContext services={services} options={options}>
       <Datetime
-        disabled={ options.disabled }
-        readonly={ options.readonly }
-        field={ options.field }
-        value={ options.value }
-        domId={ options.domId }
-        onBlur={ options.onBlur }
-        onChange={ options.onChange }
-        errors={ options.errors } />
-    </MockFormContext>, {
-      container: options.container || container.querySelector('.fjs-form')
-    }
+        disabled={options.disabled}
+        readonly={options.readonly}
+        field={options.field}
+        value={options.value}
+        domId={options.domId}
+        onBlur={options.onBlur}
+        onChange={options.onChange}
+        errors={options.errors}
+      />
+    </MockFormContext>,
+    {
+      container: options.container || container.querySelector(".fjs-form"),
+    },
   );
 }

@@ -1,52 +1,42 @@
-import { isSelectEntryEdited } from '@bpmn-io/properties-panel';
+import { isSelectEntryEdited } from "@bpmn-io/properties-panel";
 
-import { AutoFocusSelectEntry } from '../components';
+import { AutoFocusSelectEntry } from "../components";
 
-import { get, isString, isArray } from 'min-dash';
-
+import { get, isString, isArray } from "min-dash";
 
 const OPTIONS = {
   static: {
-    label: 'List of items',
-    value: 'static'
+    label: "List of items",
+    value: "static",
   },
   expression: {
-    label: 'Expression',
-    value: 'expression'
-  }
+    label: "Expression",
+    value: "expression",
+  },
 };
 
 const SELECT_OPTIONS = Object.values(OPTIONS);
 
-const COLUMNS_PATH = [ 'columns' ];
+const COLUMNS_PATH = ["columns"];
 
-const COLUMNS_EXPRESSION_PATH = [ 'columnsExpression' ];
+const COLUMNS_EXPRESSION_PATH = ["columnsExpression"];
 
 export function HeadersSourceSelectEntry(props) {
-  const {
-    editField,
-    field,
-    id
-  } = props;
+  const { editField, field, id } = props;
 
   return [
     {
-      id: id + '-select',
+      id: id + "-select",
       component: HeadersSourceSelect,
       isEdited: isSelectEntryEdited,
       editField,
-      field
-    }
+      field,
+    },
   ];
 }
 
 function HeadersSourceSelect(props) {
-
-  const {
-    editField,
-    field,
-    id
-  } = props;
+  const { editField, field, id } = props;
 
   /**
    * @returns {string|void}
@@ -67,39 +57,38 @@ function HeadersSourceSelect(props) {
   /**
    * @param {string|void} value
    */
-  const setValue = (value) => {
+  const setValue = value => {
     switch (value) {
-    case OPTIONS.static.value:
-      editField(field, {
-        columns: [
-          {
-            label: 'Column',
-            key: 'inputVariable'
-          }
-        ]
-      });
-      break;
-    case OPTIONS.expression.value:
-      editField(field, {
-        columnsExpression: '=',
-      });
-      break;
+      case OPTIONS.static.value:
+        editField(field, {
+          columns: [
+            {
+              label: "Column",
+              key: "inputVariable",
+            },
+          ],
+        });
+        break;
+      case OPTIONS.expression.value:
+        editField(field, {
+          columnsExpression: "=",
+        });
+        break;
     }
   };
 
   const getValuesSourceOptions = () => {
-
     return SELECT_OPTIONS;
   };
 
   return AutoFocusSelectEntry({
     autoFocusEntry: getAutoFocusEntryId(field),
-    label: 'Type',
+    label: "Type",
     element: field,
     getOptions: getValuesSourceOptions,
     getValue,
     id,
-    setValue
+    setValue,
   });
 }
 

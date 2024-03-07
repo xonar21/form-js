@@ -1,19 +1,11 @@
-import { get } from 'min-dash';
-import { useService } from '../../hooks';
-import { TextFieldEntry, isTextFieldEntryEdited } from '@bpmn-io/properties-panel';
+import { get } from "min-dash";
+import { useService } from "../../hooks";
+import { TextFieldEntry, isTextFieldEntryEdited } from "@bpmn-io/properties-panel";
 
 export function simpleStringEntryFactory(options) {
-  const {
-    id,
-    label,
-    path,
-    props
-  } = options;
+  const { id, label, path, props } = options;
 
-  const {
-    editField,
-    field
-  } = props;
+  const { editField, field } = props;
 
   return {
     id,
@@ -22,24 +14,18 @@ export function simpleStringEntryFactory(options) {
     field,
     editField,
     component: SimpleStringComponent,
-    isEdited: isTextFieldEntryEdited
+    isEdited: isTextFieldEntryEdited,
   };
 }
 
-const SimpleStringComponent = (props) => {
-  const {
-    id,
-    label,
-    path,
-    field,
-    editField
-  } = props;
+const SimpleStringComponent = props => {
+  const { id, label, path, field, editField } = props;
 
-  const debounce = useService('debounce');
+  const debounce = useService("debounce");
 
-  const getValue = () => get(field, path, '');
+  const getValue = () => get(field, path, "");
 
-  const setValue = (value) => editField(field, path, value);
+  const setValue = value => editField(field, path, value);
 
   return TextFieldEntry({
     debounce,
@@ -47,6 +33,6 @@ const SimpleStringComponent = (props) => {
     getValue,
     id,
     label,
-    setValue
+    setValue,
   });
 };

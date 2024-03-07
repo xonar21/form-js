@@ -1,10 +1,9 @@
-import showdown from 'showdown';
+import showdown from "showdown";
 
 // bootstrap showdown to support github flavored markdown
-showdown.setFlavor('github');
+showdown.setFlavor("github");
 
 export class MarkdownRenderer {
-
   constructor() {
     this._converter = new showdown.Converter();
   }

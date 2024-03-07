@@ -1,10 +1,6 @@
-import { get, set } from 'min-dash';
+import { get, set } from "min-dash";
 
-import {
-  NumberFieldEntry,
-  isNumberFieldEntryEdited
-} from '@bpmn-io/properties-panel';
-
+import { NumberFieldEntry, isNumberFieldEntryEdited } from "@bpmn-io/properties-panel";
 
 class CustomPropertiesProvider {
   constructor(propertiesPanel) {
@@ -12,18 +8,17 @@ class CustomPropertiesProvider {
   }
 
   getGroups(field, editField) {
-    return (groups) => {
-
-      if (field.type !== 'range') {
+    return groups => {
+      if (field.type !== "range") {
         return groups;
       }
 
-      const generalIdx = findGroupIdx(groups, 'general');
+      const generalIdx = findGroupIdx(groups, "general");
 
       groups.splice(generalIdx + 1, 0, {
-        id: 'range',
-        label: 'Range',
-        entries: RangeEntries(field, editField)
+        id: "range",
+        label: "Range",
+        entries: RangeEntries(field, editField),
       });
 
       return groups;
@@ -31,118 +26,100 @@ class CustomPropertiesProvider {
   }
 }
 
-CustomPropertiesProvider.$inject = [ 'propertiesPanel' ];
+CustomPropertiesProvider.$inject = ["propertiesPanel"];
 
 function RangeEntries(field, editField) {
+  const onChange = key => {
+    return value => {
+      const range = get(field, ["range"], {});
 
-  const onChange = (key) => {
-    return (value) => {
-      const range = get(field, [ 'range' ], {});
-
-      editField(field, [ 'range' ], set(range, [ key ], value));
+      editField(field, ["range"], set(range, [key], value));
     };
   };
 
-  const getValue = (key) => {
+  const getValue = key => {
     return () => {
-      return get(field, [ 'range', key ]);
+      return get(field, ["range", key]);
     };
   };
 
   return [
     {
-      id: 'range-min',
+      id: "range-min",
       component: Min,
       getValue,
       field,
       isEdited: isNumberFieldEntryEdited,
-      onChange
+      onChange,
     },
     {
-      id: 'range-max',
+      id: "range-max",
       component: Max,
       getValue,
       field,
       isEdited: isNumberFieldEntryEdited,
-      onChange
+      onChange,
     },
     {
-      id: 'range-step',
+      id: "range-step",
       component: Step,
       getValue,
       field,
       isEdited: isNumberFieldEntryEdited,
-      onChange
-    }
+      onChange,
+    },
   ];
-
 }
 
 function Min(props) {
-  const {
-    field,
-    getValue,
-    id,
-    onChange
-  } = props;
+  const { field, getValue, id, onChange } = props;
 
-  const debounce = (fn) => fn;
+  const debounce = fn => fn;
 
   return NumberFieldEntry({
     debounce,
     element: field,
-    getValue: getValue('min'),
+    getValue: getValue("min"),
     id,
-    label: 'Minimum',
-    setValue: onChange('min')
+    label: "Minimum",
+    setValue: onChange("min"),
   });
 }
 
 function Max(props) {
-  const {
-    field,
-    getValue,
-    id,
-    onChange
-  } = props;
+  const { field, getValue, id, onChange } = props;
 
-  const debounce = (fn) => fn;
+  const debounce = fn => fn;
 
   return NumberFieldEntry({
     debounce,
     element: field,
-    getValue: getValue('max'),
+    getValue: getValue("max"),
     id,
-    label: 'Maximum',
-    setValue: onChange('max')
+    label: "Maximum",
+    setValue: onChange("max"),
   });
 }
 
 function Step(props) {
-  const {
-    field,
-    getValue,
-    id,
-    onChange
-  } = props;
+  const { field, getValue, id, onChange } = props;
 
-  const debounce = (fn) => fn;
+  const debounce = fn => fn;
 
   return NumberFieldEntry({
     debounce,
     element: field,
-    getValue: getValue('step'),
+    getValue: getValue("step"),
     id,
     min: 0,
-    label: 'Step',
-    setValue: onChange('step')
+    label: "Step",
+    setValue: onChange("step"),
   });
 }
 
-
 export const CustomPropertiesProviderModule = {
-  __init__: [ 'customPropertiesProvider' ],
-  customPropertiesProvider: [ 'type', CustomPropertiesProvider ]
+  __init__: ["customPropertiesProvider"],
+  customPropertiesProvider: ["type", CustomPropertiesProvider],
 };
 
 // helper //////////////////////

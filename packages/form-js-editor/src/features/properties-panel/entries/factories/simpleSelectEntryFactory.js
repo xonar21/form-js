@@ -1,19 +1,10 @@
-import { get } from 'min-dash';
-import { isSelectEntryEdited, SelectEntry } from '@bpmn-io/properties-panel';
+import { get } from "min-dash";
+import { isSelectEntryEdited, SelectEntry } from "@bpmn-io/properties-panel";
 
 export function simpleSelectEntryFactory(options) {
-  const {
-    id,
-    label,
-    path,
-    props,
-    optionsArray
-  } = options;
+  const { id, label, path, props, optionsArray } = options;
 
-  const {
-    editField,
-    field
-  } = props;
+  const { editField, field } = props;
 
   return {
     id,
@@ -27,19 +18,12 @@ export function simpleSelectEntryFactory(options) {
   };
 }
 
-const SimpleSelectComponent = (props) => {
-  const {
-    id,
-    label,
-    path,
-    field,
-    editField,
-    optionsArray
-  } = props;
+const SimpleSelectComponent = props => {
+  const { id, label, path, field, editField, optionsArray } = props;
 
-  const getValue = () => get(field, path, '');
+  const getValue = () => get(field, path, "");
 
-  const setValue = (value) => editField(field, path, value);
+  const setValue = value => editField(field, path, value);
 
   const getOptions = () => optionsArray;
 
@@ -49,6 +33,6 @@ const SimpleSelectComponent = (props) => {
     getOptions,
     getValue,
     id,
-    setValue
+    setValue,
   });
 };

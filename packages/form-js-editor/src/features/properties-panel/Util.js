@@ -1,7 +1,7 @@
-import Big from 'big.js';
+import Big from "big.js";
 
 export function arrayAdd(array, index, item) {
-  const copy = [ ...array ];
+  const copy = [...array];
 
   copy.splice(index, 0, item);
 
@@ -9,7 +9,7 @@ export function arrayAdd(array, index, item) {
 }
 
 export function arrayRemove(array, index) {
-  const copy = [ ...array ];
+  const copy = [...array];
 
   copy.splice(index, 1);
 
@@ -17,14 +17,13 @@ export function arrayRemove(array, index) {
 }
 
 export function prefixId(id) {
-  return `fjs-properties-panel-${ id }`;
+  return `fjs-properties-panel-${id}`;
 }
-
 
 export function countDecimals(number) {
   const num = Big(number);
   if (num.toString() === num.toFixed(0)) return 0;
-  return num.toFixed().split('.')[1].length || 0;
+  return num.toFixed().split(".")[1].length || 0;
 }
 
 /**
@@ -33,11 +32,11 @@ export function countDecimals(number) {
  * @returns {boolean}
  */
 export function isValidNumber(value) {
-  return (typeof value === 'number' || typeof value === 'string') && value !== '' && !isNaN(Number(value));
+  return (typeof value === "number" || typeof value === "string") && value !== "" && !isNaN(Number(value));
 }
 
 export function stopPropagation(listener) {
-  return (event) => {
+  return event => {
     event.stopPropagation();
 
     listener(event);
@@ -45,15 +44,13 @@ export function stopPropagation(listener) {
 }
 
 export function textToLabel(text) {
+  if (typeof text != "string") return null;
 
-  if (typeof text != 'string') return null;
-
-  for (const line of text.split('\n')) {
-
+  for (const line of text.split("\n")) {
     const displayLine = line.trim();
 
     // we use the first non-whitespace line in the text as label
-    if (displayLine !== '') {
+    if (displayLine !== "") {
       return displayLine;
     }
   }
@@ -62,38 +59,27 @@ export function textToLabel(text) {
 }
 
 /**
-  * @param {string} path
-  */
+ * @param {string} path
+ */
 export function isValidDotPath(path) {
   return /^\w+(\.\w+)*$/.test(path);
 }
 
-export const LABELED_NON_INPUTS = [
-  'button',
-  'group',
-  'dynamiclist',
-  'iframe',
-  'table'
-];
+export const LABELED_NON_INPUTS = ["button", "group", "dynamiclist", "iframe", "table"];
 
 export const INPUTS = [
-  'checkbox',
-  'checklist',
-  'datetime',
-  'number',
-  'radio',
-  'select',
-  'taglist',
-  'textfield',
-  'textarea'
+  "checkbox",
+  "checklist",
+  "datetime",
+  "number",
+  "radio",
+  "select",
+  "taglist",
+  "textfield",
+  "textarea",
 ];
 
-export const OPTIONS_INPUTS = [
-  'checklist',
-  'radio',
-  'select',
-  'taglist'
-];
+export const OPTIONS_INPUTS = ["checklist", "radio", "select", "taglist"];
 
 export function hasEntryConfigured(formFieldDefinition, entryId) {
   const { propertiesPanelEntries = [] } = formFieldDefinition;
@@ -112,12 +98,12 @@ export function hasOptionsGroupsConfigured(formFieldDefinition) {
     return false;
   }
 
-  return propertiesPanelEntries.some(id => id === 'values');
+  return propertiesPanelEntries.some(id => id === "values");
 }
 
 /**
-  * @param {string} path
-  */
+ * @param {string} path
+ */
 export function hasIntegerPathSegment(path) {
-  return path.split('.').some(segment => /^\d+$/.test(segment));
+  return path.split(".").some(segment => /^\d+$/.test(segment));
 }

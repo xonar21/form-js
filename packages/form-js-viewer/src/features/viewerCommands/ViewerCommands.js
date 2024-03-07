@@ -1,23 +1,23 @@
-import { UpdateFieldValidationHandler } from './cmd/UpdateFieldValidationHandler';
+import { UpdateFieldValidationHandler } from "./cmd/UpdateFieldValidationHandler";
 
 export class ViewerCommands {
   constructor(commandStack, eventBus) {
     this._commandStack = commandStack;
 
-    eventBus.on('form.init', () => {
+    eventBus.on("form.init", () => {
       this.registerHandlers();
     });
   }
 
   registerHandlers() {
-    Object.entries(this.getHandlers()).forEach(([ id, handler ]) => {
+    Object.entries(this.getHandlers()).forEach(([id, handler]) => {
       this._commandStack.registerHandler(id, handler);
     });
   }
 
   getHandlers() {
     return {
-      'formField.validation.update': UpdateFieldValidationHandler
+      "formField.validation.update": UpdateFieldValidationHandler,
     };
   }
 
@@ -25,15 +25,11 @@ export class ViewerCommands {
     const context = {
       field,
       value,
-      indexes
+      indexes,
     };
 
-    this._commandStack.execute('formField.validation.update', context);
+    this._commandStack.execute("formField.validation.update", context);
   }
-
 }
 
-ViewerCommands.$inject = [
-  'commandStack',
-  'eventBus'
-];
+ViewerCommands.$inject = ["commandStack", "eventBus"];

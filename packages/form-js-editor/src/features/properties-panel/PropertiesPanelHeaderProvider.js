@@ -1,54 +1,43 @@
-import {
-  textToLabel
-} from './Util';
+import { textToLabel } from "./Util";
 
-import { iconsByType } from '../../render/components/icons';
+import { iconsByType } from "../../render/components/icons";
 
-import { getPaletteIcon } from '../palette/components/Palette';
+import { getPaletteIcon } from "../palette/components/Palette";
 
-import { useService } from './hooks';
+import { useService } from "./hooks";
 
-const headerlessTypes = [
-  'spacer',
-  'separator',
-  'html'
-];
+const headerlessTypes = ["spacer", "separator", "html"];
 
 export const PropertiesPanelHeaderProvider = {
-
-  getElementLabel: (field) => {
-    const {
-      type
-    } = field;
+  getElementLabel: field => {
+    const { type } = field;
 
     if (headerlessTypes.includes(type)) {
-      return '';
+      return "";
     }
 
-    if (type === 'text') {
+    if (type === "text") {
       return textToLabel(field.text);
     }
 
-    if (type === 'image') {
+    if (type === "image") {
       return field.alt;
     }
 
-    if (type === 'default') {
+    if (type === "default") {
       return field.id;
     }
 
     return field.label;
   },
 
-  getElementIcon: (field) => {
-    const {
-      type
-    } = field;
+  getElementIcon: field => {
+    const { type } = field;
 
     // @Note: We know that we are inside the properties panel context,
     // so we can savely use the hook here.
     // eslint-disable-next-line react-hooks/rules-of-hooks
-    const fieldDefinition = useService('formFields').get(type).config;
+    const fieldDefinition = useService("formFields").get(type).config;
 
     const Icon = fieldDefinition.icon || iconsByType(type);
 
@@ -59,20 +48,18 @@ export const PropertiesPanelHeaderProvider = {
     }
   },
 
-  getTypeLabel: (field) => {
-    const {
-      type
-    } = field;
+  getTypeLabel: field => {
+    const { type } = field;
 
-    if (type === 'default') {
-      return 'Form';
+    if (type === "default") {
+      return "Form";
     }
 
     // @Note: We know that we are inside the properties panel context,
     // so we can savely use the hook here.
     // eslint-disable-next-line react-hooks/rules-of-hooks
-    const fieldDefinition = useService('formFields').get(type).config;
+    const fieldDefinition = useService("formFields").get(type).config;
 
     return fieldDefinition.label || type;
-  }
+  },
 };

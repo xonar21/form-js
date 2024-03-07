@@ -1,11 +1,11 @@
 export const form = {
-  type: 'default',
+  type: "default",
   components: [
     {
-      type: 'datetime',
-      key: 'date'
-    }
-  ]
+      type: "datetime",
+      key: "date",
+    },
+  ],
 };
 
 export const errors = null;

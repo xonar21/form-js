@@ -2,8 +2,8 @@
  * DEPRECATED: This file is deprecated and will be removed with one of the next releases.
  */
 
-import { css, createGlobalStyle } from 'styled-components';
-import { rem } from '@carbon/elements';
+import { css, createGlobalStyle } from "styled-components";
+import { rem } from "@carbon/elements";
 
 function getSelectArrowSvg(color) {
   return `url('data:image/svg+xml;base64,${window.btoa(
@@ -68,7 +68,7 @@ const MARKDOWN_STYLES = css`
       letter-spacing: var(--cds-body-long-01-letter-spacing);
       margin-bottom: var(--cds-spacing-05);
     }
-  
+
     & h1 {
       font-size: var(--cds-productive-heading-06-font-size);
       font-weight: var(--cds-productive-heading-06-font-weight);
@@ -160,7 +160,7 @@ const MARKDOWN_STYLES = css`
       &:before {
         position: absolute;
         left: calc(-1 * var(--cds-spacing-05));
-        content: '–';
+        content: "–";
       }
     }
 
@@ -171,14 +171,14 @@ const MARKDOWN_STYLES = css`
       &:before {
         position: absolute;
         left: calc(-1 * var(--cds-spacing-05));
-        content: counter(item) '.';
+        content: counter(item) ".";
       }
     }
 
     pre {
       margin-bottom: var(--cds-spacing-05);
     }
-  
+
     div > :last-child {
       margin-bottom: 0;
     }
@@ -301,8 +301,8 @@ const READONLY_STYLES = css`
             }
           }
 
-          &.fjs-checked .fjs-input[type='checkbox'],
-          .fjs-form-field-label.fjs-checked .fjs-input[type='checkbox'] {
+          &.fjs-checked .fjs-input[type="checkbox"],
+          .fjs-form-field-label.fjs-checked .fjs-input[type="checkbox"] {
             &:before {
               border: 1px solid var(--cds-icon-disabled);
               background: transparent;
@@ -366,7 +366,7 @@ const DISABLED_STYLES = css`
       cursor: var(--cursor-disabled, not-allowed);
     }
 
-    .fjs-form-field.fjs-disabled.fjs-checked .fjs-input[type='checkbox'] {
+    .fjs-form-field.fjs-disabled.fjs-checked .fjs-input[type="checkbox"] {
       cursor: var(--cursor-disabled, not-allowed);
       &:before {
         border-color: var(--cds-icon-disabled);
@@ -379,7 +379,7 @@ const DISABLED_STYLES = css`
       }
     }
 
-    .fjs-form-field.fjs-disabled .fjs-input[type='checkbox'] {
+    .fjs-form-field.fjs-disabled .fjs-input[type="checkbox"] {
       cursor: var(--cursor-disabled, not-allowed);
       &:before {
         border-color: var(--cds-icon-disabled);
@@ -387,10 +387,7 @@ const DISABLED_STYLES = css`
       }
     }
 
-    .fjs-form-field-datetime.fjs-disabled
-      .fjs-input-group
-      .fjs-input-adornment
-      svg {
+    .fjs-form-field-datetime.fjs-disabled .fjs-input-group .fjs-input-adornment svg {
       color: var(--cds-icon-disabled);
       cursor: var(--cursor-disabled, not-allowed);
     }
@@ -416,22 +413,18 @@ const LABEL_DESCRIPTION_ERROR_STYLES = css`
       letter-spacing: var(--cds-label-01-letter-spacing);
     }
 
-    .fjs-form-field:not(.fjs-form-field-checkbox, .fjs-form-field-grouplike)
-      .fjs-form-field-label:first-child {
+    .fjs-form-field:not(.fjs-form-field-checkbox, .fjs-form-field-grouplike) .fjs-form-field-label:first-child {
       margin: 0;
       margin-bottom: var(--cds-spacing-03);
     }
 
-    .fjs-form-field.fjs-form-field-radio
-      .fjs-form-field-label:not(:first-of-type),
-    .fjs-form-field.fjs-form-field-checklist
-      .fjs-form-field-label:not(:first-of-type) {
+    .fjs-form-field.fjs-form-field-radio .fjs-form-field-label:not(:first-of-type),
+    .fjs-form-field.fjs-form-field-checklist .fjs-form-field-label:not(:first-of-type) {
       margin: 0;
       margin-bottom: 0.1875rem;
     }
 
-    .fjs-form-field.fjs-form-field-radio
-      .fjs-form-field-label:not(:first-of-type) {
+    .fjs-form-field.fjs-form-field-radio .fjs-form-field-label:not(:first-of-type) {
       min-height: ${rem(27)};
     }
 
@@ -461,13 +454,13 @@ const LABEL_DESCRIPTION_ERROR_STYLES = css`
 
 const CHECKBOX_STYLES = css`
   .fjs-container {
-    .fjs-input[type='checkbox'],
-    .fjs-input[type='checkbox']:focus {
+    .fjs-input[type="checkbox"],
+    .fjs-input[type="checkbox"]:focus {
       all: unset;
       width: ${rem(6)};
     }
 
-    .fjs-form-field .fjs-input[type='checkbox'] {
+    .fjs-form-field .fjs-input[type="checkbox"] {
       position: relative;
       display: flex;
       min-height: ${rem(24)};
@@ -495,7 +488,7 @@ const CHECKBOX_STYLES = css`
         margin: ${rem(2)} ${rem(2)} ${rem(2)} ${rem(3)};
         background-color: transparent;
         border-radius: 1px;
-        content: '';
+        content: "";
       }
 
       &:after {
@@ -508,23 +501,21 @@ const CHECKBOX_STYLES = css`
         border-left: 2px solid var(--cds-icon-inverse);
         margin-top: ${rem(-3)};
         background: 0 0;
-        content: '';
+        content: "";
         transform: scale(0) rotate(-45deg);
         transform-origin: bottom right;
       }
     }
 
-    .fjs-form-field .fjs-input[type='checkbox']:focus {
+    .fjs-form-field .fjs-input[type="checkbox"]:focus {
       &:before {
         outline: 2px solid var(--cds-focus);
         outline-offset: 1px;
       }
     }
 
-    .fjs-form-field.fjs-checked .fjs-input[type='checkbox'],
-    .fjs-form-field
-      .fjs-form-field-label.fjs-checked
-      .fjs-input[type='checkbox'] {
+    .fjs-form-field.fjs-checked .fjs-input[type="checkbox"],
+    .fjs-form-field .fjs-form-field-label.fjs-checked .fjs-input[type="checkbox"] {
       &:before {
         border: none;
         border-width: 1px;
@@ -649,7 +640,7 @@ const RADIO_STYLES = css`
         border: 1px solid var(--cds-icon-primary);
         background-color: transparent;
         border-radius: 50%;
-        content: '';
+        content: "";
       }
     }
 
@@ -662,7 +653,7 @@ const RADIO_STYLES = css`
       height: ${rem(18)};
       background-color: var(--cds-icon-primary);
       border-radius: 50%;
-      content: '';
+      content: "";
       transform: scale(0.5);
     }
 
@@ -708,8 +699,7 @@ const BUTTON_STYLES = css`
 
     .fjs-form-field.fjs-form-field-button .fjs-button:focus {
       border-color: var(--cds-focus);
-      box-shadow: inset 0 0 0 1px var(--cds-focus),
-        inset 0 0 0 2px var(--cds-background);
+      box-shadow: inset 0 0 0 1px var(--cds-focus), inset 0 0 0 2px var(--cds-background);
       color: var(--cds-text-inverse);
       background-color: var(--cds-button-tertiary);
     }
@@ -729,13 +719,13 @@ const BUTTON_STYLES = css`
       outline: none;
     }
 
-    .fjs-form-field.fjs-form-field-button .fjs-button[type='submit'] {
+    .fjs-form-field.fjs-form-field-button .fjs-button[type="submit"] {
       background-color: var(--cds-button-primary);
       border: 1px solid transparent;
       color: var(--cds-text-on-color);
     }
 
-    .fjs-form-field.fjs-form-field-button .fjs-button[type='submit']:disabled {
+    .fjs-form-field.fjs-form-field-button .fjs-button[type="submit"]:disabled {
       background: var(--cds-button-disabled);
     }
   }
@@ -851,11 +841,11 @@ const DATETIME_INPUTS = css`
         }
 
         select {
-          ${getBaseInputStyles({ height: '1.5rem' })};
+          ${getBaseInputStyles({ height: "1.5rem" })};
           ${getSelectArrowStyles({
-    arrowRightPosition: 'var(--cds-spacing-03)',
-    color: theme.iconPrimary,
-  })};
+            arrowRightPosition: "var(--cds-spacing-03)",
+            color: theme.iconPrimary,
+          })};
           border-bottom: none;
           padding-right: 2rem;
         }
@@ -940,11 +930,11 @@ const SELECT_STYLES = css`
   ${({ theme }) => css`
     .fjs-container {
       .fjs-form-field-select .fjs-input-group {
-        ${getBaseInputStyles({ height: '2.5rem' })}
+        ${getBaseInputStyles({ height: "2.5rem" })}
         ${getSelectArrowStyles({
-    arrowRightPosition: 'var(--cds-spacing-05)',
-    color: theme.iconPrimary,
-  })}
+          arrowRightPosition: "var(--cds-spacing-05)",
+          color: theme.iconPrimary,
+        })}
 
         .fjs-select-display {
           display: flex;
@@ -998,9 +988,9 @@ const SELECT_STYLES = css`
 
       .fjs-form-field-select.fjs-disabled .fjs-input-group {
         ${getSelectArrowStyles({
-    arrowRightPosition: 'var(--cds-spacing-05)',
-    color: theme.iconDisabled,
-  })}
+          arrowRightPosition: "var(--cds-spacing-05)",
+          color: theme.iconDisabled,
+        })}
       }
 
       .fjs-has-errors.fjs-form-field-select .fjs-input-group:focus-within {
@@ -1023,7 +1013,7 @@ const REMAINING_INPUTS = css`
     .fjs-textarea,
     .fjs-taglist,
     .fjs-form-field-select.fjs-disabled .fjs-input-group {
-      ${getBaseInputStyles({ height: '2.5rem' })}
+      ${getBaseInputStyles({ height: "2.5rem" })}
     }
 
     .fjs-form-field-textfield .fjs-input-group,

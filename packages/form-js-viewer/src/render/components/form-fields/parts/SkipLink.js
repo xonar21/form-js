@@ -1,29 +1,24 @@
-import classNames from 'classnames';
+import classNames from "classnames";
 
-import { useCallback } from 'preact/hooks';
+import { useCallback } from "preact/hooks";
 
 export function SkipLink(props) {
+  const { className, label, onSkip } = props;
 
-  const {
-    className,
-    label,
-    onSkip
-  } = props;
-
-  const onKeyDown = useCallback(event => {
-    if (event.key === 'Enter') {
-      event.preventDefault();
-      event.stopPropagation();
-      onSkip();
-    }
-  }, [ onSkip ]);
-
+  const onKeyDown = useCallback(
+    event => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        event.stopPropagation();
+        onSkip();
+      }
+    },
+    [onSkip],
+  );
 
   return (
-    <a
-      href="#"
-      class={ classNames('fjs-skip-link', className) }
-      onKeyDown={ onKeyDown }
-    >{ label }</a>
+    <a href="#" class={classNames("fjs-skip-link", className)} onKeyDown={onKeyDown}>
+      {label}
+    </a>
   );
 }

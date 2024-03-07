@@ -1,14 +1,14 @@
-const { useEffect, useRef, useCallback } = require('preact/hooks');
+const { useEffect, useRef, useCallback } = require("preact/hooks");
 
 const usePrevious = (value, initialValue) => {
   const ref = useRef(initialValue);
   useEffect(() => {
     ref.current = value;
-  }, [ value ]);
+  }, [value]);
   return ref.current;
 };
 
-export function useEffectDebugger(effect, dependencies, dependencyNames = [], effectName = 'noname') {
+export function useEffectDebugger(effect, dependencies, dependencyNames = [], effectName = "noname") {
   const previousDeps = usePrevious(dependencies, []);
 
   const changedDeps = dependencies.reduce((accum, dependency, index) => {
@@ -18,8 +18,8 @@ export function useEffectDebugger(effect, dependencies, dependencyNames = [], ef
         ...accum,
         [keyName]: {
           before: previousDeps[index],
-          after: dependency
-        }
+          after: dependency,
+        },
       };
     }
 
@@ -27,13 +27,13 @@ export function useEffectDebugger(effect, dependencies, dependencyNames = [], ef
   }, {});
 
   if (Object.keys(changedDeps).length) {
-    console.log('[use-effect-debugger] (' + effectName + ') ', changedDeps);
+    console.log("[use-effect-debugger] (" + effectName + ") ", changedDeps);
   }
 
-  useEffect(effect, [ effect, ...dependencies ]);
+  useEffect(effect, [effect, ...dependencies]);
 }
 
-export function useCallbackDebugger(callback, dependencies, dependencyNames = [], callbackName = 'noname') {
+export function useCallbackDebugger(callback, dependencies, dependencyNames = [], callbackName = "noname") {
   const previousDeps = usePrevious(dependencies, []);
 
   const changedDeps = dependencies.reduce((accum, dependency, index) => {
@@ -43,8 +43,8 @@ export function useCallbackDebugger(callback, dependencies, dependencyNames = []
         ...accum,
         [keyName]: {
           before: previousDeps[index],
-          after: dependency
-        }
+          after: dependency,
+        },
       };
     }
 
@@ -52,8 +52,8 @@ export function useCallbackDebugger(callback, dependencies, dependencyNames = []
   }, {});
 
   if (Object.keys(changedDeps).length) {
-    console.log('[use-callback-debugger] (' + callbackName + ') ', changedDeps);
+    console.log("[use-callback-debugger] (" + callbackName + ") ", changedDeps);
   }
 
-  return useCallback(callback, [ callback, ...dependencies ]);
+  return useCallback(callback, [callback, ...dependencies]);
 }

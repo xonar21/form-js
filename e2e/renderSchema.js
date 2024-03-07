@@ -1,20 +1,20 @@
-import { FormPlayground, FormEditor, Form } from '@bpmn-io/form-js';
-import emptySchema from './visual/fixtures/empty.json';
+import { FormPlayground, FormEditor, Form } from "@bpmn-io/form-js";
+import emptySchema from "./visual/fixtures/empty.json";
 
 const DEFAULT_SCHEMA = {
   data: {
-    component: 'playground',
+    component: "playground",
     schema: emptySchema,
   },
 };
 
 async function fetchSchema() {
   try {
-    const response = await fetch('/form');
+    const response = await fetch("/form");
 
     if (
       response.ok &&
-      (response.headers.get('content-type') === null || !response.headers.get('content-type').includes('text/html'))
+      (response.headers.get("content-type") === null || !response.headers.get("content-type").includes("text/html"))
     ) {
       return response.json();
     }
@@ -32,18 +32,18 @@ const COMPONENTS = {
 };
 
 function renderSchema() {
-  fetchSchema().then((response) => {
+  fetchSchema().then(response => {
     const data = response.data;
 
-    const FormComponent = COMPONENTS[data.component || 'viewer'];
+    const FormComponent = COMPONENTS[data.component || "viewer"];
 
     const form = new FormComponent({
-      container: document.querySelector('#container'),
+      container: document.querySelector("#container"),
       schema: data.schema,
       data: {},
     });
 
-    if (data.component !== 'playground') {
+    if (data.component !== "playground") {
       form.importSchema(data.schema);
     }
   });

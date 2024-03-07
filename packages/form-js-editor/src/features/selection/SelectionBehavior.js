@@ -1,21 +1,18 @@
 export class SelectionBehavior {
   constructor(eventBus, selection) {
-    eventBus.on([
-      'commandStack.formField.add.postExecuted',
-      'commandStack.formField.move.postExecuted'
-    ], ({ context }) => {
-      const { formField } = context;
+    eventBus.on(
+      ["commandStack.formField.add.postExecuted", "commandStack.formField.move.postExecuted"],
+      ({ context }) => {
+        const { formField } = context;
 
-      selection.set(formField);
-    });
+        selection.set(formField);
+      },
+    );
 
-    eventBus.on('commandStack.formField.remove.postExecuted', ({ context }) => {
-      const {
-        sourceFormField,
-        sourceIndex
-      } = context;
+    eventBus.on("commandStack.formField.remove.postExecuted", ({ context }) => {
+      const { sourceFormField, sourceIndex } = context;
 
-      const formField = sourceFormField.components[ sourceIndex ] || sourceFormField.components[ sourceIndex - 1 ];
+      const formField = sourceFormField.components[sourceIndex] || sourceFormField.components[sourceIndex - 1];
 
       if (formField) {
         selection.set(formField);
@@ -24,7 +21,7 @@ export class SelectionBehavior {
       }
     });
 
-    eventBus.on('formField.remove', ({ formField }) => {
+    eventBus.on("formField.remove", ({ formField }) => {
       if (selection.isSelected(formField)) {
         selection.clear();
       }
@@ -32,4 +29,4 @@ export class SelectionBehavior {
   }
 }
 
-SelectionBehavior.$inject = [ 'eventBus', 'selection' ];
+SelectionBehavior.$inject = ["eventBus", "selection"];

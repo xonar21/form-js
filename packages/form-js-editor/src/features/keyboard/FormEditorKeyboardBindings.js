@@ -1,19 +1,12 @@
-import {
-  isCmd,
-  isKey,
-  isShift
-} from 'diagram-js/lib/features/keyboard/KeyboardUtil';
+import { isCmd, isKey, isShift } from "diagram-js/lib/features/keyboard/KeyboardUtil";
 
-import {
-  KEYS_REDO,
-  KEYS_UNDO
-} from 'diagram-js/lib/features/keyboard/KeyboardBindings';
+import { KEYS_REDO, KEYS_UNDO } from "diagram-js/lib/features/keyboard/KeyboardBindings";
 
 const LOW_PRIORITY = 500;
 
 export class FormEditorKeyboardBindings {
   constructor(eventBus, keyboard) {
-    eventBus.on('editorActions.init', LOW_PRIORITY, (event) => {
+    eventBus.on("editorActions.init", LOW_PRIORITY, event => {
       const { editorActions } = event;
 
       this.registerBindings(keyboard, editorActions);
@@ -21,7 +14,6 @@ export class FormEditorKeyboardBindings {
   }
 
   registerBindings(keyboard, editorActions) {
-
     function addListener(action, fn) {
       if (editorActions.isRegistered(action)) {
         keyboard.addListener(fn);
@@ -30,11 +22,11 @@ export class FormEditorKeyboardBindings {
 
     // undo
     // (CTRL|CMD) + Z
-    addListener('undo', (context) => {
+    addListener("undo", context => {
       const { keyEvent } = context;
 
       if (isCmd(keyEvent) && !isShift(keyEvent) && isKey(KEYS_UNDO, keyEvent)) {
-        editorActions.trigger('undo');
+        editorActions.trigger("undo");
 
         return true;
       }
@@ -43,17 +35,16 @@ export class FormEditorKeyboardBindings {
     // redo
     // CTRL + Y
     // CMD + SHIFT + Z
-    addListener('redo', (context) => {
+    addListener("redo", context => {
       const { keyEvent } = context;
 
       if (isCmd(keyEvent) && (isKey(KEYS_REDO, keyEvent) || (isKey(KEYS_UNDO, keyEvent) && isShift(keyEvent)))) {
-        editorActions.trigger('redo');
+        editorActions.trigger("redo");
 
         return true;
       }
     });
-
   }
 }
 
-FormEditorKeyboardBindings.$inject = [ 'eventBus', 'keyboard' ];
+FormEditorKeyboardBindings.$inject = ["eventBus", "keyboard"];

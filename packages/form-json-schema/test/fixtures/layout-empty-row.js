@@ -1,15 +1,15 @@
 export const form = {
-  type: 'default',
+  type: "default",
   components: [
     {
-      type: 'textfield',
-      key: 'firstName',
+      type: "textfield",
+      key: "firstName",
       layout: {
         row: null,
-        columns: 12
-      }
-    }
-  ]
+        columns: 12,
+      },
+    },
+  ],
 };
 
 export const errors = null;

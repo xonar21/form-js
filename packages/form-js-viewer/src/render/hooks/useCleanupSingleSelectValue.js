@@ -1,20 +1,12 @@
-import { useEffect } from 'preact/hooks';
-import { LOAD_STATES } from './useOptionsAsync';
-import { hasEqualValue } from '../components/util/sanitizerUtil';
+import { useEffect } from "preact/hooks";
+import { LOAD_STATES } from "./useOptionsAsync";
+import { hasEqualValue } from "../components/util/sanitizerUtil";
 
 export function useCleanupSingleSelectValue(props) {
-
-  const {
-    field,
-    options,
-    loadState,
-    onChange,
-    value
-  } = props;
+  const { field, options, loadState, onChange, value } = props;
 
   // Ensures that the value is always one of the possible options
   useEffect(() => {
-
     if (loadState !== LOAD_STATES.LOADED) {
       return;
     }
@@ -25,10 +17,8 @@ export function useCleanupSingleSelectValue(props) {
     if (hasValueNotInOptions) {
       onChange({
         field,
-        value: null
+        value: null,
       });
     }
-
-  }, [ field, options, onChange, value, loadState ]);
-
+  }, [field, options, onChange, value, loadState]);
 }

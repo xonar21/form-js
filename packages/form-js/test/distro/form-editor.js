@@ -1,16 +1,13 @@
-describe('form-editor', function() {
-
+describe("form-editor", function () {
   let container;
 
   beforeEach(() => {
-    container = document.createElement('div');
+    container = document.createElement("div");
 
     document.body.appendChild(container);
   });
 
-
-  it('should expose <FormEditor> global', function() {
-
+  it("should expose <FormEditor> global", function () {
     // when
     const FormEditor = window.FormEditor;
 
@@ -21,42 +18,37 @@ describe('form-editor', function() {
     expect(FormEditor.schemaVersion).to.exist;
   });
 
-
-  it('should edit form', async function() {
-
+  it("should edit form", async function () {
     // given
-    const {
-      createFormEditor,
-      schemaVersion
-    } = window.FormEditor;
+    const { createFormEditor, schemaVersion } = window.FormEditor;
 
     const schema = {
-      type: 'default',
+      type: "default",
       components: [
         {
-          type: 'text',
-          text: 'Apply for a loan'
+          type: "text",
+          text: "Apply for a loan",
         },
         {
-          key: 'creditor',
-          label: 'Creditor',
-          type: 'textfield',
+          key: "creditor",
+          label: "Creditor",
+          type: "textfield",
           validate: {
-            required: true
-          }
-        }
-      ]
+            required: true,
+          },
+        },
+      ],
     };
 
     const data = {
-      creditor: 'John Doe Company'
+      creditor: "John Doe Company",
     };
 
     // when
     const editor = await createFormEditor({
       container,
       schema,
-      data
+      data,
     });
 
     // then
@@ -65,7 +57,6 @@ describe('form-editor', function() {
     // export works, too
     const savedSchema = editor.getSchema();
 
-    expect(savedSchema).to.have.property('schemaVersion', schemaVersion);
+    expect(savedSchema).to.have.property("schemaVersion", schemaVersion);
   });
-
 });

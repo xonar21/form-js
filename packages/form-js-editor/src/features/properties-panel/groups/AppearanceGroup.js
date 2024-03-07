@@ -1,16 +1,10 @@
-import {
-  AdornerEntry,
-  GroupAppearanceEntry,
-  LayouterAppearanceEntry
-} from '../entries';
-
+import { AdornerEntry, GroupAppearanceEntry, LayouterAppearanceEntry } from "../entries";
 
 export function AppearanceGroup(field, editField, getService) {
-
   const entries = [
     ...AdornerEntry({ field, editField }),
     ...GroupAppearanceEntry({ field, editField }),
-    ...LayouterAppearanceEntry({ field, editField })
+    ...LayouterAppearanceEntry({ field, editField }),
   ];
 
   if (!entries.length) {
@@ -18,8 +12,8 @@ export function AppearanceGroup(field, editField, getService) {
   }
 
   return {
-    id: 'appearance',
-    label: 'Appearance',
-    entries
+    id: "appearance",
+    label: "Appearance",
+    entries,
   };
 }

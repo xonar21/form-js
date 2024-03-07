@@ -1,10 +1,10 @@
-import { FormEditorContext } from '../../../../../../src/render/context';
-import { FormContext } from '@bpmn-io/form-js-viewer';
-import showdown from 'showdown';
+import { FormEditorContext } from "../../../../../../src/render/context";
+import { FormContext } from "@bpmn-io/form-js-viewer";
+import showdown from "showdown";
 
 class MarkdownRenderer {
   constructor() {
-    showdown.setFlavor('github');
+    showdown.setFlavor("github");
     this._converter = new showdown.Converter();
   }
 
@@ -15,16 +15,11 @@ class MarkdownRenderer {
 
 MarkdownRenderer.$inject = [];
 
-export function WithEditorFormContext(Component, options = {}, formId = 'foo') {
-
+export function WithEditorFormContext(Component, options = {}, formId = "foo") {
   function getService(type, strict) {
+    const { isExpression, isTemplate } = options;
 
-    const {
-      isExpression,
-      isTemplate,
-    } = options;
-
-    if (type === 'form') {
+    if (type === "form") {
       return {
         _getState() {
           return {
@@ -32,30 +27,28 @@ export function WithEditorFormContext(Component, options = {}, formId = 'foo') {
             data: {},
             errors: {},
             properties: {
-              disabled: true
-            }
+              disabled: true,
+            },
           };
-        }
+        },
       };
-    } else if (type === 'templating') {
+    } else if (type === "templating") {
       return { isTemplate };
-    } else if (type === 'expressionLanguage') {
+    } else if (type === "expressionLanguage") {
       return { isExpression };
-    } else if (type === 'markdownRenderer') {
+    } else if (type === "markdownRenderer") {
       return new MarkdownRenderer();
     }
   }
 
   const formEditorContext = {
     getService,
-    formId
+    formId,
   };
 
   return (
-    <FormContext.Provider value={ formEditorContext }>
-      <FormEditorContext.Provider value={ formEditorContext }>
-        { Component }
-      </FormEditorContext.Provider>
+    <FormContext.Provider value={formEditorContext}>
+      <FormEditorContext.Provider value={formEditorContext}>{Component}</FormEditorContext.Provider>
     </FormContext.Provider>
   );
 }

@@ -1,14 +1,14 @@
-import classNames from 'classnames';
+import classNames from "classnames";
 
 const emptyImage = createEmptyImage();
 
 export function editorFormFieldClasses(type, { disabled = false } = {}) {
   if (!type) {
-    throw new Error('type required');
+    throw new Error("type required");
   }
 
-  return classNames('fjs-form-field', `fjs-form-field-${type}`, {
-    'fjs-disabled': disabled
+  return classNames("fjs-form-field", `fjs-form-field-${type}`, {
+    "fjs-disabled": disabled,
   });
 }
 
@@ -29,14 +29,12 @@ export function editorFormFieldClasses(type, { disabled = false } = {}) {
  * @return {Function} drag start callback function
  */
 export function createDragger(fn) {
-
   let self;
 
   let startX, startY;
 
   /** drag start */
   function onDragStart(event) {
-
     self = this;
 
     startX = event.clientX;
@@ -50,15 +48,15 @@ export function createDragger(fn) {
     // (2) setup drag listeners
 
     // attach drag + cleanup event
-    document.addEventListener('dragover', onDrag);
-    document.addEventListener('dragend', onEnd);
-    document.addEventListener('drop', preventDefault);
+    document.addEventListener("dragover", onDrag);
+    document.addEventListener("dragend", onEnd);
+    document.addEventListener("drop", preventDefault);
   }
 
   function onDrag(event) {
     const delta = {
       x: event.clientX - startX,
-      y: event.clientY - startY
+      y: event.clientY - startY,
     };
 
     // call provided fn with event, delta
@@ -66,9 +64,9 @@ export function createDragger(fn) {
   }
 
   function onEnd() {
-    document.removeEventListener('dragover', onDrag);
-    document.removeEventListener('dragend', onEnd);
-    document.removeEventListener('drop', preventDefault);
+    document.removeEventListener("dragover", onDrag);
+    document.removeEventListener("dragend", onEnd);
+    document.removeEventListener("drop", preventDefault);
   }
 
   return onDragStart;
@@ -87,8 +85,7 @@ export function throttle(fn) {
   let lastArgs = [];
   let lastThis = undefined;
 
-  return function(...args) {
-
+  return function (...args) {
     lastArgs = args;
     lastThis = this;
 
@@ -100,11 +97,10 @@ export function throttle(fn) {
 
     fn.apply(lastThis, lastArgs);
 
-    window.requestAnimationFrame(function() {
+    window.requestAnimationFrame(function () {
       lastArgs = lastThis = active = undefined;
     });
   };
-
 }
 
 function preventDefault(event) {
@@ -114,6 +110,6 @@ function preventDefault(event) {
 
 function createEmptyImage() {
   const img = new Image();
-  img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+  img.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
   return img;
 }

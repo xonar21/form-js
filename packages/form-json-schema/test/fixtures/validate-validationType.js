@@ -1,40 +1,40 @@
 export const form = {
-  type: 'default',
+  type: "default",
   components: [
     {
-      type: 'textfield',
-      key: 'field_email',
+      type: "textfield",
+      key: "field_email",
       validate: {
-        validationType: 'email'
-      }
+        validationType: "email",
+      },
     },
     {
-      type: 'textfield',
-      key: 'field_phone',
+      type: "textfield",
+      key: "field_phone",
       validate: {
-        validationType: 'phone'
-      }
+        validationType: "phone",
+      },
     },
     {
-      type: 'textfield',
-      key: 'field_custom',
+      type: "textfield",
+      key: "field_custom",
       validate: {
-        validationType: 'custom'
-      }
+        validationType: "custom",
+      },
     },
     {
-      type: 'textfield',
-      key: 'field_empty',
+      type: "textfield",
+      key: "field_empty",
       validate: {
-        validationType: ''
-      }
+        validationType: "",
+      },
     },
     {
-      type: 'textfield',
-      key: 'field_undefined',
-      validate: {}
-    }
-  ]
+      type: "textfield",
+      key: "field_undefined",
+      validate: {},
+    },
+  ],
 };
 
 export const errors = null;

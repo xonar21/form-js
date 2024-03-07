@@ -1,18 +1,13 @@
-import { FormContext, LocalExpressionContext } from '../../../../../src/render/context';
+import { FormContext, LocalExpressionContext } from "../../../../../src/render/context";
 
-import { createMockInjector } from './mocks';
+import { createMockInjector } from "./mocks";
 
-export const MockFormContext = (props) => {
-
-  const {
-    options = {},
-    services = {},
-    formId = 'foo'
-  } = props;
+export const MockFormContext = props => {
+  const { options = {}, services = {}, formId = "foo" } = props;
 
   const formContext = {
     getService: (type, strict) => createMockInjector(services, options).get(type, strict),
-    formId
+    formId,
   };
 
   const data = options.data || options.initialData || {};
@@ -21,15 +16,12 @@ export const MockFormContext = (props) => {
     data,
     parent: null,
     this: data,
-    i: []
+    i: [],
   };
 
   return (
-    <LocalExpressionContext.Provider value={ localExpressionContext }>
-      <FormContext.Provider value={ formContext }>
-        { props.children }
-      </FormContext.Provider>
+    <LocalExpressionContext.Provider value={localExpressionContext}>
+      <FormContext.Provider value={formContext}>{props.children}</FormContext.Provider>
     </LocalExpressionContext.Provider>
   );
-
 };

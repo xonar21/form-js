@@ -1,5 +1,5 @@
-import { useRef } from 'preact/hooks';
-import isEqual from 'lodash/isEqual';
+import { useRef } from "preact/hooks";
+import isEqual from "lodash/isEqual";
 
 /**
  * A custom hook to manage state changes with deep comparison.

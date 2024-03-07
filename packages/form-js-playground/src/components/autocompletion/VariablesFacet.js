@@ -1,4 +1,4 @@
-import { Facet } from '@codemirror/state';
+import { Facet } from "@codemirror/state";
 
 /**
  * @type {Facet<import('..').Variables>} Variables

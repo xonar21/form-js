@@ -9,10 +9,10 @@ import {
   OptionsGroups,
   TableHeaderGroups,
   LayoutGroup,
-  SecurityAttributesGroup
-} from './groups';
+  SecurityAttributesGroup,
+} from "./groups";
 
-import { hasEntryConfigured } from './Util';
+import { hasEntryConfigured } from "./Util";
 
 export class PropertiesProvider {
   constructor(propertiesPanel, injector) {
@@ -22,15 +22,11 @@ export class PropertiesProvider {
 
   _filterVisibleEntries(groups, field, getService) {
     return groups.forEach(group => {
-      const {
-        entries
-      } = group;
+      const { entries } = group;
 
-      const {
-        type
-      } = field;
+      const { type } = field;
 
-      const formFields = getService('formFields');
+      const formFields = getService("formFields");
 
       const fieldDefinition = formFields.get(type).config;
 
@@ -39,9 +35,7 @@ export class PropertiesProvider {
       }
 
       group.entries = entries.filter(entry => {
-        const {
-          isDefaultVisible
-        } = entry;
+        const { isDefaultVisible } = entry;
 
         if (!isDefaultVisible) {
           return true;
@@ -53,7 +47,7 @@ export class PropertiesProvider {
   }
 
   getGroups(field, editField) {
-    return (groups) => {
+    return groups => {
       if (!field) {
         return groups;
       }
@@ -72,17 +66,17 @@ export class PropertiesProvider {
         ...OptionsGroups(field, editField, getService),
         ConstraintsGroup(field, editField),
         ValidationGroup(field, editField),
-        CustomPropertiesGroup(field, editField)
+        CustomPropertiesGroup(field, editField),
       ].filter(group => group != null);
 
       this._filterVisibleEntries(groups, field, getService);
 
       // contract: if a group has no entries or items, it should not be displayed at all
       return groups.filter(group => {
-        return group.items || group.entries && group.entries.length;
+        return group.items || (group.entries && group.entries.length);
       });
     };
   }
 }
 
-PropertiesProvider.$inject = [ 'propertiesPanel', 'injector' ];
+PropertiesProvider.$inject = ["propertiesPanel", "injector"];

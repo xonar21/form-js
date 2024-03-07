@@ -1,19 +1,11 @@
-import { get } from 'min-dash';
-import { useService } from '../../hooks';
-import { NumberFieldEntry, isNumberFieldEntryEdited } from '@bpmn-io/properties-panel';
+import { get } from "min-dash";
+import { useService } from "../../hooks";
+import { NumberFieldEntry, isNumberFieldEntryEdited } from "@bpmn-io/properties-panel";
 
 export function zeroPositiveIntegerEntryFactory(options) {
-  const {
-    id,
-    label,
-    path,
-    props
-  } = options;
+  const { id, label, path, props } = options;
 
-  const {
-    editField,
-    field
-  } = props;
+  const { editField, field } = props;
 
   return {
     id,
@@ -22,27 +14,21 @@ export function zeroPositiveIntegerEntryFactory(options) {
     field,
     editField,
     component: ZeroPositiveIntegerEntry,
-    isEdited: isNumberFieldEntryEdited
+    isEdited: isNumberFieldEntryEdited,
   };
 }
 
-const ZeroPositiveIntegerEntry = (props) => {
-  const {
-    id,
-    label,
-    path,
-    field,
-    editField
-  } = props;
+const ZeroPositiveIntegerEntry = props => {
+  const { id, label, path, field, editField } = props;
 
-  const debounce = useService('debounce');
+  const debounce = useService("debounce");
 
   const getValue = () => {
     const value = get(field, path, 0);
     return Number.isInteger(value) ? value : 0;
   };
 
-  const setValue = (value) => {
+  const setValue = value => {
     if (Number.isInteger(value) && value >= 0) {
       editField(field, path, value);
     }
@@ -56,6 +42,6 @@ const ZeroPositiveIntegerEntry = (props) => {
     min: 0,
     getValue,
     id,
-    setValue
+    setValue,
   });
 };

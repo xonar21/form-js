@@ -1,46 +1,38 @@
-import { get, isNumber } from 'min-dash';
+import { get, isNumber } from "min-dash";
 
-import { ToggleSwitchEntry, isToggleSwitchEntryEdited } from '@bpmn-io/properties-panel';
-
+import { ToggleSwitchEntry, isToggleSwitchEntryEdited } from "@bpmn-io/properties-panel";
 
 export function PaginationEntry(props) {
-  const {
-    editField,
-    field
-  } = props;
+  const { editField, field } = props;
 
   const entries = [];
 
   entries.push({
-    id: 'pagination',
+    id: "pagination",
     component: Pagination,
     editField: editField,
     field: field,
     isEdited: isToggleSwitchEntryEdited,
-    isDefaultVisible: (field) => field.type === 'table'
+    isDefaultVisible: field => field.type === "table",
   });
 
   return entries;
 }
 
 function Pagination(props) {
-  const {
-    editField,
-    field,
-    id
-  } = props;
+  const { editField, field, id } = props;
   const defaultRowCount = 10;
 
-  const path = [ 'rowCount' ];
+  const path = ["rowCount"];
 
   const getValue = () => {
     return isNumber(get(field, path));
   };
 
   /**
-    * @param {boolean} value
-    */
-  const setValue = (value) => {
+   * @param {boolean} value
+   */
+  const setValue = value => {
     value ? editField(field, path, defaultRowCount) : editField(field, path, undefined);
   };
 
@@ -48,7 +40,7 @@ function Pagination(props) {
     element: field,
     getValue,
     id,
-    label: 'Pagination',
+    label: "Pagination",
     inline: true,
     setValue,
   });

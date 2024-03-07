@@ -1,46 +1,35 @@
-import { isSelectEntryEdited } from '@bpmn-io/properties-panel';
+import { isSelectEntryEdited } from "@bpmn-io/properties-panel";
 
-import { AutoFocusSelectEntry } from '../components';
+import { AutoFocusSelectEntry } from "../components";
 
 import {
   getOptionsSource,
   OPTIONS_SOURCES,
   OPTIONS_SOURCES_DEFAULTS,
   OPTIONS_SOURCES_LABELS,
-  OPTIONS_SOURCES_PATHS
-} from '@bpmn-io/form-js-viewer';
-
+  OPTIONS_SOURCES_PATHS,
+} from "@bpmn-io/form-js-viewer";
 
 export function OptionsSourceSelectEntry(props) {
-  const {
-    editField,
-    field,
-    id
-  } = props;
+  const { editField, field, id } = props;
 
   return [
     {
-      id: id + '-select',
+      id: id + "-select",
       component: ValuesSourceSelect,
       isEdited: isSelectEntryEdited,
       editField,
-      field
-    }
+      field,
+    },
   ];
 }
 
 function ValuesSourceSelect(props) {
-
-  const {
-    editField,
-    field,
-    id
-  } = props;
+  const { editField, field, id } = props;
 
   const getValue = getOptionsSource;
 
-  const setValue = (value) => {
-
+  const setValue = value => {
     let newField = field;
 
     const newProperties = {};
@@ -52,21 +41,20 @@ function ValuesSourceSelect(props) {
   };
 
   const getOptionsSourceOptions = () => {
-
-    return Object.values(OPTIONS_SOURCES).map((valueSource) => ({
+    return Object.values(OPTIONS_SOURCES).map(valueSource => ({
       label: OPTIONS_SOURCES_LABELS[valueSource],
-      value: valueSource
+      value: valueSource,
     }));
   };
 
   return AutoFocusSelectEntry({
     autoFocusEntry: getAutoFocusEntryId(field),
-    label: 'Type',
+    label: "Type",
     element: field,
     getOptions: getOptionsSourceOptions,
     getValue,
     id,
-    setValue
+    setValue,
   });
 }
 
@@ -76,11 +64,11 @@ function getAutoFocusEntryId(field) {
   const valuesSource = getOptionsSource(field);
 
   if (valuesSource === OPTIONS_SOURCES.EXPRESSION) {
-    return 'optionsExpression-expression';
+    return "optionsExpression-expression";
   } else if (valuesSource === OPTIONS_SOURCES.INPUT) {
-    return 'dynamicOptions-key';
+    return "dynamicOptions-key";
   } else if (valuesSource === OPTIONS_SOURCES.STATIC) {
-    return 'staticOptions-0-label';
+    return "staticOptions-0-label";
   }
 
   return null;

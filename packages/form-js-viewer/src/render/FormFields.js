@@ -1,19 +1,19 @@
-import { formFields } from './components';
+import { formFields } from "./components";
 
 export class FormFields {
   constructor() {
     this._formFields = {};
 
-    formFields.forEach((formField) => {
+    formFields.forEach(formField => {
       this.register(formField.config.type, formField);
     });
   }
 
   register(type, formField) {
-    this._formFields[ type ] = formField;
+    this._formFields[type] = formField;
   }
 
   get(type) {
-    return this._formFields[ type ];
+    return this._formFields[type];
   }
 }

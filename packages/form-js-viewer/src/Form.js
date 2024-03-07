@@ -1,16 +1,11 @@
-import Ids from 'ids';
-import { get, isObject, isString, isUndefined, set } from 'min-dash';
+import Ids from "ids";
+import { get, isObject, isString, isUndefined, set } from "min-dash";
 
-import {
-  ExpressionLanguageModule,
-  MarkdownRendererModule,
-  ViewerCommandsModule,
-  RepeatRenderModule
-} from './features';
+import { ExpressionLanguageModule, MarkdownRendererModule, ViewerCommandsModule, RepeatRenderModule } from "./features";
 
-import { CoreModule } from './core';
+import { CoreModule } from "./core";
 
-import { clone, createFormContainer, createInjector } from './util';
+import { clone, createFormContainer, createInjector } from "./util";
 
 /**
  * @typedef { import('./types').Injector } Injector
@@ -35,19 +30,17 @@ import { clone, createFormContainer, createInjector } from './util';
  * @typedef { OnEventWithPriority & OnEventWithOutPriority } OnEventType
  */
 
-const ids = new Ids([ 32, 36, 1 ]);
+const ids = new Ids([32, 36, 1]);
 
 /**
  * The form.
  */
 export class Form {
-
   /**
    * @constructor
    * @param {FormOptions} options
    */
   constructor(options = {}) {
-
     /**
      * @public
      * @type {OnEventType}
@@ -66,11 +59,7 @@ export class Form {
      */
     this._container = createFormContainer();
 
-    const {
-      container,
-      injector = this._createInjector(options, this._container),
-      properties = {}
-    } = options;
+    const { container, injector = this._createInjector(options, this._container), properties = {} } = options;
 
     /**
      * @private
@@ -81,14 +70,14 @@ export class Form {
       data: null,
       properties,
       errors: {},
-      schema: null
+      schema: null,
     };
 
     this.get = injector.get;
 
     this.invoke = injector.invoke;
 
-    this.get('eventBus').fire('form.init');
+    this.get("eventBus").fire("form.init");
 
     if (container) {
       this.attachTo(container);
@@ -96,12 +85,11 @@ export class Form {
   }
 
   clear() {
-
     // clear diagram services (e.g. EventBus)
-    this._emit('diagram.clear');
+    this._emit("diagram.clear");
 
     // clear form services
-    this._emit('form.clear');
+    this._emit("form.clear");
   }
 
   /**
@@ -109,12 +97,11 @@ export class Form {
    * if attached.
    */
   destroy() {
-
     // destroy form services
-    this.get('eventBus').fire('form.destroy');
+    this.get("eventBus").fire("form.destroy");
 
     // destroy diagram services (e.g. EventBus)
-    this.get('eventBus').fire('diagram.destroy');
+    this.get("eventBus").fire("diagram.destroy");
 
     this._detach(false);
   }
@@ -132,10 +119,7 @@ export class Form {
       try {
         this.clear();
 
-        const {
-          schema: importedSchema,
-          warnings
-        } = this.get('importer').importSchema(schema);
+        const { schema: importedSchema, warnings } = this.get("importer").importSchema(schema);
 
         const initializedData = this._getInitializedFieldData(clone(data));
 
@@ -143,16 +127,16 @@ export class Form {
           data: initializedData,
           errors: {},
           schema: importedSchema,
-          initialData: clone(initializedData)
+          initialData: clone(initializedData),
         });
 
-        this._emit('import.done', { warnings });
+        this._emit("import.done", { warnings });
 
         return resolve({ warnings });
       } catch (error) {
-        this._emit('import.done', {
+        this._emit("import.done", {
           error,
-          warnings: error.warnings || []
+          warnings: error.warnings || [],
         });
 
         return reject(error);
@@ -166,13 +150,10 @@ export class Form {
    * @returns { { data: Data, errors: Errors } }
    */
   submit() {
-
-    const {
-      properties
-    } = this._getState();
+    const { properties } = this._getState();
 
     if (properties.readOnly || properties.disabled) {
-      throw new Error('form is read-only');
+      throw new Error("form is read-only");
     }
 
     const data = this._getSubmitData();
@@ -181,20 +162,20 @@ export class Form {
 
     const result = {
       data,
-      errors
+      errors,
     };
 
-    this._emit('submit', result);
+    this._emit("submit", result);
 
     return result;
   }
 
   reset() {
-    this._emit('reset');
+    this._emit("reset");
 
     this._setState({
       data: clone(this._state.initialData),
-      errors: {}
+      errors: {},
     });
   }
 
@@ -202,14 +183,14 @@ export class Form {
    * @returns {Errors}
    */
   validate() {
-    const formFields = this.get('formFields'),
-          formFieldRegistry = this.get('formFieldRegistry'),
-          pathRegistry = this.get('pathRegistry'),
-          validator = this.get('validator');
+    const formFields = this.get("formFields"),
+      formFieldRegistry = this.get("formFieldRegistry"),
+      pathRegistry = this.get("pathRegistry"),
+      validator = this.get("validator");
 
     const { data } = this._getState();
 
-    const getErrorPath = (field, indexes) => [ field.id, ...Object.values(indexes || {}) ];
+    const getErrorPath = (field, indexes) => [field.id, ...Object.values(indexes || {})];
 
     function validateFieldRecursively(errors, field, indexes) {
       const { disabled, type, isRepeating } = field;
@@ -236,13 +217,12 @@ export class Form {
 
       // (4a) Recurse repeatable parents both across the indexes of repetition and the children
       if (fieldConfig.repeatable && isRepeating) {
-
         if (!Array.isArray(valueData)) {
           return;
         }
 
         valueData.forEach((_, index) => {
-          field.components.forEach((component) => {
+          field.components.forEach(component => {
             validateFieldRecursively(errors, component, { ...indexes, [field.id]: index });
           });
         });
@@ -251,12 +231,15 @@ export class Form {
       }
 
       // (4b) Recurse non-repeatable parents only across the children
-      field.components.forEach((component) => validateFieldRecursively(errors, component, indexes));
+      field.components.forEach(component => validateFieldRecursively(errors, component, indexes));
     }
 
     const workingErrors = {};
     validateFieldRecursively(workingErrors, formFieldRegistry.getForm());
-    const filteredErrors = this._applyConditions(workingErrors, data, { getFilterPath: getErrorPath, leafNodeDeletionOnly: true });
+    const filteredErrors = this._applyConditions(workingErrors, data, {
+      getFilterPath: getErrorPath,
+      leafNodeDeletionOnly: true,
+    });
     this._setState({ errors: filteredErrors });
 
     return filteredErrors;
@@ -267,7 +250,7 @@ export class Form {
    */
   attachTo(parentNode) {
     if (!parentNode) {
-      throw new Error('parentNode required');
+      throw new Error("parentNode required");
     }
 
     this.detach();
@@ -280,7 +263,7 @@ export class Form {
 
     parentNode.appendChild(container);
 
-    this._emit('attach');
+    this._emit("attach");
   }
 
   detach() {
@@ -294,14 +277,14 @@ export class Form {
    */
   _detach(emit = true) {
     const container = this._container,
-          parentNode = container.parentNode;
+      parentNode = container.parentNode;
 
     if (!parentNode) {
       return;
     }
 
     if (emit) {
-      this._emit('detach');
+      this._emit("detach");
     }
 
     parentNode.removeChild(container);
@@ -312,7 +295,7 @@ export class Form {
    * @param {any} value
    */
   setProperty(property, value) {
-    const properties = set(this._getState().properties, [ property ], value);
+    const properties = set(this._getState().properties, [property], value);
 
     this._setState({ properties });
   }
@@ -322,7 +305,7 @@ export class Form {
    * @param {Function} handler
    */
   off(type, handler) {
-    this.get('eventBus').off(type, handler);
+    this.get("eventBus").off(type, handler);
   }
 
   /**
@@ -334,25 +317,21 @@ export class Form {
    * @returns {Injector}
    */
   _createInjector(options, container) {
-    const {
-      modules = this._getModules(),
-      additionalModules = [],
-      ...config
-    } = options;
+    const { modules = this._getModules(), additionalModules = [], ...config } = options;
 
     const enrichedConfig = {
       ...config,
       renderer: {
-        container
-      }
+        container,
+      },
     };
 
     return createInjector([
-      { config: [ 'value', enrichedConfig ] },
-      { form: [ 'value', this ] },
+      { config: ["value", enrichedConfig] },
+      { form: ["value", this] },
       CoreModule,
       ...modules,
-      ...additionalModules
+      ...additionalModules,
     ]);
   }
 
@@ -360,7 +339,7 @@ export class Form {
    * @private
    */
   _emit(type, data) {
-    this.get('eventBus').fire(type, data);
+    this.get("eventBus").fire(type, data);
   }
 
   /**
@@ -369,19 +348,12 @@ export class Form {
    * @param { { add?: boolean, field: any, indexes: object, remove?: number, value?: any } } update
    */
   _update(update) {
-    const {
-      field,
-      indexes,
-      value
-    } = update;
+    const { field, indexes, value } = update;
 
-    const {
-      data,
-      errors
-    } = this._getState();
+    const { data, errors } = this._getState();
 
-    const validator = this.get('validator'),
-          pathRegistry = this.get('pathRegistry');
+    const validator = this.get("validator"),
+      pathRegistry = this.get("pathRegistry");
 
     const fieldErrors = validator.validateField(field, value);
 
@@ -389,11 +361,11 @@ export class Form {
 
     set(data, valuePath, value);
 
-    set(errors, [ field.id, ...Object.values(indexes || {}) ], fieldErrors.length ? fieldErrors : undefined);
+    set(errors, [field.id, ...Object.values(indexes || {})], fieldErrors.length ? fieldErrors : undefined);
 
     this._setState({
       data: clone(data),
-      errors: clone(errors)
+      errors: clone(errors),
     });
   }
 
@@ -410,38 +382,33 @@ export class Form {
   _setState(state) {
     this._state = {
       ...this._state,
-      ...state
+      ...state,
     };
 
-    this._emit('changed', this._getState());
+    this._emit("changed", this._getState());
   }
 
   /**
- * @internal
- */
+   * @internal
+   */
   _getModules() {
-    return [
-      ExpressionLanguageModule,
-      MarkdownRendererModule,
-      ViewerCommandsModule,
-      RepeatRenderModule
-    ];
+    return [ExpressionLanguageModule, MarkdownRendererModule, ViewerCommandsModule, RepeatRenderModule];
   }
 
   /**
    * @internal
    */
   _onEvent(type, priority, handler) {
-    this.get('eventBus').on(type, priority, handler);
+    this.get("eventBus").on(type, priority, handler);
   }
 
   /**
    * @internal
    */
   _getSubmitData() {
-    const formFieldRegistry = this.get('formFieldRegistry');
-    const formFields = this.get('formFields');
-    const pathRegistry = this.get('pathRegistry');
+    const formFieldRegistry = this.get("formFieldRegistry");
+    const formFields = this.get("formFields");
+    const pathRegistry = this.get("pathRegistry");
     const formData = this._getState().data;
 
     function collectSubmitDataRecursively(submitData, formField, indexes) {
@@ -462,7 +429,6 @@ export class Form {
 
       // (3a) Recurse repeatable parents both across the indexes of repetition and the children
       if (fieldConfig.repeatable && formField.isRepeating) {
-
         const valueData = get(formData, pathRegistry.getValuePath(formField, { indexes }));
 
         if (!Array.isArray(valueData)) {
@@ -470,7 +436,7 @@ export class Form {
         }
 
         valueData.forEach((_, index) => {
-          formField.components.forEach((component) => {
+          formField.components.forEach(component => {
             collectSubmitDataRecursively(submitData, component, { ...indexes, [formField.id]: index });
           });
         });
@@ -479,7 +445,7 @@ export class Form {
       }
 
       // (3b) Recurse non-repeatable parents only across the children
-      formField.components.forEach((component) => collectSubmitDataRecursively(submitData, component, indexes));
+      formField.components.forEach(component => collectSubmitDataRecursively(submitData, component, indexes));
     }
 
     const workingSubmitData = {};
@@ -491,7 +457,7 @@ export class Form {
    * @internal
    */
   _applyConditions(toFilter, data, options = {}) {
-    const conditionChecker = this.get('conditionChecker');
+    const conditionChecker = this.get("conditionChecker");
     return conditionChecker.applyConditions(toFilter, data, options);
   }
 
@@ -499,9 +465,9 @@ export class Form {
    * @internal
    */
   _getInitializedFieldData(data, options = {}) {
-    const formFieldRegistry = this.get('formFieldRegistry');
-    const formFields = this.get('formFields');
-    const pathRegistry = this.get('pathRegistry');
+    const formFieldRegistry = this.get("formFieldRegistry");
+    const formFields = this.get("formFields");
+    const pathRegistry = this.get("pathRegistry");
 
     function initializeFieldDataRecursively(initializedData, formField, indexes) {
       const { defaultValue, type, isRepeating } = formField;
@@ -512,14 +478,17 @@ export class Form {
 
       // (1) Process keyed fields
       if (fieldConfig.keyed) {
-
         // (a) Retrieve and sanitize data from input
         if (!isUndefined(valueData) && fieldConfig.sanitizeValue) {
           valueData = fieldConfig.sanitizeValue({ formField, data, value: valueData });
         }
 
         // (b) Initialize field value in output data
-        const initializedFieldValue = !isUndefined(valueData) ? valueData : (!isUndefined(defaultValue) ? defaultValue : fieldConfig.emptyValue);
+        const initializedFieldValue = !isUndefined(valueData)
+          ? valueData
+          : !isUndefined(defaultValue)
+          ? defaultValue
+          : fieldConfig.emptyValue;
         set(initializedData, valuePath, initializedFieldValue);
       }
 
@@ -529,22 +498,24 @@ export class Form {
       }
 
       if (fieldConfig.repeatable && isRepeating) {
-
         // (a) Sanitize repeatable parents data if it is not an array
         if (!valueData || !Array.isArray(valueData)) {
-          valueData = new Array(isUndefined(formField.defaultRepetitions) ? 1 : formField.defaultRepetitions).fill().map(_ => ({})) || [];
+          valueData =
+            new Array(isUndefined(formField.defaultRepetitions) ? 1 : formField.defaultRepetitions)
+              .fill()
+              .map(_ => ({})) || [];
         }
 
         // (b) Ensure all elements of the array are objects
-        valueData = valueData.map((val) => isObject(val) ? val : {});
+        valueData = valueData.map(val => (isObject(val) ? val : {}));
 
         // (c) Initialize field value in output data
         set(initializedData, valuePath, valueData);
 
         // (d) If indexed ahead of time, recurse repeatable simply across the children
         if (!isUndefined(indexes[formField.id])) {
-          formField.components.forEach(
-            (component) => initializeFieldDataRecursively(initializedData, component, { ...indexes })
+          formField.components.forEach(component =>
+            initializeFieldDataRecursively(initializedData, component, { ...indexes }),
           );
 
           return;
@@ -552,8 +523,8 @@ export class Form {
 
         // (e1) Recurse repeatable parents both across the indexes of repetition and the children
         valueData.forEach((_, index) => {
-          formField.components.forEach(
-            (component) => initializeFieldDataRecursively(initializedData, component, { ...indexes, [formField.id]: index })
+          formField.components.forEach(component =>
+            initializeFieldDataRecursively(initializedData, component, { ...indexes, [formField.id]: index }),
           );
         });
 
@@ -561,7 +532,7 @@ export class Form {
       }
 
       // (e2) Recurse non-repeatable parents only across the children
-      formField.components.forEach((component) => initializeFieldDataRecursively(initializedData, component, indexes));
+      formField.components.forEach(component => initializeFieldDataRecursively(initializedData, component, indexes));
     }
 
     // allows definition of a specific subfield to generate the data for
@@ -570,11 +541,10 @@ export class Form {
     const basePath = pathRegistry.getValuePath(container, { indexes }) || [];
 
     // if indexing ahead of time, we must add this index to the data path at the end
-    const path = !isUndefined(indexes[container.id]) ? [ ...basePath, indexes[container.id] ] : basePath;
+    const path = !isUndefined(indexes[container.id]) ? [...basePath, indexes[container.id]] : basePath;
 
     const workingData = clone(data);
     initializeFieldDataRecursively(workingData, container, indexes);
     return get(workingData, path, {});
   }
-
 }

@@ -1,5 +1,5 @@
-import { useTemplateEvaluation } from './useTemplateEvaluation';
-import { useMemo } from 'preact/hooks';
+import { useTemplateEvaluation } from "./useTemplateEvaluation";
+import { useMemo } from "preact/hooks";
 
 /**
  * Template a string reactively based on form data. If the string is not a template, it is returned as is.
@@ -15,5 +15,5 @@ import { useMemo } from 'preact/hooks';
  */
 export function useSingleLineTemplateEvaluation(value, options = {}) {
   const evaluatedTemplate = useTemplateEvaluation(value, options);
-  return useMemo(() => evaluatedTemplate && evaluatedTemplate.split('\n')[0], [ evaluatedTemplate ]);
+  return useMemo(() => evaluatedTemplate && evaluatedTemplate.split("\n")[0], [evaluatedTemplate]);
 }

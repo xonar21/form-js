@@ -1,37 +1,31 @@
-import TestContainer from 'mocha-test-container-support';
+import TestContainer from "mocha-test-container-support";
 
-import { useEffect } from 'preact/hooks';
+import { useEffect } from "preact/hooks";
 
-import { waitFor } from '@testing-library/preact/pure';
+import { waitFor } from "@testing-library/preact/pure";
 
-import {
-  insertStyles
-} from '../../../TestHelper';
+import { insertStyles } from "../../../TestHelper";
 
-import {
-  createFormEditor
-} from '../../../../src';
+import { createFormEditor } from "../../../../src";
 
-import { RenderInjectionModule } from '../../../../src/features/render-injection';
+import { RenderInjectionModule } from "../../../../src/features/render-injection";
 
-import schema from '../../form.json';
+import schema from "../../form.json";
 
 insertStyles();
 
-
-describe('features/render-injection', function() {
-
+describe("features/render-injection", function () {
   let formEditor, formContainer;
 
-  beforeEach(function() {
+  beforeEach(function () {
     const container = TestContainer.get(this);
 
-    formContainer = document.createElement('div');
+    formContainer = document.createElement("div");
 
     container.appendChild(formContainer);
   });
 
-  afterEach(function() {
+  afterEach(function () {
     const container = TestContainer.get(this);
 
     container.removeChild(formContainer);
@@ -40,36 +34,29 @@ describe('features/render-injection', function() {
   });
 
   async function createEditor(schema, options = {}) {
-    const {
-      additionalModules = [
-        RenderInjectionModule,
-        ExtensionModule
-      ]
-    } = options;
+    const { additionalModules = [RenderInjectionModule, ExtensionModule] } = options;
 
     formEditor = await createFormEditor({
       schema,
       renderer: {
-        container: formContainer
+        container: formContainer,
       },
       additionalModules,
-      ...options
+      ...options,
     });
 
     return { formEditor };
   }
 
-
-  it('should inject renderered component', async function() {
-
+  it("should inject renderered component", async function () {
     // when
     const spy = sinon.spy();
     const result = await createEditor(schema);
     formEditor = result.formEditor;
 
-    const eventBus = formEditor.get('eventBus');
+    const eventBus = formEditor.get("eventBus");
 
-    eventBus.on('extension.rendered', spy);
+    eventBus.on("extension.rendered", spy);
 
     // then
     await waitFor(() => {
@@ -77,9 +64,7 @@ describe('features/render-injection', function() {
     });
   });
 
-
-  it('should detach renderer', async function() {
-
+  it("should detach renderer", async function () {
     // when
     const attachSpy = sinon.spy();
     const detachSpy = sinon.spy();
@@ -87,59 +72,55 @@ describe('features/render-injection', function() {
     const result = await createEditor(schema);
     formEditor = result.formEditor;
 
-    const eventBus = formEditor.get('eventBus');
-    const renderInjector = formEditor.get('renderInjector');
+    const eventBus = formEditor.get("eventBus");
+    const renderInjector = formEditor.get("renderInjector");
 
-    eventBus.on('extension.rendered', attachSpy);
-    eventBus.on('extension.detached', detachSpy);
+    eventBus.on("extension.rendered", attachSpy);
+    eventBus.on("extension.detached", detachSpy);
 
     // assume
     await waitFor(() => {
       expect(attachSpy).to.have.been.calledOnce;
     });
 
-
     // when
-    renderInjector.detachRenderer('example-extension');
+    renderInjector.detachRenderer("example-extension");
 
     // initiate re-render
     await formEditor.importSchema(schema);
 
     // then
     expect(detachSpy).to.have.been.calledOnce;
-
   });
-
 });
 
 // helper /////////
 
 class ExampleExtension {
   constructor(renderInjector) {
-    renderInjector.attachRenderer('example-extension', ExtensionComponent);
+    renderInjector.attachRenderer("example-extension", ExtensionComponent);
   }
 }
 
-ExampleExtension.$inject = [ 'renderInjector' ];
+ExampleExtension.$inject = ["renderInjector"];
 
 const ExtensionModule = {
-  __init__: [ 'exampleExtension' ],
-  'exampleExtension': [ 'type', ExampleExtension ],
+  __init__: ["exampleExtension"],
+  exampleExtension: ["type", ExampleExtension],
 };
 
 function ExtensionComponent(props) {
-
   const { useService } = props;
 
-  const eventBus = useService('eventBus');
+  const eventBus = useService("eventBus");
 
   useEffect(() => {
-    eventBus.fire('extension.rendered');
+    eventBus.fire("extension.rendered");
 
     return () => {
-      eventBus.fire('extension.detached');
+      eventBus.fire("extension.detached");
     };
-  }, [ eventBus ]);
+  }, [eventBus]);
 
   return <div id="extension">I am an example</div>;
 }

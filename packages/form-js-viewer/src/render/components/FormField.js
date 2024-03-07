@@ -1,51 +1,33 @@
-import { useCallback, useContext, useEffect, useMemo, useState } from 'preact/hooks';
+import { useCallback, useContext, useEffect, useMemo, useState } from "preact/hooks";
 
-import { get } from 'min-dash';
+import { get } from "min-dash";
 
-import { FormContext, FormRenderContext } from '../context';
+import { FormContext, FormRenderContext } from "../context";
 
-import {
-  useCondition,
-  useReadonly,
-  useService
-} from '../hooks';
+import { useCondition, useReadonly, useService } from "../hooks";
 
-import { gridColumnClasses, prefixId } from './Util';
+import { gridColumnClasses, prefixId } from "./Util";
 
 const noop = () => false;
 
-
 export function FormField(props) {
-  const {
-    field,
-    indexes,
-    onChange
-  } = props;
+  const { field, indexes, onChange } = props;
 
-  const formFields = useService('formFields'),
-        viewerCommands = useService('viewerCommands', false),
-        pathRegistry = useService('pathRegistry'),
-        eventBus = useService('eventBus'),
-        form = useService('form');
+  const formFields = useService("formFields"),
+    viewerCommands = useService("viewerCommands", false),
+    pathRegistry = useService("pathRegistry"),
+    eventBus = useService("eventBus"),
+    form = useService("form");
 
-  const {
-    initialData,
-    data,
-    errors,
-    properties
-  } = form._getState();
+  const { initialData, data, errors, properties } = form._getState();
 
-  const {
-    Element,
-    Hidden,
-    Column
-  } = useContext(FormRenderContext);
+  const { Element, Hidden, Column } = useContext(FormRenderContext);
 
   const { formId } = useContext(FormContext);
 
   // track whether we should trigger initial validation on certain actions, e.g. field blur
   // disabled straight away, if viewerCommands are not available
-  const [ initialValidationTrigger, setInitialValidationTrigger ] = useState(!!viewerCommands);
+  const [initialValidationTrigger, setInitialValidationTrigger] = useState(!!viewerCommands);
 
   const FormFieldComponent = formFields.get(field.type);
 
@@ -53,22 +35,19 @@ export function FormField(props) {
     throw new Error(`cannot render field <${field.type}>`);
   }
 
-  const valuePath = useMemo(() => pathRegistry.getValuePath(field, { indexes }), [ field, indexes, pathRegistry ]);
+  const valuePath = useMemo(() => pathRegistry.getValuePath(field, { indexes }), [field, indexes, pathRegistry]);
 
-  const initialValue = useMemo(() => get(initialData, valuePath), [ initialData, valuePath ]);
+  const initialValue = useMemo(() => get(initialData, valuePath), [initialData, valuePath]);
 
   const readonly = useReadonly(field, properties);
 
   const value = get(data, valuePath);
 
   // add precedence: global readonly > form field disabled
-  const disabled = !properties.readOnly && (
-    properties.disabled || field.disabled || false
-  );
+  const disabled = !properties.readOnly && (properties.disabled || field.disabled || false);
 
   // ensures the initial validation behavior can be re-triggered upon form reset
   useEffect(() => {
-
     if (!viewerCommands) {
       return;
     }
@@ -77,27 +56,23 @@ export function FormField(props) {
       setInitialValidationTrigger(true);
     };
 
-    eventBus.on('import.done', resetValidation);
-    eventBus.on('reset', resetValidation);
+    eventBus.on("import.done", resetValidation);
+    eventBus.on("reset", resetValidation);
 
     return () => {
-      eventBus.off('import.done', resetValidation);
-      eventBus.off('reset', resetValidation);
+      eventBus.off("import.done", resetValidation);
+      eventBus.off("reset", resetValidation);
     };
-
-  }, [ eventBus, viewerCommands ]);
+  }, [eventBus, viewerCommands]);
 
   useEffect(() => {
-
     if (initialValidationTrigger && initialValue) {
       setInitialValidationTrigger(false);
       viewerCommands.updateFieldValidation(field, initialValue, indexes);
     }
-
-  }, [ viewerCommands, field, initialValue, initialValidationTrigger, indexes ]);
+  }, [viewerCommands, field, initialValue, initialValidationTrigger, indexes]);
 
   const onBlur = useCallback(() => {
-
     const value = get(data, valuePath);
 
     if (initialValidationTrigger) {
@@ -105,45 +80,47 @@ export function FormField(props) {
       viewerCommands.updateFieldValidation(field, value, indexes);
     }
 
-    eventBus.fire('formField.blur', { formField: field });
-
-  }, [ eventBus, field, indexes, viewerCommands, initialValidationTrigger, data, valuePath ]);
+    eventBus.fire("formField.blur", { formField: field });
+  }, [eventBus, field, indexes, viewerCommands, initialValidationTrigger, data, valuePath]);
 
   const onFocus = useCallback(() => {
-    eventBus.fire('formField.focus', { formField: field });
-  }, [ eventBus, field ]);
+    eventBus.fire("formField.focus", { formField: field });
+  }, [eventBus, field]);
 
-  const hidden = useCondition(field.conditional && field.conditional.hide || null);
+  const hidden = useCondition((field.conditional && field.conditional.hide) || null);
 
-  const onChangeIndexed = useCallback((update) => {
+  const onChangeIndexed = useCallback(
+    update => {
+      // any data change will trigger validation
+      setInitialValidationTrigger(false);
 
-    // any data change will trigger validation
-    setInitialValidationTrigger(false);
-
-    // add indexes of the keyed field to the update, if any
-    onChange(FormFieldComponent.config.keyed ? { ...update, indexes } : update);
-  }, [ onChange, FormFieldComponent.config.keyed, indexes ]);
+      // add indexes of the keyed field to the update, if any
+      onChange(FormFieldComponent.config.keyed ? { ...update, indexes } : update);
+    },
+    [onChange, FormFieldComponent.config.keyed, indexes],
+  );
 
   if (hidden) {
-    return <Hidden field={ field } />;
+    return <Hidden field={field} />;
   }
 
   const domId = `${prefixId(field.id, formId, indexes)}`;
-  const fieldErrors = get(errors, [ field.id, ...Object.values(indexes || {}) ]) || [];
+  const fieldErrors = get(errors, [field.id, ...Object.values(indexes || {})]) || [];
 
   return (
-    <Column field={ field } class={ gridColumnClasses(field) }>
-      <Element class="fjs-element" field={ field }>
+    <Column field={field} class={gridColumnClasses(field)}>
+      <Element class="fjs-element" field={field}>
         <FormFieldComponent
-          { ...props }
-          disabled={ disabled }
-          errors={ fieldErrors }
-          domId={ domId }
-          onChange={ disabled || readonly ? noop : onChangeIndexed }
-          onBlur={ disabled || readonly ? noop : onBlur }
-          onFocus={ disabled || readonly ? noop : onFocus }
-          readonly={ readonly }
-          value={ value } />
+          {...props}
+          disabled={disabled}
+          errors={fieldErrors}
+          domId={domId}
+          onChange={disabled || readonly ? noop : onChangeIndexed}
+          onBlur={disabled || readonly ? noop : onBlur}
+          onFocus={disabled || readonly ? noop : onFocus}
+          readonly={readonly}
+          value={value}
+        />
       </Element>
     </Column>
   );

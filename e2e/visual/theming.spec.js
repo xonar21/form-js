@@ -1,36 +1,34 @@
-import { expect } from '@playwright/test';
+import { expect } from "@playwright/test";
 
-import { test } from '../test-fixtures';
+import { test } from "../test-fixtures";
 
-import schema from './fixtures/form.json';
+import schema from "./fixtures/form.json";
 
-test('theming - viewer', async ({ page, makeAxeBuilder }) => {
-
+test("theming - viewer", async ({ page, makeAxeBuilder }) => {
   // given
-  await page.route('/form', route => {
-
+  await page.route("/form", route => {
     route.fulfill({
       status: 200,
       body: JSON.stringify({
         data: {
           schema,
-          component: 'viewer'
-        }
-      })
+          component: "viewer",
+        },
+      }),
     });
   });
 
   // when
-  await page.goto('/theming/');
+  await page.goto("/theming/");
 
-  await page.waitForSelector('#container', {
-    state: 'visible'
+  await page.waitForSelector("#container", {
+    state: "visible",
   });
 
   await page.evaluate(() => {
-    const container = document.querySelector('body');
-    container.classList.remove('cds--g10');
-    container.classList.add('cds--g100');
+    const container = document.querySelector("body");
+    container.classList.remove("cds--g10");
+    container.classList.add("cds--g100");
   });
 
   // then
@@ -43,34 +41,31 @@ test('theming - viewer', async ({ page, makeAxeBuilder }) => {
   expect(results.passes.length).toBeGreaterThan(0);
 });
 
-
-test('theming - editor', async ({ page, makeAxeBuilder }) => {
-
+test("theming - editor", async ({ page, makeAxeBuilder }) => {
   // given
-  await page.route('/form', route => {
-
+  await page.route("/form", route => {
     route.fulfill({
       status: 200,
       body: JSON.stringify({
         data: {
           schema,
-          component: 'editor'
-        }
-      })
+          component: "editor",
+        },
+      }),
     });
   });
 
   // when
-  await page.goto('/theming/');
+  await page.goto("/theming/");
 
-  await page.waitForSelector('#container', {
-    state: 'visible'
+  await page.waitForSelector("#container", {
+    state: "visible",
   });
 
   await page.evaluate(() => {
-    const container = document.querySelector('body');
-    container.classList.remove('cds--g10');
-    container.classList.add('cds--g100');
+    const container = document.querySelector("body");
+    container.classList.remove("cds--g10");
+    container.classList.add("cds--g100");
   });
 
   // then
@@ -78,9 +73,7 @@ test('theming - editor', async ({ page, makeAxeBuilder }) => {
 
   // and then
   const results = await makeAxeBuilder({
-    disableRules: [
-      'page-has-heading-one'
-    ]
+    disableRules: ["page-has-heading-one"],
   }).analyze();
 
   expect(results.violations).toHaveLength(0);

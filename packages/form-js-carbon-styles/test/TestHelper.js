@@ -7,14 +7,14 @@ export function insertCSS(name, css) {
     return;
   }
 
-  const head = document.head || document.getElementsByTagName('head')[0];
-  const style = document.createElement('style');
-  style.setAttribute('data-css-file', name);
+  const head = document.head || document.getElementsByTagName("head")[0];
+  const style = document.createElement("style");
+  style.setAttribute("data-css-file", name);
 
-  style.type = 'text/css';
+  style.type = "text/css";
   style.appendChild(document.createTextNode(css));
 
   head.appendChild(style);
 }
 
-export { expectNoViolations } from '../../form-js-viewer/test/helper';
+export { expectNoViolations } from "../../form-js-viewer/test/helper";

@@ -1,43 +1,31 @@
-import {
-  act,
-  fireEvent,
-  render,
-  screen,
-  waitFor
-} from '@testing-library/preact/pure';
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/preact/pure";
 
-import { query as domQuery } from 'min-dom';
+import { query as domQuery } from "min-dom";
 
-import { OPTIONS_SOURCES, OPTIONS_SOURCES_DEFAULTS } from '@bpmn-io/form-js-viewer';
-import { removeKey } from '../../../../src/features/properties-panel/groups/CustomPropertiesGroup';
+import { OPTIONS_SOURCES, OPTIONS_SOURCES_DEFAULTS } from "@bpmn-io/form-js-viewer";
+import { removeKey } from "../../../../src/features/properties-panel/groups/CustomPropertiesGroup";
 
-import { PropertiesProvider } from '../../../../src/features/properties-panel/PropertiesProvider';
-import { PropertiesPanel } from '../../../../src/features/properties-panel/PropertiesPanel';
-import { FormFields } from '@bpmn-io/form-js-viewer';
+import { PropertiesProvider } from "../../../../src/features/properties-panel/PropertiesProvider";
+import { PropertiesPanel } from "../../../../src/features/properties-panel/PropertiesPanel";
+import { FormFields } from "@bpmn-io/form-js-viewer";
 
-import {
-  EventBusMock,
-  PropertiesPanelMock,
-  createMockInjector
-} from './helper/mocks';
+import { EventBusMock, PropertiesPanelMock, createMockInjector } from "./helper/mocks";
 
-import schema from '../../form.json';
-import defaultValuesSchema from '../../defaultValues.json';
-import redundantValuesSchema from '../../redundantValues.json';
-import iframeSchema from '../../../../../form-js-viewer/test/spec/iframes.json';
-import tableSchema from '../../form-table.json';
+import schema from "../../form.json";
+import defaultValuesSchema from "../../defaultValues.json";
+import redundantValuesSchema from "../../redundantValues.json";
+import iframeSchema from "../../../../../form-js-viewer/test/spec/iframes.json";
+import tableSchema from "../../form-table.json";
 
-import { insertStyles, setEditorValue } from '../../../TestHelper';
+import { insertStyles, setEditorValue } from "../../../TestHelper";
 
-import { EMPTY_OPTION } from '../../../../src/features/properties-panel/entries/DefaultValueEntry';
+import { EMPTY_OPTION } from "../../../../src/features/properties-panel/entries/DefaultValueEntry";
 
 insertStyles();
 
 const spy = sinon.spy;
 
-
-describe('properties panel', function() {
-
+describe("properties panel", function () {
   let parent, container, propertiesPanel;
 
   const bootstrapPropertiesPanel = ({ bootstrapExecute = () => {}, ...options }) => {
@@ -47,174 +35,153 @@ describe('properties panel', function() {
     });
   };
 
-  beforeEach(function() {
-    parent = document.createElement('div');
+  beforeEach(function () {
+    parent = document.createElement("div");
 
-    parent.classList.add('fjs-container', 'fjs-editor-container');
+    parent.classList.add("fjs-container", "fjs-editor-container");
 
-    container = document.createElement('div');
+    container = document.createElement("div");
 
-    container.classList.add('fjs-properties-container');
+    container.classList.add("fjs-properties-container");
 
-    container.style.position = 'absolute';
-    container.style.right = '0';
+    container.style.position = "absolute";
+    container.style.right = "0";
 
     parent.appendChild(container);
 
     document.body.appendChild(parent);
   });
 
-  afterEach(function() {
+  afterEach(function () {
     document.body.removeChild(parent);
   });
 
-
-  it('should render (no field)', async function() {
-
+  it("should render (no field)", async function () {
     // given
     bootstrapPropertiesPanel({ container, schema: null });
 
     // then
-    const placeholder = propertiesPanel.container.querySelector('.bio-properties-panel-placeholder');
-    const text = placeholder.querySelector('.bio-properties-panel-placeholder-text');
+    const placeholder = propertiesPanel.container.querySelector(".bio-properties-panel-placeholder");
+    const text = placeholder.querySelector(".bio-properties-panel-placeholder-text");
 
     expect(placeholder).to.exist;
-    expect(text.innerText).to.eql('Select a form field to edit its properties.');
+    expect(text.innerText).to.eql("Select a form field to edit its properties.");
   });
 
-
-  it('should render (multiple)', async function() {
-
+  it("should render (multiple)", async function () {
     // given
     const field = [
-      schema.components.find(({ key }) => key === 'creditor'),
-      schema.components.find(({ key }) => key === 'invoiceNumber'),
+      schema.components.find(({ key }) => key === "creditor"),
+      schema.components.find(({ key }) => key === "invoiceNumber"),
     ];
 
     bootstrapPropertiesPanel({
       container,
-      field
+      field,
     });
 
     // then
-    const placeholder = container.querySelector('.bio-properties-panel-placeholder');
-    const text = placeholder.querySelector('.bio-properties-panel-placeholder-text');
+    const placeholder = container.querySelector(".bio-properties-panel-placeholder");
+    const text = placeholder.querySelector(".bio-properties-panel-placeholder-text");
 
     expect(placeholder).to.exist;
-    expect(text.innerText).to.eql('Multiple form fields are selected. Select a single form field to edit its properties.');
+    expect(text.innerText).to.eql(
+      "Multiple form fields are selected. Select a single form field to edit its properties.",
+    );
   });
 
-
-  it('should render (field)', async function() {
-
+  it("should render (field)", async function () {
     // given
-    const field = schema.components.find(({ key }) => key === 'creditor');
+    const field = schema.components.find(({ key }) => key === "creditor");
 
     bootstrapPropertiesPanel({
       container,
-      field
+      field,
     });
 
     // then
-    expect(container.querySelector('.fjs-properties-panel-placeholder')).not.to.exist;
+    expect(container.querySelector(".fjs-properties-panel-placeholder")).not.to.exist;
 
-    expect(container.querySelector('.bio-properties-panel-header-type')).to.exist;
-    expect(container.querySelector('.bio-properties-panel-group')).to.exist;
+    expect(container.querySelector(".bio-properties-panel-header-type")).to.exist;
+    expect(container.querySelector(".bio-properties-panel-group")).to.exist;
   });
 
-
-  describe('fields', function() {
-
-    it('default', function() {
-
+  describe("fields", function () {
+    it("default", function () {
       // given
       const field = schema;
 
       bootstrapPropertiesPanel({
         container,
-        field
+        field,
       });
 
       // then
-      expectGroups(container, [
-        'General'
-      ]);
+      expectGroups(container, ["General"]);
 
-      expectGroupEntries(container, 'General', [
-        'ID'
-      ]);
+      expectGroupEntries(container, "General", ["ID"]);
     });
 
-
-    describe('id', function() {
-
+    describe("id", function () {
       const schema = {
-        type: 'default',
-        id: 'form',
-        components: [
-          { type: 'text', id: 'text', text: 'TEXT' }
-        ]
+        type: "default",
+        id: "form",
+        components: [{ type: "text", id: "text", text: "TEXT" }],
       };
 
-
-      it('should not be empty', function() {
-
+      it("should not be empty", function () {
         // given
         const editFieldSpy = spy();
 
         bootstrapPropertiesPanel({
           container,
           editField: editFieldSpy,
-          field: schema
+          field: schema,
         });
 
         // assume
-        const input = screen.getByLabelText('ID');
+        const input = screen.getByLabelText("ID");
 
         expect(input.value).to.equal(schema.id);
 
         // when
-        fireEvent.input(input, { target: { value: '' } });
+        fireEvent.input(input, { target: { value: "" } });
 
         // then
         expect(editFieldSpy).not.to.have.been.called;
 
-        const error = screen.getByText('Must not be empty.');
+        const error = screen.getByText("Must not be empty.");
 
         expect(error).to.exist;
       });
 
-
-      it('should not contain spaces', function() {
-
+      it("should not contain spaces", function () {
         // given
         const editFieldSpy = spy();
 
         bootstrapPropertiesPanel({
           container,
           editField: editFieldSpy,
-          field: schema
+          field: schema,
         });
 
         // assume
-        const input = screen.getByLabelText('ID');
+        const input = screen.getByLabelText("ID");
 
         expect(input.value).to.equal(schema.id);
 
         // when
-        fireEvent.input(input, { target: { value: 'fo rm' } });
+        fireEvent.input(input, { target: { value: "fo rm" } });
 
         // then
         expect(editFieldSpy).not.to.have.been.called;
 
-        const error = screen.getByText('Must not contain spaces.');
+        const error = screen.getByText("Must not contain spaces.");
 
         expect(error).to.exist;
       });
 
-
-      it('should be unique', function() {
-
+      it("should be unique", function () {
         // given
         const editFieldSpy = spy();
 
@@ -226,548 +193,476 @@ describe('properties panel', function() {
             formFieldRegistry: {
               _ids: {
                 assigned(id) {
-                  return schema.components.find((component) => component.id === id);
-                }
-              }
-            }
-          }
+                  return schema.components.find(component => component.id === id);
+                },
+              },
+            },
+          },
         });
 
         // assume
-        const input = screen.getByLabelText('ID');
+        const input = screen.getByLabelText("ID");
 
         expect(input.value).to.equal(schema.id);
 
         // when
-        fireEvent.input(input, { target: { value: 'text' } });
+        fireEvent.input(input, { target: { value: "text" } });
 
         // then
         expect(editFieldSpy).not.to.have.been.called;
 
-        const error = screen.getByText('Must be unique.');
+        const error = screen.getByText("Must be unique.");
 
         expect(error).to.exist;
       });
 
-
-      it('should be a valid QName', function() {
-
+      it("should be a valid QName", function () {
         // given
         const editFieldSpy = spy();
 
         bootstrapPropertiesPanel({
           container,
           editField: editFieldSpy,
-          field: schema
+          field: schema,
         });
 
         // assume
-        const input = screen.getByLabelText('ID');
+        const input = screen.getByLabelText("ID");
 
         expect(input.value).to.equal(schema.id);
 
         // when
-        fireEvent.input(input, { target: { value: '<HELLO>' } });
+        fireEvent.input(input, { target: { value: "<HELLO>" } });
 
         // then
         expect(editFieldSpy).not.to.have.been.called;
 
-        const error = screen.getByText('Must be a valid QName.');
+        const error = screen.getByText("Must be a valid QName.");
 
         expect(error).to.exist;
       });
-
     });
 
-
-    describe('button', function() {
-
-      it('entries', function() {
-
+    describe("button", function () {
+      it("entries", function () {
         // given
-        const field = schema.components.find(({ action }) => action === 'submit');
+        const field = schema.components.find(({ action }) => action === "submit");
 
         bootstrapPropertiesPanel({
           container,
-          field
+          field,
+        });
+
+        // then
+        expectGroups(container, ["General", "Condition", "Custom properties"]);
+
+        expectGroupEntries(container, "General", ["Field label", "Action"]);
+      });
+
+      describe("action", function () {
+        it("should change action", function () {
+          // given
+          const editFieldSpy = spy();
+
+          const field = schema.components.find(({ action }) => action === "reset");
+
+          bootstrapPropertiesPanel({
+            container,
+            editField: editFieldSpy,
+            field,
+          });
+
+          // assume
+          const input = screen.getByLabelText("Action");
+
+          expect(input.value).to.equal("reset");
+
+          // when
+          fireEvent.input(input, { target: { value: "submit" } });
+
+          // then
+          expect(editFieldSpy).to.have.been.calledOnce;
+          expect(editFieldSpy).to.have.been.calledWith(field, ["action"], "submit");
+        });
+      });
+    });
+
+    describe("checkbox", function () {
+      it("entries", function () {
+        // given
+        const field = schema.components.find(({ key }) => key === "approved");
+
+        bootstrapPropertiesPanel({
+          container,
+          field,
+        });
+
+        // then
+        expectGroups(container, ["General", "Condition", "Validation", "Custom properties"]);
+
+        expectGroupEntries(container, "General", [
+          "Field label",
+          "Field description",
+          "Key",
+          "Default value",
+          "Disabled",
+          "Read only",
+        ]);
+
+        expectGroupEntries(container, "Validation", ["Required"]);
+      });
+
+      describe("default value", function () {
+        it("should add default value", function () {
+          // given
+          const editFieldSpy = spy();
+
+          const field = schema.components.find(({ key }) => key === "approved");
+
+          bootstrapPropertiesPanel({
+            container,
+            editField: editFieldSpy,
+            field,
+          });
+
+          // assume
+          const input = screen.getByLabelText("Default value");
+
+          expect(input.value).to.equal("false");
+
+          // when
+          fireEvent.input(input, { target: { value: "true" } });
+
+          // then
+          expect(editFieldSpy).to.have.been.calledOnce;
+          expect(editFieldSpy).to.have.been.calledWith(field, ["defaultValue"], true);
+        });
+      });
+    });
+
+    describe("radio", function () {
+      it("entries", function () {
+        // given
+        const field = schema.components.find(({ key }) => key === "product");
+
+        bootstrapPropertiesPanel({
+          container,
+          field,
         });
 
         // then
         expectGroups(container, [
-          'General',
-          'Condition',
-          'Custom properties'
+          "General",
+          "Condition",
+          "Options source",
+          "Static options",
+          "Validation",
+          "Custom properties",
         ]);
 
-        expectGroupEntries(container, 'General', [
-          'Field label',
-          'Action'
+        expectGroupEntries(container, "General", [
+          "Field label",
+          "Field description",
+          "Key",
+          "Default value",
+          "Disabled",
+          "Read only",
         ]);
+
+        expectGroupEntries(container, "Options source", ["Type"]);
+
+        expectGroupEntries(container, "Static options", [
+          ["Label", 2],
+          ["Value", 2],
+        ]);
+
+        expectGroupEntries(container, "Validation", ["Required"]);
       });
 
-
-      describe('action', function() {
-
-        it('should change action', function() {
-
+      describe("default value", function () {
+        it("should add default value", function () {
           // given
           const editFieldSpy = spy();
 
-          const field = schema.components.find(({ action }) => action === 'reset');
+          const field = schema.components.find(({ key }) => key === "product");
 
           bootstrapPropertiesPanel({
             container,
             editField: editFieldSpy,
-            field
+            field,
           });
 
           // assume
-          const input = screen.getByLabelText('Action');
+          const input = screen.getByLabelText("Default value");
 
-          expect(input.value).to.equal('reset');
+          expect(input.value).to.equal("");
 
           // when
-          fireEvent.input(input, { target: { value: 'submit' } });
+          fireEvent.input(input, { target: { value: "camunda-platform" } });
 
           // then
           expect(editFieldSpy).to.have.been.calledOnce;
-          expect(editFieldSpy).to.have.been.calledWith(field, [ 'action' ], 'submit');
+          expect(editFieldSpy).to.have.been.calledWith(field, ["defaultValue"], "camunda-platform");
         });
 
-      });
-
-    });
-
-
-    describe('checkbox', function() {
-
-      it('entries', function() {
-
-        // given
-        const field = schema.components.find(({ key }) => key === 'approved');
-
-        bootstrapPropertiesPanel({
-          container,
-          field
-        });
-
-        // then
-        expectGroups(container, [
-          'General',
-          'Condition',
-          'Validation',
-          'Custom properties'
-        ]);
-
-        expectGroupEntries(container, 'General', [
-          'Field label',
-          'Field description',
-          'Key',
-          'Default value',
-          'Disabled',
-          'Read only'
-        ]);
-
-        expectGroupEntries(container, 'Validation', [
-          'Required'
-        ]);
-      });
-
-
-      describe('default value', function() {
-
-        it('should add default value', function() {
-
+        it("should remove default value", function () {
           // given
           const editFieldSpy = spy();
 
-          const field = schema.components.find(({ key }) => key === 'approved');
+          const field = defaultValuesSchema.components.find(({ key }) => key === "product");
 
           bootstrapPropertiesPanel({
             container,
             editField: editFieldSpy,
-            field
+            field,
           });
 
           // assume
-          const input = screen.getByLabelText('Default value');
+          const input = screen.getByLabelText("Default value");
 
-          expect(input.value).to.equal('false');
+          expect(input.value).to.equal("camunda-platform");
 
           // when
-          fireEvent.input(input, { target: { value: 'true' } });
+          fireEvent.input(input, { target: { value: "" } });
 
           // then
           expect(editFieldSpy).to.have.been.calledOnce;
-          expect(editFieldSpy).to.have.been.calledWith(field, [ 'defaultValue' ], true);
+          expect(editFieldSpy).to.have.been.calledWith(field, ["defaultValue"], undefined);
         });
-
       });
 
-    });
-
-
-    describe('radio', function() {
-
-      it('entries', function() {
-
-        // given
-        const field = schema.components.find(({ key }) => key === 'product');
-
-        bootstrapPropertiesPanel({
-          container,
-          field
-        });
-
-        // then
-        expectGroups(container, [
-          'General',
-          'Condition',
-          'Options source',
-          'Static options',
-          'Validation',
-          'Custom properties'
-        ]);
-
-        expectGroupEntries(container, 'General', [
-          'Field label',
-          'Field description',
-          'Key',
-          'Default value',
-          'Disabled',
-          'Read only'
-        ]);
-
-        expectGroupEntries(container, 'Options source', [
-          'Type'
-        ]);
-
-        expectGroupEntries(container, 'Static options', [
-          [ 'Label', 2 ],
-          [ 'Value', 2 ]
-        ]);
-
-        expectGroupEntries(container, 'Validation', [
-          'Required'
-        ]);
-      });
-
-
-      describe('default value', function() {
-
-        it('should add default value', function() {
-
+      describe("options", function () {
+        it("should NOT order alphanumerical", function () {
           // given
           const editFieldSpy = spy();
 
-          const field = schema.components.find(({ key }) => key === 'product');
+          const field = schema.components.find(({ key }) => key === "product");
 
           bootstrapPropertiesPanel({
             container,
             editField: editFieldSpy,
-            field
+            field,
           });
 
-          // assume
-          const input = screen.getByLabelText('Default value');
-
-          expect(input.value).to.equal('');
-
           // when
-          fireEvent.input(input, { target: { value: 'camunda-platform' } });
+          const group = findGroup(container, "Static options");
+
+          const list = group.querySelector(".bio-properties-panel-list");
 
           // then
-          expect(editFieldSpy).to.have.been.calledOnce;
-          expect(editFieldSpy).to.have.been.calledWith(field, [ 'defaultValue' ], 'camunda-platform');
+          expect(getListOrdering(list)).to.eql(["Camunda Platform", "Camunda Cloud"]);
         });
 
-
-        it('should remove default value', function() {
-
+        it("should add option", function () {
           // given
           const editFieldSpy = spy();
 
-          const field = defaultValuesSchema.components.find(({ key }) => key === 'product');
+          const field = schema.components.find(({ key }) => key === "product");
 
           bootstrapPropertiesPanel({
             container,
             editField: editFieldSpy,
-            field
+            field,
           });
 
-          // assume
-          const input = screen.getByLabelText('Default value');
-
-          expect(input.value).to.equal('camunda-platform');
+          const group = findGroup(container, "Static options");
 
           // when
-          fireEvent.input(input, { target: { value: '' } });
-
-          // then
-          expect(editFieldSpy).to.have.been.calledOnce;
-          expect(editFieldSpy).to.have.been.calledWith(field, [ 'defaultValue' ], undefined);
-        });
-
-      });
-
-
-      describe('options', function() {
-
-        it('should NOT order alphanumerical', function() {
-
-          // given
-          const editFieldSpy = spy();
-
-          const field = schema.components.find(({ key }) => key === 'product');
-
-          bootstrapPropertiesPanel({
-            container,
-            editField: editFieldSpy,
-            field
-          });
-
-          // when
-          const group = findGroup(container, 'Static options');
-
-          const list = group.querySelector('.bio-properties-panel-list');
-
-          // then
-          expect(getListOrdering(list)).to.eql([
-            'Camunda Platform',
-            'Camunda Cloud'
-          ]);
-
-        });
-
-
-        it('should add option', function() {
-
-          // given
-          const editFieldSpy = spy();
-
-          const field = schema.components.find(({ key }) => key === 'product');
-
-          bootstrapPropertiesPanel({
-            container,
-            editField: editFieldSpy,
-            field
-          });
-
-          const group = findGroup(container, 'Static options');
-
-          // when
-          const addEntry = group.querySelector('.bio-properties-panel-add-entry');
+          const addEntry = group.querySelector(".bio-properties-panel-add-entry");
 
           fireEvent.click(addEntry);
 
           // then
-          expect(editFieldSpy).to.have.been.calledWith(field, [ 'values' ], [
-            ...field.values,
-            {
-              label: 'Value 3',
-              value: 'value3',
-            }
-          ]);
+          expect(editFieldSpy).to.have.been.calledWith(
+            field,
+            ["values"],
+            [
+              ...field.values,
+              {
+                label: "Value 3",
+                value: "value3",
+              },
+            ],
+          );
         });
 
-
-        it('should add option with different index if already used', function() {
-
+        it("should add option with different index if already used", function () {
           // given
           const editFieldSpy = spy();
 
-          const field = redundantValuesSchema.components.find(({ key }) => key === 'redundantValues');
+          const field = redundantValuesSchema.components.find(({ key }) => key === "redundantValues");
 
           bootstrapPropertiesPanel({
             container,
             editField: editFieldSpy,
-            field
+            field,
           });
 
-          const group = findGroup(container, 'Static options');
+          const group = findGroup(container, "Static options");
 
           // when
-          const addEntry = group.querySelector('.bio-properties-panel-add-entry');
+          const addEntry = group.querySelector(".bio-properties-panel-add-entry");
           fireEvent.click(addEntry);
 
           // then
-          expect(editFieldSpy).to.have.been.calledWith(field, [ 'values' ], [
-            ...field.values,
-            {
-              label: 'Value 4',
-              value: 'value4',
-            }
-          ]);
+          expect(editFieldSpy).to.have.been.calledWith(
+            field,
+            ["values"],
+            [
+              ...field.values,
+              {
+                label: "Value 4",
+                value: "value4",
+              },
+            ],
+          );
         });
 
-
-        it('should remove option', function() {
-
+        it("should remove option", function () {
           // given
           const editFieldSpy = spy();
 
-          const field = schema.components.find(({ key }) => key === 'product');
+          const field = schema.components.find(({ key }) => key === "product");
 
           bootstrapPropertiesPanel({
             container,
             editField: editFieldSpy,
-            field
+            field,
           });
 
-          const group = findGroup(container, 'Static options');
+          const group = findGroup(container, "Static options");
 
           // when
-          const removeEntry = group.querySelector('.bio-properties-panel-remove-entry');
+          const removeEntry = group.querySelector(".bio-properties-panel-remove-entry");
 
           fireEvent.click(removeEntry);
 
           // then
-          expect(editFieldSpy).to.have.been.calledWith(field, [ 'values' ], [
-            field.values[ 1 ]
-          ]);
+          expect(editFieldSpy).to.have.been.calledWith(field, ["values"], [field.values[1]]);
         });
 
-
-        describe('validation', function() {
-
-          describe('value', function() {
-
-            it('should not be empty', function() {
-
+        describe("validation", function () {
+          describe("value", function () {
+            it("should not be empty", function () {
               // given
               const editFieldSpy = spy();
 
-              const field = schema.components.find(({ key }) => key === 'product');
+              const field = schema.components.find(({ key }) => key === "product");
 
               bootstrapPropertiesPanel({
                 container,
                 editField: editFieldSpy,
-                field
+                field,
               });
 
               // when
-              const input = screen.getByLabelText('Value', { selector: '#bio-properties-panel-staticOptions-0-value' });
+              const input = screen.getByLabelText("Value", { selector: "#bio-properties-panel-staticOptions-0-value" });
 
-              fireEvent.input(input, { target: { value: '' } });
+              fireEvent.input(input, { target: { value: "" } });
 
               // then
               expect(editFieldSpy).to.not.have.been.called;
 
-              const error = screen.getByText('Must not be empty.');
+              const error = screen.getByText("Must not be empty.");
 
               expect(error).to.exist;
             });
 
-
-            it('should be unique', function() {
-
+            it("should be unique", function () {
               // given
               const editFieldSpy = spy();
 
-              const field = schema.components.find(({ key }) => key === 'product');
+              const field = schema.components.find(({ key }) => key === "product");
 
               bootstrapPropertiesPanel({
                 container,
                 editField: editFieldSpy,
-                field
+                field,
               });
 
               // when
-              const input = screen.getByLabelText('Value', { selector: '#bio-properties-panel-staticOptions-0-value' });
+              const input = screen.getByLabelText("Value", { selector: "#bio-properties-panel-staticOptions-0-value" });
 
-              fireEvent.input(input, { target: { value: 'camunda-cloud' } });
+              fireEvent.input(input, { target: { value: "camunda-cloud" } });
 
               // then
               expect(editFieldSpy).to.not.have.been.called;
 
-              const error = screen.getByText('Must be unique.');
+              const error = screen.getByText("Must be unique.");
 
               expect(error).to.exist;
             });
-
           });
 
-
-          describe('label', function() {
-
-            it('should not be empty', function() {
-
+          describe("label", function () {
+            it("should not be empty", function () {
               // given
               const editFieldSpy = spy();
 
-              const field = schema.components.find(({ key }) => key === 'product');
+              const field = schema.components.find(({ key }) => key === "product");
 
               bootstrapPropertiesPanel({
                 container,
                 editField: editFieldSpy,
-                field
+                field,
               });
 
               // when
-              const input = screen.getByLabelText('Label', { selector: '#bio-properties-panel-staticOptions-0-label' });
+              const input = screen.getByLabelText("Label", { selector: "#bio-properties-panel-staticOptions-0-label" });
 
-              fireEvent.input(input, { target: { value: '' } });
+              fireEvent.input(input, { target: { value: "" } });
 
               // then
               expect(editFieldSpy).to.not.have.been.called;
 
-              const error = screen.getByText('Must not be empty.');
+              const error = screen.getByText("Must not be empty.");
 
               expect(error).to.exist;
             });
 
-
-            it('should be unique', function() {
-
-
+            it("should be unique", function () {
               // given
               const editFieldSpy = spy();
 
-              const field = schema.components.find(({ key }) => key === 'product');
+              const field = schema.components.find(({ key }) => key === "product");
 
               bootstrapPropertiesPanel({
                 container,
                 editField: editFieldSpy,
-                field
+                field,
               });
 
               // when
-              const input = screen.getByLabelText('Label', { selector: '#bio-properties-panel-staticOptions-0-label' });
+              const input = screen.getByLabelText("Label", { selector: "#bio-properties-panel-staticOptions-0-label" });
 
-              fireEvent.input(input, { target: { value: 'Camunda Cloud' } });
+              fireEvent.input(input, { target: { value: "Camunda Cloud" } });
 
               // then
               expect(editFieldSpy).to.not.have.been.called;
 
-              const error = screen.getByText('Must be unique.');
+              const error = screen.getByText("Must be unique.");
 
               expect(error).to.exist;
             });
-
           });
-
         });
-
       });
 
-
-      describe('static options', function() {
-
-        it('should re-configure static source defaults', function() {
-
+      describe("static options", function () {
+        it("should re-configure static source defaults", function () {
           // given
           const editFieldSpy = spy();
 
-          const field = schema.components.find(({ key }) => key === 'product');
+          const field = schema.components.find(({ key }) => key === "product");
 
           bootstrapPropertiesPanel({
             container,
             editField: editFieldSpy,
-            field
+            field,
           });
 
           // assume
-          const input = screen.getByLabelText('Type');
+          const input = screen.getByLabelText("Type");
 
           expect(input.value).to.equal(OPTIONS_SOURCES.STATIC);
 
@@ -778,29 +673,26 @@ describe('properties panel', function() {
           // then
           expect(editFieldSpy).to.have.been.calledTwice;
           expect(editFieldSpy).to.have.been.calledWith(field, {
-            values: OPTIONS_SOURCES_DEFAULTS[OPTIONS_SOURCES.STATIC]
+            values: OPTIONS_SOURCES_DEFAULTS[OPTIONS_SOURCES.STATIC],
           });
         });
       });
 
-
-      describe('dynamic options', function() {
-
-        it('should configure input source', function() {
-
+      describe("dynamic options", function () {
+        it("should configure input source", function () {
           // given
           const editFieldSpy = spy();
 
-          const field = schema.components.find(({ key }) => key === 'product');
+          const field = schema.components.find(({ key }) => key === "product");
 
           bootstrapPropertiesPanel({
             container,
             editField: editFieldSpy,
-            field
+            field,
           });
 
           // assume
-          const input = screen.getByLabelText('Type');
+          const input = screen.getByLabelText("Type");
 
           expect(input.value).to.equal(OPTIONS_SOURCES.STATIC);
 
@@ -810,337 +702,290 @@ describe('properties panel', function() {
           // then
           expect(editFieldSpy).to.have.been.calledOnce;
           expect(editFieldSpy).to.have.been.calledWith(field, {
-            valuesKey: '',
+            valuesKey: "",
           });
         });
 
-
-        it('should configure valuesKey', function() {
-
+        it("should configure valuesKey", function () {
           // given
           const editFieldSpy = spy();
 
-          let field = schema.components.find(({ key }) => key === 'product');
-          field = { ...field, values: undefined, valuesKey: '' };
+          let field = schema.components.find(({ key }) => key === "product");
+          field = { ...field, values: undefined, valuesKey: "" };
 
           bootstrapPropertiesPanel({
             container,
             editField: editFieldSpy,
-            field
+            field,
           });
 
           // assume
-          const input = screen.getByLabelText('Input values key');
+          const input = screen.getByLabelText("Input values key");
 
-          expect(input.value).to.equal('');
+          expect(input.value).to.equal("");
 
           // when
-          fireEvent.input(input, { target: { value: 'newKey' } });
+          fireEvent.input(input, { target: { value: "newKey" } });
 
           // then
           expect(editFieldSpy).to.have.been.calledOnce;
-          expect(editFieldSpy).to.have.been.calledWith(field, [ 'valuesKey' ], 'newKey');
-
+          expect(editFieldSpy).to.have.been.calledWith(field, ["valuesKey"], "newKey");
         });
 
-
-        it('should not be empty', function() {
-
+        it("should not be empty", function () {
           // given
           const editFieldSpy = spy();
 
-          let field = schema.components.find(({ key }) => key === 'product');
-          field = { ...field, values: undefined, valuesKey: '' };
+          let field = schema.components.find(({ key }) => key === "product");
+          field = { ...field, values: undefined, valuesKey: "" };
 
           bootstrapPropertiesPanel({
             container,
             editField: editFieldSpy,
-            field
+            field,
           });
 
           // assume
-          const input = screen.getByLabelText('Input values key');
+          const input = screen.getByLabelText("Input values key");
 
-          expect(input.value).to.equal('');
+          expect(input.value).to.equal("");
 
           // when
-          fireEvent.input(input, { target: { value: '' } });
+          fireEvent.input(input, { target: { value: "" } });
 
           // then
           expect(editFieldSpy).not.to.have.been.called;
 
-          const error = screen.getByText('Must not be empty.');
+          const error = screen.getByText("Must not be empty.");
 
           expect(error).to.exist;
         });
 
-
-        it('should not contain spaces', function() {
-
+        it("should not contain spaces", function () {
           // given
           const editFieldSpy = spy();
 
-          let field = schema.components.find(({ key }) => key === 'product');
-          field = { ...field, values: undefined, valuesKey: '' };
+          let field = schema.components.find(({ key }) => key === "product");
+          field = { ...field, values: undefined, valuesKey: "" };
 
           bootstrapPropertiesPanel({
             container,
             editField: editFieldSpy,
-            field
+            field,
           });
 
           // assume
-          const input = screen.getByLabelText('Input values key');
+          const input = screen.getByLabelText("Input values key");
 
-          expect(input.value).to.equal('');
+          expect(input.value).to.equal("");
 
           // when
-          fireEvent.input(input, { target: { value: 'credi tor' } });
+          fireEvent.input(input, { target: { value: "credi tor" } });
 
           // then
           expect(editFieldSpy).not.to.have.been.called;
 
-          const error = screen.getByText('Must not contain spaces.');
+          const error = screen.getByText("Must not contain spaces.");
 
           expect(error).to.exist;
         });
 
-
-        it('entries should change', function() {
-
+        it("entries should change", function () {
           // given
-          let field = schema.components.find(({ key }) => key === 'product');
-          field = { ...field, values: undefined, valuesKey: '' };
+          let field = schema.components.find(({ key }) => key === "product");
+          field = { ...field, values: undefined, valuesKey: "" };
 
           bootstrapPropertiesPanel({
             container,
-            field
+            field,
           });
 
           // then
           expectGroups(container, [
-            'General',
-            'Condition',
-            'Options source',
-            'Dynamic options',
-            'Validation',
-            'Custom properties'
+            "General",
+            "Condition",
+            "Options source",
+            "Dynamic options",
+            "Validation",
+            "Custom properties",
           ]);
 
-          expectGroupEntries(container, 'General', [
-            'Field label',
-            'Field description',
-            'Key',
-            'Disabled',
-            'Read only'
+          expectGroupEntries(container, "General", [
+            "Field label",
+            "Field description",
+            "Key",
+            "Disabled",
+            "Read only",
           ]);
 
-          expectGroupEntries(container, 'Options source', [
-            'Type'
-          ]);
+          expectGroupEntries(container, "Options source", ["Type"]);
 
-          expectGroupEntries(container, 'Dynamic options', [
-            'Input values key'
-          ]);
+          expectGroupEntries(container, "Dynamic options", ["Input values key"]);
 
-          expectGroupEntries(container, 'Validation', [
-            'Required'
-          ]);
+          expectGroupEntries(container, "Validation", ["Required"]);
         });
-
       });
-
     });
 
-
-    describe('checklist', function() {
-
-      it('entries', function() {
-
+    describe("checklist", function () {
+      it("entries", function () {
         // given
-        const field = schema.components.find(({ key }) => key === 'mailto');
+        const field = schema.components.find(({ key }) => key === "mailto");
 
         bootstrapPropertiesPanel({
           container,
-          field
+          field,
         });
 
         // then
         expectGroups(container, [
-          'General',
-          'Condition',
-          'Options source',
-          'Static options',
-          'Validation',
-          'Custom properties'
+          "General",
+          "Condition",
+          "Options source",
+          "Static options",
+          "Validation",
+          "Custom properties",
         ]);
 
-        expectGroupEntries(container, 'General', [
-          'Field label',
-          'Field description',
-          'Key',
-          'Disabled',
-          'Read only'
+        expectGroupEntries(container, "General", ["Field label", "Field description", "Key", "Disabled", "Read only"]);
+
+        expectGroupEntries(container, "Options source", ["Type"]);
+
+        expectGroupEntries(container, "Static options", [
+          ["Label", 3],
+          ["Value", 3],
         ]);
 
-        expectGroupEntries(container, 'Options source', [
-          'Type'
-        ]);
-
-        expectGroupEntries(container, 'Static options', [
-          [ 'Label', 3 ],
-          [ 'Value', 3 ]
-        ]);
-
-        expectGroupEntries(container, 'Validation', [
-          'Required'
-        ]);
-
+        expectGroupEntries(container, "Validation", ["Required"]);
       });
 
-
-      describe('options', function() {
-
-        it('should add option', function() {
-
+      describe("options", function () {
+        it("should add option", function () {
           // given
           const editFieldSpy = spy();
 
-          const field = schema.components.find(({ key }) => key === 'mailto');
+          const field = schema.components.find(({ key }) => key === "mailto");
 
           bootstrapPropertiesPanel({
             container,
             editField: editFieldSpy,
-            field
+            field,
           });
 
-          const group = findGroup(container, 'Static options');
+          const group = findGroup(container, "Static options");
 
           // when
-          const addEntry = group.querySelector('.bio-properties-panel-add-entry');
+          const addEntry = group.querySelector(".bio-properties-panel-add-entry");
 
           fireEvent.click(addEntry);
 
           // then
-          expect(editFieldSpy).to.have.been.calledWith(field, [ 'values' ], [
-            ...field.values,
-            {
-              label: 'Value 4',
-              value: 'value4',
-            }
-          ]);
+          expect(editFieldSpy).to.have.been.calledWith(
+            field,
+            ["values"],
+            [
+              ...field.values,
+              {
+                label: "Value 4",
+                value: "value4",
+              },
+            ],
+          );
         });
 
-
-        it('should remove option', function() {
-
+        it("should remove option", function () {
           // given
           const editFieldSpy = spy();
 
-          const field = schema.components.find(({ key }) => key === 'mailto');
+          const field = schema.components.find(({ key }) => key === "mailto");
 
           bootstrapPropertiesPanel({
             container,
             editField: editFieldSpy,
-            field
+            field,
           });
 
-          const group = findGroup(container, 'Static options');
+          const group = findGroup(container, "Static options");
 
           // when
-          const removeEntry = group.querySelector('.bio-properties-panel-remove-entry');
+          const removeEntry = group.querySelector(".bio-properties-panel-remove-entry");
 
           fireEvent.click(removeEntry);
 
           // then
-          expect(editFieldSpy).to.have.been.calledWith(field, [ 'values' ], [
-            field.values[ 1 ],
-            field.values[ 2 ]
-          ]);
+          expect(editFieldSpy).to.have.been.calledWith(field, ["values"], [field.values[1], field.values[2]]);
         });
 
-
-        describe('validation', function() {
-
-          describe('value', function() {
-
-            it('should not be empty', function() {
-
+        describe("validation", function () {
+          describe("value", function () {
+            it("should not be empty", function () {
               // given
               const editFieldSpy = spy();
 
-              const field = schema.components.find(({ key }) => key === 'mailto');
+              const field = schema.components.find(({ key }) => key === "mailto");
 
               bootstrapPropertiesPanel({
                 container,
                 editField: editFieldSpy,
-                field
+                field,
               });
 
               // when
-              const input = screen.getByLabelText('Value', { selector: '#bio-properties-panel-staticOptions-0-value' });
+              const input = screen.getByLabelText("Value", { selector: "#bio-properties-panel-staticOptions-0-value" });
 
-              fireEvent.input(input, { target: { value: '' } });
+              fireEvent.input(input, { target: { value: "" } });
 
               // then
               expect(editFieldSpy).to.not.have.been.called;
 
-              const error = screen.getByText('Must not be empty.');
+              const error = screen.getByText("Must not be empty.");
 
               expect(error).to.exist;
             });
 
-
-            it('should be unique', function() {
-
+            it("should be unique", function () {
               // given
               const editFieldSpy = spy();
 
-              const field = schema.components.find(({ key }) => key === 'mailto');
+              const field = schema.components.find(({ key }) => key === "mailto");
 
               bootstrapPropertiesPanel({
                 container,
                 editField: editFieldSpy,
-                field
+                field,
               });
 
               // when
-              const input = screen.getByLabelText('Value', { selector: '#bio-properties-panel-staticOptions-0-value' });
+              const input = screen.getByLabelText("Value", { selector: "#bio-properties-panel-staticOptions-0-value" });
 
-              fireEvent.input(input, { target: { value: 'manager' } });
+              fireEvent.input(input, { target: { value: "manager" } });
 
               // then
               expect(editFieldSpy).to.not.have.been.called;
 
-              const error = screen.getByText('Must be unique.');
+              const error = screen.getByText("Must be unique.");
 
               expect(error).to.exist;
             });
-
           });
-
         });
-
       });
 
-
-      describe('dynamic options', function() {
-
-        it('should configure input source', function() {
-
+      describe("dynamic options", function () {
+        it("should configure input source", function () {
           // given
           const editFieldSpy = spy();
 
-          const field = schema.components.find(({ key }) => key === 'mailto');
+          const field = schema.components.find(({ key }) => key === "mailto");
 
           bootstrapPropertiesPanel({
             container,
             editField: editFieldSpy,
-            field
+            field,
           });
 
           // assume
-          const input = screen.getByLabelText('Type');
+          const input = screen.getByLabelText("Type");
 
           expect(input.value).to.equal(OPTIONS_SOURCES.STATIC);
 
@@ -1150,269 +995,226 @@ describe('properties panel', function() {
           // then
           expect(editFieldSpy).to.have.been.calledOnce;
           expect(editFieldSpy).to.have.been.calledWith(field, {
-            valuesKey: ''
+            valuesKey: "",
           });
         });
 
-
-        it('should configure valuesKey', function() {
-
+        it("should configure valuesKey", function () {
           // given
           const editFieldSpy = spy();
 
-          let field = schema.components.find(({ key }) => key === 'mailto');
-          field = { ...field, values: undefined, valuesKey: '' };
+          let field = schema.components.find(({ key }) => key === "mailto");
+          field = { ...field, values: undefined, valuesKey: "" };
 
           bootstrapPropertiesPanel({
             container,
             editField: editFieldSpy,
-            field
+            field,
           });
 
           // assume
-          const input = screen.getByLabelText('Input values key');
+          const input = screen.getByLabelText("Input values key");
 
-          expect(input.value).to.equal('');
+          expect(input.value).to.equal("");
 
           // when
-          fireEvent.input(input, { target: { value: 'newKey' } });
+          fireEvent.input(input, { target: { value: "newKey" } });
 
           // then
           expect(editFieldSpy).to.have.been.calledOnce;
-          expect(editFieldSpy).to.have.been.calledWith(field, [ 'valuesKey' ], 'newKey');
-
+          expect(editFieldSpy).to.have.been.calledWith(field, ["valuesKey"], "newKey");
         });
 
-
-        it('entries should change', function() {
-
+        it("entries should change", function () {
           // given
-          let field = schema.components.find(({ key }) => key === 'mailto');
-          field = { ...field, values: undefined, valuesKey: '' };
+          let field = schema.components.find(({ key }) => key === "mailto");
+          field = { ...field, values: undefined, valuesKey: "" };
 
           bootstrapPropertiesPanel({
             container,
-            field
+            field,
           });
 
           // then
-          expectGroups(container, [
-            'General',
-            'Condition',
-            'Options source',
-            'Dynamic options',
-            'Custom properties'
+          expectGroups(container, ["General", "Condition", "Options source", "Dynamic options", "Custom properties"]);
+
+          expectGroupEntries(container, "General", [
+            "Field label",
+            "Field description",
+            "Key",
+            "Disabled",
+            "Read only",
           ]);
 
-          expectGroupEntries(container, 'General', [
-            'Field label',
-            'Field description',
-            'Key',
-            'Disabled',
-            'Read only'
-          ]);
+          expectGroupEntries(container, "Options source", ["Type"]);
 
-          expectGroupEntries(container, 'Options source', [
-            'Type'
-          ]);
-
-          expectGroupEntries(container, 'Dynamic options', [
-            'Input values key'
-          ]);
+          expectGroupEntries(container, "Dynamic options", ["Input values key"]);
         });
-
       });
-
     });
 
-
-    describe('taglist', function() {
-
-      it('entries', function() {
-
+    describe("taglist", function () {
+      it("entries", function () {
         // given
-        const field = schema.components.find(({ key }) => key === 'tags');
+        const field = schema.components.find(({ key }) => key === "tags");
 
         bootstrapPropertiesPanel({
           container,
-          field
+          field,
         });
 
         // then
         expectGroups(container, [
-          'General',
-          'Condition',
-          'Options source',
-          'Static options',
-          'Validation',
-          'Custom properties'
+          "General",
+          "Condition",
+          "Options source",
+          "Static options",
+          "Validation",
+          "Custom properties",
         ]);
 
-        expectGroupEntries(container, 'General', [
-          'Field label',
-          'Field description',
-          'Key',
-          'Disabled',
-          'Read only'
+        expectGroupEntries(container, "General", ["Field label", "Field description", "Key", "Disabled", "Read only"]);
+
+        expectGroupEntries(container, "Options source", ["Type"]);
+
+        expectGroupEntries(container, "Static options", [
+          ["Label", 11],
+          ["Value", 11],
         ]);
 
-        expectGroupEntries(container, 'Options source', [
-          'Type'
-        ]);
-
-        expectGroupEntries(container, 'Static options', [
-          [ 'Label', 11 ],
-          [ 'Value', 11 ]
-        ]);
-
-        expectGroupEntries(container, 'Validation', [
-          'Required'
-        ]);
+        expectGroupEntries(container, "Validation", ["Required"]);
       });
 
-
-      describe('options', function() {
-
-        it('should add option', function() {
-
+      describe("options", function () {
+        it("should add option", function () {
           // given
           const editFieldSpy = spy();
 
-          const field = schema.components.find(({ key }) => key === 'tags');
+          const field = schema.components.find(({ key }) => key === "tags");
 
           bootstrapPropertiesPanel({
             container,
             editField: editFieldSpy,
-            field
+            field,
           });
 
-          const group = findGroup(container, 'Static options');
+          const group = findGroup(container, "Static options");
 
           // when
-          const addEntry = group.querySelector('.bio-properties-panel-add-entry');
+          const addEntry = group.querySelector(".bio-properties-panel-add-entry");
 
           fireEvent.click(addEntry);
 
           // then
-          expect(editFieldSpy).to.have.been.calledWith(field, [ 'values' ], [
-            ...field.values,
-            {
-              label: 'Value 12',
-              value: 'value12',
-            }
-          ]);
+          expect(editFieldSpy).to.have.been.calledWith(
+            field,
+            ["values"],
+            [
+              ...field.values,
+              {
+                label: "Value 12",
+                value: "value12",
+              },
+            ],
+          );
         });
 
-
-        it('should remove option', function() {
-
+        it("should remove option", function () {
           // given
           const editFieldSpy = spy();
 
-          const field = schema.components.find(({ key }) => key === 'tags');
+          const field = schema.components.find(({ key }) => key === "tags");
 
           bootstrapPropertiesPanel({
             container,
             editField: editFieldSpy,
-            field
+            field,
           });
 
-          const group = findGroup(container, 'Static options');
+          const group = findGroup(container, "Static options");
 
           // when
-          const removeEntry = group.querySelector('.bio-properties-panel-remove-entry');
+          const removeEntry = group.querySelector(".bio-properties-panel-remove-entry");
 
           fireEvent.click(removeEntry);
 
           // then
-          const expectedValues = [ ...field.values ];
+          const expectedValues = [...field.values];
           expectedValues.shift();
 
-          expect(editFieldSpy).to.have.been.calledWith(field, [ 'values' ], expectedValues);
+          expect(editFieldSpy).to.have.been.calledWith(field, ["values"], expectedValues);
         });
 
-
-        describe('validation', function() {
-
-          describe('value', function() {
-
-            it('should not be empty', function() {
-
+        describe("validation", function () {
+          describe("value", function () {
+            it("should not be empty", function () {
               // given
               const editFieldSpy = spy();
 
-              const field = schema.components.find(({ key }) => key === 'tags');
+              const field = schema.components.find(({ key }) => key === "tags");
 
               bootstrapPropertiesPanel({
                 container,
                 editField: editFieldSpy,
-                field
+                field,
               });
 
               // when
-              const input = screen.getByLabelText('Value', { selector: '#bio-properties-panel-staticOptions-0-value' });
+              const input = screen.getByLabelText("Value", { selector: "#bio-properties-panel-staticOptions-0-value" });
 
-              fireEvent.input(input, { target: { value: '' } });
+              fireEvent.input(input, { target: { value: "" } });
 
               // then
               expect(editFieldSpy).to.not.have.been.called;
 
-              const error = screen.getByText('Must not be empty.');
+              const error = screen.getByText("Must not be empty.");
 
               expect(error).to.exist;
             });
 
-
-            it('should be unique', function() {
-
+            it("should be unique", function () {
               // given
               const editFieldSpy = spy();
 
-              const field = schema.components.find(({ key }) => key === 'tags');
+              const field = schema.components.find(({ key }) => key === "tags");
 
               bootstrapPropertiesPanel({
                 container,
                 editField: editFieldSpy,
-                field
+                field,
               });
 
               // when
-              const input = screen.getByLabelText('Value', { selector: '#bio-properties-panel-staticOptions-0-value' });
+              const input = screen.getByLabelText("Value", { selector: "#bio-properties-panel-staticOptions-0-value" });
 
-              fireEvent.input(input, { target: { value: 'tag2' } });
+              fireEvent.input(input, { target: { value: "tag2" } });
 
               // then
               expect(editFieldSpy).to.not.have.been.called;
 
-              const error = screen.getByText('Must be unique.');
+              const error = screen.getByText("Must be unique.");
 
               expect(error).to.exist;
             });
-
           });
-
         });
-
       });
 
-
-      describe('dynamic options (valuesKey)', function() {
-
-        it('should configure input source', function() {
-
+      describe("dynamic options (valuesKey)", function () {
+        it("should configure input source", function () {
           // given
           const editFieldSpy = spy();
 
-          const field = schema.components.find(({ key }) => key === 'tags');
+          const field = schema.components.find(({ key }) => key === "tags");
 
           bootstrapPropertiesPanel({
             container,
             editField: editFieldSpy,
-            field
+            field,
           });
 
           // assume
-          const input = screen.getByLabelText('Type');
+          const input = screen.getByLabelText("Type");
 
           expect(input.value).to.equal(OPTIONS_SOURCES.STATIC);
 
@@ -1422,48 +1224,44 @@ describe('properties panel', function() {
           // then
           expect(editFieldSpy).to.have.been.calledOnce;
           expect(editFieldSpy).to.have.been.calledWith(field, {
-            valuesKey: ''
+            valuesKey: "",
           });
         });
 
-
-        it('should configure valuesKey', function() {
-
+        it("should configure valuesKey", function () {
           // given
           const editFieldSpy = spy();
 
-          let field = schema.components.find(({ key }) => key === 'tags');
-          field = { ...field, values: undefined, valuesKey: '' };
+          let field = schema.components.find(({ key }) => key === "tags");
+          field = { ...field, values: undefined, valuesKey: "" };
 
           bootstrapPropertiesPanel({
             container,
             editField: editFieldSpy,
-            field
+            field,
           });
 
           // assume
-          const input = screen.getByLabelText('Input values key');
+          const input = screen.getByLabelText("Input values key");
 
-          expect(input.value).to.equal('');
+          expect(input.value).to.equal("");
 
           // when
-          fireEvent.input(input, { target: { value: 'newKey' } });
+          fireEvent.input(input, { target: { value: "newKey" } });
 
           // then
           expect(editFieldSpy).to.have.been.calledOnce;
-          expect(editFieldSpy).to.have.been.calledWith(field, [ 'valuesKey' ], 'newKey');
+          expect(editFieldSpy).to.have.been.calledWith(field, ["valuesKey"], "newKey");
         });
 
-
-        it('should auto focus other entry', async function() {
-
+        it("should auto focus other entry", async function () {
           // given
-          let field = schema.components.find(({ key }) => key === 'tags');
+          let field = schema.components.find(({ key }) => key === "tags");
 
           const eventBus = new EventBusMock();
 
           const editField = () => {
-            field = { ...field, values: undefined, valuesKey: '' };
+            field = { ...field, values: undefined, valuesKey: "" };
           };
 
           bootstrapPropertiesPanel({
@@ -1473,86 +1271,69 @@ describe('properties panel', function() {
             services: {
               eventBus,
               selection: {
-                get: () => field
-              }
-            }
+                get: () => field,
+              },
+            },
           });
 
           // assume
-          const input = screen.getByLabelText('Type');
+          const input = screen.getByLabelText("Type");
           expect(input.value).to.equal(OPTIONS_SOURCES.STATIC);
 
           // when
           fireEvent.input(input, { target: { value: OPTIONS_SOURCES.INPUT } });
-          await act(() => eventBus.fire('changed'));
+          await act(() => eventBus.fire("changed"));
 
           // then
-          const valuesKeyInput = screen.getByLabelText('Input values key');
+          const valuesKeyInput = screen.getByLabelText("Input values key");
 
           await waitFor(() => {
             expect(document.activeElement).to.eql(valuesKeyInput);
           });
         });
 
-
-        it('entries should change', function() {
-
+        it("entries should change", function () {
           // given
-          let field = schema.components.find(({ key }) => key === 'tags');
-          field = { ...field, values: undefined, valuesKey: '' };
+          let field = schema.components.find(({ key }) => key === "tags");
+          field = { ...field, values: undefined, valuesKey: "" };
 
           bootstrapPropertiesPanel({
             container,
-            field
+            field,
           });
 
           // then
-          expectGroups(container, [
-            'General',
-            'Condition',
-            'Options source',
-            'Dynamic options',
-            'Custom properties'
+          expectGroups(container, ["General", "Condition", "Options source", "Dynamic options", "Custom properties"]);
+
+          expectGroupEntries(container, "General", [
+            "Field label",
+            "Field description",
+            "Key",
+            "Disabled",
+            "Read only",
           ]);
 
-          expectGroupEntries(container, 'General', [
-            'Field label',
-            'Field description',
-            'Key',
-            'Disabled',
-            'Read only'
-          ]);
+          expectGroupEntries(container, "Options source", ["Type"]);
 
-          expectGroupEntries(container, 'Options source', [
-            'Type'
-          ]);
-
-          expectGroupEntries(container, 'Dynamic options', [
-            'Input values key'
-          ]);
-
+          expectGroupEntries(container, "Dynamic options", ["Input values key"]);
         });
-
       });
 
-
-      describe('dynamic options (valuesExpression)', function() {
-
-        it('should configure input source', function() {
-
+      describe("dynamic options (valuesExpression)", function () {
+        it("should configure input source", function () {
           // given
           const editFieldSpy = spy();
 
-          const field = schema.components.find(({ key }) => key === 'tags');
+          const field = schema.components.find(({ key }) => key === "tags");
 
           bootstrapPropertiesPanel({
             container,
             editField: editFieldSpy,
-            field
+            field,
           });
 
           // assume
-          const input = screen.getByLabelText('Type');
+          const input = screen.getByLabelText("Type");
 
           expect(input.value).to.equal(OPTIONS_SOURCES.STATIC);
 
@@ -1562,52 +1343,48 @@ describe('properties panel', function() {
           // then
           expect(editFieldSpy).to.have.been.calledOnce;
           expect(editFieldSpy).to.have.been.calledWith(field, {
-            valuesExpression: '='
+            valuesExpression: "=",
           });
         });
 
-
-        it('should configure valuesExpression', async function() {
-
+        it("should configure valuesExpression", async function () {
           // given
           const editFieldSpy = spy();
 
-          let field = schema.components.find(({ key }) => key === 'tags');
-          field = { ...field, values: undefined, valuesExpression: '=' };
+          let field = schema.components.find(({ key }) => key === "tags");
+          field = { ...field, values: undefined, valuesExpression: "=" };
 
           bootstrapPropertiesPanel({
             container,
             editField: editFieldSpy,
-            field
+            field,
           });
 
           // assume
-          const input = findTextbox('optionsExpression-expression', container);
+          const input = findTextbox("optionsExpression-expression", container);
 
-          expect(input.textContent).to.equal('');
+          expect(input.textContent).to.equal("");
 
           // when
-          await setEditorValue(input, 'newVal');
+          await setEditorValue(input, "newVal");
 
           // then
           expect(editFieldSpy).to.have.been.calledOnce;
-          expect(editFieldSpy).to.have.been.calledWith(field, [ 'valuesExpression' ], '=newVal');
+          expect(editFieldSpy).to.have.been.calledWith(field, ["valuesExpression"], "=newVal");
         });
 
-
-        it('should auto focus other entry', async function() {
-
+        it("should auto focus other entry", async function () {
           // given
-          let field = schema.components.find(({ key }) => key === 'tags');
+          let field = schema.components.find(({ key }) => key === "tags");
 
           const eventBus = new EventBusMock();
 
           const editField = () => {
-            field = { ...field, values: undefined, valuesExpression: '=' };
+            field = { ...field, values: undefined, valuesExpression: "=" };
           };
 
           const selection = {
-            get: () => field
+            get: () => field,
           };
 
           bootstrapPropertiesPanel({
@@ -1616,299 +1393,254 @@ describe('properties panel', function() {
             field,
             services: {
               eventBus,
-              selection
-            }
+              selection,
+            },
           });
 
           // assume
-          const input = screen.getByLabelText('Type');
+          const input = screen.getByLabelText("Type");
           expect(input.value).to.equal(OPTIONS_SOURCES.STATIC);
 
           // when
           fireEvent.input(input, { target: { value: OPTIONS_SOURCES.EXPRESSION } });
-          await act(() => eventBus.fire('changed'));
+          await act(() => eventBus.fire("changed"));
 
           // then
-          const editor = findTextbox('optionsExpression-expression', container);
+          const editor = findTextbox("optionsExpression-expression", container);
 
           await waitFor(() => {
             expect(document.activeElement).to.eql(editor);
           });
         });
 
-
-        it('entries should change', function() {
-
+        it("entries should change", function () {
           // given
-          let field = schema.components.find(({ key }) => key === 'tags');
-          field = { ...field, values: undefined, valuesExpression: '=' };
+          let field = schema.components.find(({ key }) => key === "tags");
+          field = { ...field, values: undefined, valuesExpression: "=" };
 
           bootstrapPropertiesPanel({
             container,
-            field
+            field,
           });
 
           // then
           expectGroups(container, [
-            'General',
-            'Condition',
-            'Options source',
-            'Options expression',
-            'Validation',
-            'Custom properties'
+            "General",
+            "Condition",
+            "Options source",
+            "Options expression",
+            "Validation",
+            "Custom properties",
           ]);
 
-          expectGroupEntries(container, 'General', [
-            'Field label',
-            'Field description',
-            'Key',
-            'Disabled',
-            'Read only'
+          expectGroupEntries(container, "General", [
+            "Field label",
+            "Field description",
+            "Key",
+            "Disabled",
+            "Read only",
           ]);
 
-          expectGroupEntries(container, 'Options source', [
-            'Type'
-          ]);
+          expectGroupEntries(container, "Options source", ["Type"]);
 
-          expectGroupEntries(container, 'Options expression', [
-            'Options expression'
-          ]);
+          expectGroupEntries(container, "Options expression", ["Options expression"]);
 
-          expectGroupEntries(container, 'Validation', [
-            'Required'
-          ]);
+          expectGroupEntries(container, "Validation", ["Required"]);
         });
-
       });
-
     });
 
-
-    describe('datetime', function() {
-
-      it('entries', function() {
-
+    describe("datetime", function () {
+      it("entries", function () {
         // given
-        const field = schema.components.find(({ key }) => key === 'conversation');
+        const field = schema.components.find(({ key }) => key === "conversation");
 
         bootstrapPropertiesPanel({
           container,
-          field
+          field,
         });
 
         // then
         expectGroups(container, [
-          'General',
-          'Condition',
-          'Serialization',
-          'Constraints',
-          'Validation',
-          'Custom properties'
+          "General",
+          "Condition",
+          "Serialization",
+          "Constraints",
+          "Validation",
+          "Custom properties",
         ]);
 
-        expectGroupEntries(container, 'General', [
-          'Date label',
-          'Time label',
-          'Field description',
-          'Key',
-          'Subtype',
-          'Use 24h',
-          'Disabled',
-          'Read only'
+        expectGroupEntries(container, "General", [
+          "Date label",
+          "Time label",
+          "Field description",
+          "Key",
+          "Subtype",
+          "Use 24h",
+          "Disabled",
+          "Read only",
         ]);
 
-        expectGroupEntries(container, 'Serialization', [
-          'Time format'
-        ]);
+        expectGroupEntries(container, "Serialization", ["Time format"]);
 
-        expectGroupEntries(container, 'Constraints', [
-          'Time interval',
-          'Disallow past dates'
-        ]);
+        expectGroupEntries(container, "Constraints", ["Time interval", "Disallow past dates"]);
 
-        expectGroupEntries(container, 'Validation', [
-          'Required'
-        ]);
-
+        expectGroupEntries(container, "Validation", ["Required"]);
       });
     });
 
-
-    describe('select', function() {
-
-      it('entries', function() {
-
+    describe("select", function () {
+      it("entries", function () {
         // given
-        const field = schema.components.find(({ key }) => key === 'language');
+        const field = schema.components.find(({ key }) => key === "language");
 
         bootstrapPropertiesPanel({
           container,
-          field
+          field,
         });
 
         // then
         expectGroups(container, [
-          'General',
-          'Condition',
-          'Options source',
-          'Static options',
-          'Validation',
-          'Custom properties'
+          "General",
+          "Condition",
+          "Options source",
+          "Static options",
+          "Validation",
+          "Custom properties",
         ]);
 
-        expectGroupEntries(container, 'General', [
-          'Field label',
-          'Field description',
-          'Key',
-          'Default value',
-          'Searchable',
-          'Disabled',
-          'Read only'
+        expectGroupEntries(container, "General", [
+          "Field label",
+          "Field description",
+          "Key",
+          "Default value",
+          "Searchable",
+          "Disabled",
+          "Read only",
         ]);
 
-        expectGroupEntries(container, 'Options source', [
-          'Type'
+        expectGroupEntries(container, "Options source", ["Type"]);
+
+        expectGroupEntries(container, "Static options", [
+          ["Label", 2],
+          ["Value", 2],
         ]);
 
-        expectGroupEntries(container, 'Static options', [
-          [ 'Label', 2 ],
-          [ 'Value', 2 ]
-        ]);
-
-        expectGroupEntries(container, 'Validation', [
-          'Required'
-        ]);
+        expectGroupEntries(container, "Validation", ["Required"]);
       });
 
-
-      describe('default value', function() {
-
-        it('should not add default value', function() {
-
+      describe("default value", function () {
+        it("should not add default value", function () {
           // given
           const editFieldSpy = spy();
 
-          const field = schema.components.find(({ key }) => key === 'language');
+          const field = schema.components.find(({ key }) => key === "language");
 
           bootstrapPropertiesPanel({
             container,
             editField: editFieldSpy,
-            field
+            field,
           });
 
           // assume
-          const input = screen.getByLabelText('Default value');
+          const input = screen.getByLabelText("Default value");
 
-          expect(input.value).to.equal('');
+          expect(input.value).to.equal("");
 
           // when
           fireEvent.input(input, { target: { value: EMPTY_OPTION } });
 
           // then
           expect(editFieldSpy).to.have.been.calledOnce;
-          expect(editFieldSpy).to.have.been.calledWith(field, [ 'defaultValue' ], undefined);
+          expect(editFieldSpy).to.have.been.calledWith(field, ["defaultValue"], undefined);
         });
 
-
-        it('should add default value', function() {
-
+        it("should add default value", function () {
           // given
           const editFieldSpy = spy();
 
-          const field = schema.components.find(({ key }) => key === 'language');
+          const field = schema.components.find(({ key }) => key === "language");
 
           bootstrapPropertiesPanel({
             container,
             editField: editFieldSpy,
-            field
+            field,
           });
 
           // assume
-          const input = screen.getByLabelText('Default value');
+          const input = screen.getByLabelText("Default value");
 
-          expect(input.value).to.equal('');
+          expect(input.value).to.equal("");
 
           // when
-          fireEvent.input(input, { target: { value: 'english' } });
+          fireEvent.input(input, { target: { value: "english" } });
 
           // then
           expect(editFieldSpy).to.have.been.calledOnce;
-          expect(editFieldSpy).to.have.been.calledWith(field, [ 'defaultValue' ], 'english');
+          expect(editFieldSpy).to.have.been.calledWith(field, ["defaultValue"], "english");
         });
 
-
-        it('should remove default value', function() {
-
+        it("should remove default value", function () {
           // given
           const editFieldSpy = spy();
 
-          const field = defaultValuesSchema.components.find(({ key }) => key === 'language');
+          const field = defaultValuesSchema.components.find(({ key }) => key === "language");
 
           bootstrapPropertiesPanel({
             container,
             editField: editFieldSpy,
-            field
+            field,
           });
 
           // assume
-          const input = screen.getByLabelText('Default value');
+          const input = screen.getByLabelText("Default value");
 
-          expect(input.value).to.equal('english');
+          expect(input.value).to.equal("english");
 
           // when
-          fireEvent.input(input, { target: { value: '' } });
+          fireEvent.input(input, { target: { value: "" } });
 
           // then
           expect(editFieldSpy).to.have.been.calledOnce;
-          expect(editFieldSpy).to.have.been.calledWith(field, [ 'defaultValue' ], undefined);
+          expect(editFieldSpy).to.have.been.calledWith(field, ["defaultValue"], undefined);
         });
-
       });
 
-
-      describe('options', function() {
-
-        it('should NOT order alphanumerical', function() {
-
+      describe("options", function () {
+        it("should NOT order alphanumerical", function () {
           // given
           const editFieldSpy = spy();
 
-          const field = schema.components.find(({ key }) => key === 'language');
+          const field = schema.components.find(({ key }) => key === "language");
 
           bootstrapPropertiesPanel({
             container,
             editField: editFieldSpy,
-            field
+            field,
           });
 
           // when
-          const group = findGroup(container, 'Static options');
+          const group = findGroup(container, "Static options");
 
-          const list = group.querySelector('.bio-properties-panel-list');
+          const list = group.querySelector(".bio-properties-panel-list");
 
           // then
-          expect(getListOrdering(list)).to.eql([
-            'German',
-            'English'
-          ]);
-
+          expect(getListOrdering(list)).to.eql(["German", "English"]);
         });
 
-
-        it('should auto focus other entry', async function() {
-
+        it("should auto focus other entry", async function () {
           // given
           let field = {
-            key: 'dri',
-            label: 'Assign DRI',
-            type: 'select',
-            valuesKey: 'queriedDRIs'
+            key: "dri",
+            label: "Assign DRI",
+            type: "select",
+            valuesKey: "queriedDRIs",
           };
 
           const eventBus = new EventBusMock();
 
           const editField = () => {
-            field = { ...field, values: [ 'foo' ], valuesKey: undefined };
+            field = { ...field, values: ["foo"], valuesKey: undefined };
           };
 
           bootstrapPropertiesPanel({
@@ -1918,167 +1650,153 @@ describe('properties panel', function() {
             services: {
               eventBus,
               selection: {
-                get: () => field
-              }
-            }
+                get: () => field,
+              },
+            },
           });
 
           // assume
-          const input = screen.getByLabelText('Type');
+          const input = screen.getByLabelText("Type");
           expect(input.value).to.equal(OPTIONS_SOURCES.INPUT);
 
           // when
           fireEvent.input(input, { target: { value: OPTIONS_SOURCES.STATIC } });
-          await act(() => eventBus.fire('changed'));
+          await act(() => eventBus.fire("changed"));
 
           // then
-          const optionLabelInput = screen.getByLabelText('Label');
+          const optionLabelInput = screen.getByLabelText("Label");
 
           await waitFor(() => {
             expect(document.activeElement).to.eql(optionLabelInput);
           });
         });
 
-
-        it('should add option', function() {
-
+        it("should add option", function () {
           // given
           const editFieldSpy = spy();
 
-          const field = schema.components.find(({ key }) => key === 'language');
+          const field = schema.components.find(({ key }) => key === "language");
 
           bootstrapPropertiesPanel({
             container,
             editField: editFieldSpy,
-            field
+            field,
           });
 
-          const group = findGroup(container, 'Static options');
+          const group = findGroup(container, "Static options");
 
           // when
-          const addEntry = group.querySelector('.bio-properties-panel-add-entry');
+          const addEntry = group.querySelector(".bio-properties-panel-add-entry");
 
           fireEvent.click(addEntry);
 
           // then
-          expect(editFieldSpy).to.have.been.calledWith(field, [ 'values' ], [
-            ...field.values,
-            {
-              label: 'Value 3',
-              value: 'value3',
-            }
-          ]);
+          expect(editFieldSpy).to.have.been.calledWith(
+            field,
+            ["values"],
+            [
+              ...field.values,
+              {
+                label: "Value 3",
+                value: "value3",
+              },
+            ],
+          );
         });
 
-
-        it('should remove option', function() {
-
+        it("should remove option", function () {
           // given
           const editFieldSpy = spy();
 
-          const field = schema.components.find(({ key }) => key === 'language');
+          const field = schema.components.find(({ key }) => key === "language");
 
           bootstrapPropertiesPanel({
             container,
             editField: editFieldSpy,
-            field
+            field,
           });
 
-          const group = findGroup(container, 'Static options');
+          const group = findGroup(container, "Static options");
 
           // when
-          const removeEntry = group.querySelector('.bio-properties-panel-remove-entry');
+          const removeEntry = group.querySelector(".bio-properties-panel-remove-entry");
 
           fireEvent.click(removeEntry);
 
           // then
-          expect(editFieldSpy).to.have.been.calledWith(field, [ 'values' ], [
-            field.values[ 1 ]
-          ]);
+          expect(editFieldSpy).to.have.been.calledWith(field, ["values"], [field.values[1]]);
         });
 
-
-        describe('validation', function() {
-
-          describe('value', function() {
-
-            it('should not be empty', function() {
-
+        describe("validation", function () {
+          describe("value", function () {
+            it("should not be empty", function () {
               // given
               const editFieldSpy = spy();
 
-              const field = schema.components.find(({ key }) => key === 'language');
+              const field = schema.components.find(({ key }) => key === "language");
 
               bootstrapPropertiesPanel({
                 container,
                 editField: editFieldSpy,
-                field
+                field,
               });
 
               // when
-              const input = screen.getByLabelText('Value', { selector: '#bio-properties-panel-staticOptions-0-value' });
+              const input = screen.getByLabelText("Value", { selector: "#bio-properties-panel-staticOptions-0-value" });
 
-              fireEvent.input(input, { target: { value: '' } });
+              fireEvent.input(input, { target: { value: "" } });
 
               // then
               expect(editFieldSpy).to.not.have.been.called;
 
-              const error = screen.getByText('Must not be empty.');
+              const error = screen.getByText("Must not be empty.");
 
               expect(error).to.exist;
             });
 
-
-            it('should be unique', function() {
-
+            it("should be unique", function () {
               // given
               const editFieldSpy = spy();
 
-              const field = schema.components.find(({ key }) => key === 'language');
+              const field = schema.components.find(({ key }) => key === "language");
 
               bootstrapPropertiesPanel({
                 container,
                 editField: editFieldSpy,
-                field
+                field,
               });
 
               // when
-              const input = screen.getByLabelText('Value', { selector: '#bio-properties-panel-staticOptions-0-value' });
+              const input = screen.getByLabelText("Value", { selector: "#bio-properties-panel-staticOptions-0-value" });
 
-              fireEvent.input(input, { target: { value: 'english' } });
+              fireEvent.input(input, { target: { value: "english" } });
 
               // then
               expect(editFieldSpy).to.not.have.been.called;
 
-              const error = screen.getByText('Must be unique.');
+              const error = screen.getByText("Must be unique.");
 
               expect(error).to.exist;
             });
-
           });
-
         });
-
       });
 
-
-      describe('dynamic options (valuesKey)', function() {
-
-        it('should configure input source', function() {
-
+      describe("dynamic options (valuesKey)", function () {
+        it("should configure input source", function () {
           // given
           const editFieldSpy = spy();
 
-          const field = schema.components.find(({ key }) => key === 'language');
+          const field = schema.components.find(({ key }) => key === "language");
 
           bootstrapPropertiesPanel({
             container,
             editField: editFieldSpy,
-            field
+            field,
           });
 
           // assume
-          const input = screen.getByLabelText('Type');
+          const input = screen.getByLabelText("Type");
 
           expect(input.value).to.equal(OPTIONS_SOURCES.STATIC);
 
@@ -2088,48 +1806,44 @@ describe('properties panel', function() {
           // then
           expect(editFieldSpy).to.have.been.calledOnce;
           expect(editFieldSpy).to.have.been.calledWith(field, {
-            valuesKey: ''
+            valuesKey: "",
           });
         });
 
-
-        it('should configure valuesKey', function() {
-
+        it("should configure valuesKey", function () {
           // given
           const editFieldSpy = spy();
 
-          let field = schema.components.find(({ key }) => key === 'language');
-          field = { ...field, values: undefined, valuesKey: '' };
+          let field = schema.components.find(({ key }) => key === "language");
+          field = { ...field, values: undefined, valuesKey: "" };
 
           bootstrapPropertiesPanel({
             container,
             editField: editFieldSpy,
-            field
+            field,
           });
 
           // assume
-          const input = screen.getByLabelText('Input values key');
+          const input = screen.getByLabelText("Input values key");
 
-          expect(input.value).to.equal('');
+          expect(input.value).to.equal("");
 
           // when
-          fireEvent.input(input, { target: { value: 'newKey' } });
+          fireEvent.input(input, { target: { value: "newKey" } });
 
           // then
           expect(editFieldSpy).to.have.been.calledOnce;
-          expect(editFieldSpy).to.have.been.calledWith(field, [ 'valuesKey' ], 'newKey');
+          expect(editFieldSpy).to.have.been.calledWith(field, ["valuesKey"], "newKey");
         });
 
-
-        it('should auto focus other entry', async function() {
-
+        it("should auto focus other entry", async function () {
           // given
-          let field = schema.components.find(({ key }) => key === 'language');
+          let field = schema.components.find(({ key }) => key === "language");
 
           const eventBus = new EventBusMock();
 
           const editField = () => {
-            field = { ...field, values: undefined, valuesKey: '' };
+            field = { ...field, values: undefined, valuesKey: "" };
           };
 
           bootstrapPropertiesPanel({
@@ -2139,90 +1853,78 @@ describe('properties panel', function() {
             services: {
               eventBus,
               selection: {
-                get: () => field
-              }
-            }
+                get: () => field,
+              },
+            },
           });
 
           // assume
-          const input = screen.getByLabelText('Type');
+          const input = screen.getByLabelText("Type");
           expect(input.value).to.equal(OPTIONS_SOURCES.STATIC);
 
           // when
           fireEvent.input(input, { target: { value: OPTIONS_SOURCES.EXPRESSION } });
-          await act(() => eventBus.fire('changed'));
+          await act(() => eventBus.fire("changed"));
 
           // then
-          const valuesKeyInput = screen.getByLabelText('Input values key');
+          const valuesKeyInput = screen.getByLabelText("Input values key");
 
           await waitFor(() => {
             expect(document.activeElement).to.eql(valuesKeyInput);
           });
         });
 
-
-        it('entries should change', function() {
-
+        it("entries should change", function () {
           // given
-          let field = schema.components.find(({ key }) => key === 'language');
-          field = { ...field, values: undefined, valuesKey: '' };
+          let field = schema.components.find(({ key }) => key === "language");
+          field = { ...field, values: undefined, valuesKey: "" };
 
           bootstrapPropertiesPanel({
             container,
-            field
+            field,
           });
 
           // then
           expectGroups(container, [
-            'General',
-            'Condition',
-            'Options source',
-            'Dynamic options',
-            'Validation',
-            'Custom properties'
+            "General",
+            "Condition",
+            "Options source",
+            "Dynamic options",
+            "Validation",
+            "Custom properties",
           ]);
 
-          expectGroupEntries(container, 'General', [
-            'Field label',
-            'Field description',
-            'Key',
-            'Disabled',
-            'Read only'
+          expectGroupEntries(container, "General", [
+            "Field label",
+            "Field description",
+            "Key",
+            "Disabled",
+            "Read only",
           ]);
 
-          expectGroupEntries(container, 'Options source', [
-            'Type'
-          ]);
+          expectGroupEntries(container, "Options source", ["Type"]);
 
-          expectGroupEntries(container, 'Dynamic options', [
-            'Input values key'
-          ]);
+          expectGroupEntries(container, "Dynamic options", ["Input values key"]);
 
-          expectGroupEntries(container, 'Validation', [
-            'Required'
-          ]);
+          expectGroupEntries(container, "Validation", ["Required"]);
         });
-
       });
 
-
-      describe('dynamic options (valuesExpression)', function() {
-
-        it('should configure input source', function() {
-
+      describe("dynamic options (valuesExpression)", function () {
+        it("should configure input source", function () {
           // given
           const editFieldSpy = spy();
 
-          const field = schema.components.find(({ key }) => key === 'language');
+          const field = schema.components.find(({ key }) => key === "language");
 
           bootstrapPropertiesPanel({
             container,
             editField: editFieldSpy,
-            field
+            field,
           });
 
           // assume
-          const input = screen.getByLabelText('Type');
+          const input = screen.getByLabelText("Type");
 
           expect(input.value).to.equal(OPTIONS_SOURCES.STATIC);
 
@@ -2232,48 +1934,44 @@ describe('properties panel', function() {
           // then
           expect(editFieldSpy).to.have.been.calledOnce;
           expect(editFieldSpy).to.have.been.calledWith(field, {
-            valuesExpression: '='
+            valuesExpression: "=",
           });
         });
 
-
-        it('should configure valuesExpression', async function() {
-
+        it("should configure valuesExpression", async function () {
           // given
           const editFieldSpy = spy();
 
-          let field = schema.components.find(({ key }) => key === 'language');
-          field = { ...field, values: undefined, valuesExpression: '=' };
+          let field = schema.components.find(({ key }) => key === "language");
+          field = { ...field, values: undefined, valuesExpression: "=" };
 
           bootstrapPropertiesPanel({
             container,
             editField: editFieldSpy,
-            field
+            field,
           });
 
           // assume
-          const input = findTextbox('optionsExpression-expression', container);
+          const input = findTextbox("optionsExpression-expression", container);
 
-          expect(input.textContent).to.equal('');
+          expect(input.textContent).to.equal("");
 
           // when
-          await setEditorValue(input, 'newVal');
+          await setEditorValue(input, "newVal");
 
           // then
           expect(editFieldSpy).to.have.been.calledOnce;
-          expect(editFieldSpy).to.have.been.calledWith(field, [ 'valuesExpression' ], '=newVal');
+          expect(editFieldSpy).to.have.been.calledWith(field, ["valuesExpression"], "=newVal");
         });
 
-
-        it('should auto focus other entry', async function() {
-
+        it("should auto focus other entry", async function () {
           // given
-          let field = schema.components.find(({ key }) => key === 'language');
+          let field = schema.components.find(({ key }) => key === "language");
 
           const eventBus = new EventBusMock();
 
           const editField = () => {
-            field = { ...field, values: undefined, valuesExpression: '=' };
+            field = { ...field, values: undefined, valuesExpression: "=" };
           };
 
           bootstrapPropertiesPanel({
@@ -2283,707 +1981,572 @@ describe('properties panel', function() {
             services: {
               eventBus,
               selection: {
-                get: () => field
-              }
-            }
+                get: () => field,
+              },
+            },
           });
 
           // assume
-          const input = screen.getByLabelText('Type');
+          const input = screen.getByLabelText("Type");
           expect(input.value).to.equal(OPTIONS_SOURCES.STATIC);
 
           // when
           fireEvent.input(input, { target: { value: OPTIONS_SOURCES.EXPRESSION } });
-          await act(() => eventBus.fire('changed'));
+          await act(() => eventBus.fire("changed"));
 
           // then
-          const editor = findTextbox('optionsExpression-expression', container);
+          const editor = findTextbox("optionsExpression-expression", container);
 
           await waitFor(() => {
             expect(document.activeElement).to.eql(editor);
           });
         });
 
-
-        it('entries should change', function() {
-
+        it("entries should change", function () {
           // given
-          let field = schema.components.find(({ key }) => key === 'language');
-          field = { ...field, values: undefined, valuesExpression: '=' };
+          let field = schema.components.find(({ key }) => key === "language");
+          field = { ...field, values: undefined, valuesExpression: "=" };
 
           bootstrapPropertiesPanel({
             container,
-            field
+            field,
           });
 
           // then
           expectGroups(container, [
-            'General',
-            'Condition',
-            'Options source',
-            'Options expression',
-            'Validation',
-            'Custom properties'
+            "General",
+            "Condition",
+            "Options source",
+            "Options expression",
+            "Validation",
+            "Custom properties",
           ]);
 
-          expectGroupEntries(container, 'General', [
-            'Field label',
-            'Field description',
-            'Key',
-            'Disabled',
-            'Read only'
+          expectGroupEntries(container, "General", [
+            "Field label",
+            "Field description",
+            "Key",
+            "Disabled",
+            "Read only",
           ]);
 
-          expectGroupEntries(container, 'Options source', [
-            'Type'
-          ]);
+          expectGroupEntries(container, "Options source", ["Type"]);
 
-          expectGroupEntries(container, 'Options expression', [
-            'Options expression'
-          ]);
+          expectGroupEntries(container, "Options expression", ["Options expression"]);
 
-          expectGroupEntries(container, 'Validation', [
-            'Required'
-          ]);
+          expectGroupEntries(container, "Validation", ["Required"]);
         });
-
       });
-
     });
 
-
-    describe('text', function() {
-
-      it('entries', function() {
-
+    describe("text", function () {
+      it("entries", function () {
         // given
-        const field = schema.components.find(({ type }) => type === 'text');
+        const field = schema.components.find(({ type }) => type === "text");
 
         bootstrapPropertiesPanel({
           container,
-          field
+          field,
         });
 
         // then
-        expectGroups(container, [
-          'General',
-          'Condition',
-          'Custom properties'
-        ]);
+        expectGroups(container, ["General", "Condition", "Custom properties"]);
 
-        expectGroupEntries(container, 'General', [
-          'Text'
-        ]);
+        expectGroupEntries(container, "General", ["Text"]);
       });
-
     });
 
-
-    describe('spacer', function() {
-
-      it('entries', function() {
-
+    describe("spacer", function () {
+      it("entries", function () {
         // given
-        const field = schema.components.find(({ type }) => type === 'spacer');
+        const field = schema.components.find(({ type }) => type === "spacer");
 
         bootstrapPropertiesPanel({
           container,
-          field
+          field,
         });
 
         // then
-        expectGroups(container, [
-          'General',
-          'Condition',
-          'Layout',
-          'Custom properties'
-        ]);
+        expectGroups(container, ["General", "Condition", "Layout", "Custom properties"]);
 
-        expectGroupEntries(container, 'General', [
-          'Height'
-        ]);
-
+        expectGroupEntries(container, "General", ["Height"]);
       });
-
     });
 
-
-    describe('group', function() {
-
-      it('entries', function() {
-
+    describe("group", function () {
+      it("entries", function () {
         // given
-        const field = schema.components.find(({ type }) => type === 'group');
+        const field = schema.components.find(({ type }) => type === "group");
 
         bootstrapPropertiesPanel({
           container,
-          field
+          field,
         });
 
         // then
-        expectGroups(container, [
-          'General',
-          'Condition',
-          'Layout',
-          'Appearance',
-          'Custom properties'
-        ]);
+        expectGroups(container, ["General", "Condition", "Layout", "Appearance", "Custom properties"]);
 
-        expectGroupEntries(container, 'General', [
-          'Group label',
-          'Path'
-        ]);
+        expectGroupEntries(container, "General", ["Group label", "Path"]);
 
-        expectGroupEntries(container, 'Condition', [
-          'Hide if'
-        ]);
+        expectGroupEntries(container, "Condition", ["Hide if"]);
 
-        expectGroupEntries(container, 'Layout', [
-          'Columns'
-        ]);
+        expectGroupEntries(container, "Layout", ["Columns"]);
 
-        expectGroupEntries(container, 'Appearance', [
-          'Show outline',
-          'Vertical alignment'
-        ]);
-
+        expectGroupEntries(container, "Appearance", ["Show outline", "Vertical alignment"]);
       });
-
     });
 
-
-    describe('dynamiclist', function() {
-
-      it('entries', function() {
-
+    describe("dynamiclist", function () {
+      it("entries", function () {
         // given
-        const field = schema.components.find(({ type }) => type === 'dynamiclist');
+        const field = schema.components.find(({ type }) => type === "dynamiclist");
 
         bootstrapPropertiesPanel({
           container,
-          field
+          field,
         });
 
         // then
-        expectGroups(container, [
-          'General',
-          'Condition',
-          'Layout',
-          'Appearance',
-          'Custom properties'
+        expectGroups(container, ["General", "Condition", "Layout", "Appearance", "Custom properties"]);
+
+        expectGroupEntries(container, "General", [
+          "Group label",
+          "Path",
+          "Default number of items",
+          "Allow add/delete items",
+          "Disable collapse",
+          "Number of non-collapsing items",
         ]);
 
-        expectGroupEntries(container, 'General', [
-          'Group label',
-          'Path',
-          'Default number of items',
-          'Allow add/delete items',
-          'Disable collapse',
-          'Number of non-collapsing items'
-        ]);
+        expectGroupEntries(container, "Condition", ["Hide if"]);
 
-        expectGroupEntries(container, 'Condition', [
-          'Hide if'
-        ]);
+        expectGroupEntries(container, "Layout", ["Columns"]);
 
-        expectGroupEntries(container, 'Layout', [
-          'Columns'
-        ]);
-
-        expectGroupEntries(container, 'Appearance', [
-          'Show outline',
-          'Vertical alignment'
-        ]);
-
+        expectGroupEntries(container, "Appearance", ["Show outline", "Vertical alignment"]);
       });
-
     });
 
-
-    describe('textfield', function() {
-
-      it('entries', function() {
-
+    describe("textfield", function () {
+      it("entries", function () {
         // given
-        const field = schema.components.find(({ key }) => key === 'creditor');
+        const field = schema.components.find(({ key }) => key === "creditor");
 
         bootstrapPropertiesPanel({
           container,
-          field
+          field,
         });
 
         // then
-        expectGroups(container, [
-          'General',
-          'Condition',
-          'Validation',
-          'Custom properties'
+        expectGroups(container, ["General", "Condition", "Validation", "Custom properties"]);
+
+        expectGroupEntries(container, "General", [
+          "Field label",
+          "Field description",
+          "Key",
+          "Default value",
+          "Disabled",
+          "Read only",
         ]);
 
-        expectGroupEntries(container, 'General', [
-          'Field label',
-          'Field description',
-          'Key',
-          'Default value',
-          'Disabled',
-          'Read only'
-        ]);
-
-        expectGroupEntries(container, 'Validation', [
-          'Required',
-          'Minimum length',
-          'Maximum length',
-          'Validation pattern',
-          'Custom regular expression'
+        expectGroupEntries(container, "Validation", [
+          "Required",
+          "Minimum length",
+          "Maximum length",
+          "Validation pattern",
+          "Custom regular expression",
         ]);
       });
 
-
-      describe('default value', function() {
-
-        it('should add default value', function() {
-
+      describe("default value", function () {
+        it("should add default value", function () {
           // given
           const editFieldSpy = spy();
 
-          const field = schema.components.find(({ key }) => key === 'creditor');
+          const field = schema.components.find(({ key }) => key === "creditor");
 
           bootstrapPropertiesPanel({
             container,
             editField: editFieldSpy,
-            field
+            field,
           });
 
           // assume
-          const input = screen.getByLabelText('Default value');
+          const input = screen.getByLabelText("Default value");
 
-          expect(input.value).to.equal('');
+          expect(input.value).to.equal("");
 
           // when
-          fireEvent.input(input, { target: { value: 'Max Mustermann GmbH' } });
+          fireEvent.input(input, { target: { value: "Max Mustermann GmbH" } });
 
           // then
           expect(editFieldSpy).to.have.been.calledOnce;
-          expect(editFieldSpy).to.have.been.calledWith(field, [ 'defaultValue' ], 'Max Mustermann GmbH');
+          expect(editFieldSpy).to.have.been.calledWith(field, ["defaultValue"], "Max Mustermann GmbH");
         });
 
-
-        it('should remove default value', function() {
-
+        it("should remove default value", function () {
           // given
           const editFieldSpy = spy();
 
-          const field = defaultValuesSchema.components.find(({ key }) => key === 'creditor');
+          const field = defaultValuesSchema.components.find(({ key }) => key === "creditor");
 
           bootstrapPropertiesPanel({
             container,
             editField: editFieldSpy,
-            field
+            field,
           });
 
           // assume
-          const input = screen.getByLabelText('Default value');
+          const input = screen.getByLabelText("Default value");
 
-          expect(input.value).to.equal('Max Mustermann GmbH');
+          expect(input.value).to.equal("Max Mustermann GmbH");
 
           // when
-          fireEvent.input(input, { target: { value: '' } });
+          fireEvent.input(input, { target: { value: "" } });
 
           // then
           expect(editFieldSpy).to.have.been.calledOnce;
-          expect(editFieldSpy).to.have.been.calledWith(field, [ 'defaultValue' ], undefined);
+          expect(editFieldSpy).to.have.been.calledWith(field, ["defaultValue"], undefined);
         });
-
       });
 
-
-      describe('validation', function() {
-
-        describe('maximum length', function() {
-
-          it('should have min value of 0', function() {
-
+      describe("validation", function () {
+        describe("maximum length", function () {
+          it("should have min value of 0", function () {
             // given
             const editFieldSpy = spy();
 
-            const field = schema.components.find(({ key }) => key === 'creditor');
-
-            bootstrapPropertiesPanel({
-              container,
-              editField: editFieldSpy,
-              field
-            });
-
-            // assume
-            // the fx toggle is screened as well
-            const input = screen.getAllByLabelText('Maximum length').find((el) => el.type === 'number');
-
-            expect(input.min).to.equal('0');
-
-            // when
-            fireEvent.input(input, { target: { value: -1 } });
-
-            fireEvent.input(input, { target: { value: 1 } });
-
-            // then
-            expect(editFieldSpy).to.have.been.calledOnce;
-
-            expect(editFieldSpy).to.have.been.calledWith(field, [ 'validate' ], {
-              ...field.validate,
-              maxLength: 1
-            });
-          });
-
-        });
-
-
-        describe('minimum length', function() {
-
-          it('should have min value of 0', function() {
-
-            // given
-            const editFieldSpy = spy();
-
-            const field = schema.components.find(({ key }) => key === 'creditor');
-
-            bootstrapPropertiesPanel({
-              container,
-              editField: editFieldSpy,
-              field
-            });
-
-            // assume
-            const input = screen.getAllByLabelText('Minimum length').find((el) => el.type === 'number');
-
-            expect(input.min).to.equal('0');
-
-            // when
-            fireEvent.input(input, { target: { value: -1 } });
-
-            fireEvent.input(input, { target: { value: 1 } });
-
-            // then
-            expect(editFieldSpy).to.have.been.calledOnce;
-            expect(editFieldSpy).to.have.been.calledWith(field, [ 'validate' ], {
-              ...field.validate,
-              minLength: 1
-            });
-          });
-
-        });
-
-
-        describe('key', function() {
-
-          it('should not be empty', function() {
-
-            // given
-            const editFieldSpy = spy();
-
-            const field = schema.components.find(({ key }) => key === 'creditor');
-
-            bootstrapPropertiesPanel({
-              container,
-              editField: editFieldSpy,
-              field
-            });
-
-            // assume
-            const input = screen.getByLabelText('Key', { selector: '#bio-properties-panel-key' });
-
-            expect(input.value).to.equal('creditor');
-
-            // when
-            fireEvent.input(input, { target: { value: '' } });
-
-            // then
-            expect(editFieldSpy).not.to.have.been.called;
-
-            const error = screen.getByText('Must not be empty.');
-
-            expect(error).to.exist;
-          });
-
-
-          it('should not contain spaces', function() {
-
-            // given
-            const editFieldSpy = spy();
-
-            const field = schema.components.find(({ key }) => key === 'creditor');
-
-            bootstrapPropertiesPanel({
-              container,
-              editField: editFieldSpy,
-              field
-            });
-
-            // assume
-            const input = screen.getByLabelText('Key', { selector: '#bio-properties-panel-key' });
-
-            expect(input.value).to.equal('creditor');
-
-            // when
-            fireEvent.input(input, { target: { value: 'credi tor' } });
-
-            // then
-            expect(editFieldSpy).not.to.have.been.called;
-
-            const error = screen.getByText('Must be a variable or a dot separated path.');
-
-            expect(error).to.exist;
-          });
-
-
-          it('should not conflict', function() {
-
-            // given
-            const editFieldSpy = spy();
-
-            const field = schema.components.find(({ key }) => key === 'creditor');
+            const field = schema.components.find(({ key }) => key === "creditor");
 
             bootstrapPropertiesPanel({
               container,
               editField: editFieldSpy,
               field,
-              claimedPaths: [ 'amount' ],
-              valuePaths: {
-                [ field.id ] : [ 'amount' ]
-              }
             });
 
             // assume
-            const input = screen.getByLabelText('Key', { selector: '#bio-properties-panel-key' });
+            // the fx toggle is screened as well
+            const input = screen.getAllByLabelText("Maximum length").find(el => el.type === "number");
 
-            expect(input.value).to.equal('creditor');
+            expect(input.min).to.equal("0");
 
             // when
-            fireEvent.input(input, { target: { value: 'amount' } });
+            fireEvent.input(input, { target: { value: -1 } });
+
+            fireEvent.input(input, { target: { value: 1 } });
 
             // then
-            expect(editFieldSpy).not.to.have.been.called;
+            expect(editFieldSpy).to.have.been.calledOnce;
 
-            const error = screen.getByText('Must not conflict with other key/path assignments.');
-
-            expect(error).to.exist;
+            expect(editFieldSpy).to.have.been.calledWith(field, ["validate"], {
+              ...field.validate,
+              maxLength: 1,
+            });
           });
+        });
 
-
-          it('should not allow numerical key segments', function() {
-
+        describe("minimum length", function () {
+          it("should have min value of 0", function () {
             // given
             const editFieldSpy = spy();
 
-            const field = schema.components.find(({ key }) => key === 'creditor');
+            const field = schema.components.find(({ key }) => key === "creditor");
 
             bootstrapPropertiesPanel({
               container,
               editField: editFieldSpy,
-              field
+              field,
             });
 
             // assume
-            const input = screen.getByLabelText('Key', { selector: '#bio-properties-panel-key' });
+            const input = screen.getAllByLabelText("Minimum length").find(el => el.type === "number");
 
-            expect(input.value).to.equal('creditor');
+            expect(input.min).to.equal("0");
 
             // when
-            fireEvent.input(input, { target: { value: 'credi.0.tor' } });
+            fireEvent.input(input, { target: { value: -1 } });
+
+            fireEvent.input(input, { target: { value: 1 } });
+
+            // then
+            expect(editFieldSpy).to.have.been.calledOnce;
+            expect(editFieldSpy).to.have.been.calledWith(field, ["validate"], {
+              ...field.validate,
+              minLength: 1,
+            });
+          });
+        });
+
+        describe("key", function () {
+          it("should not be empty", function () {
+            // given
+            const editFieldSpy = spy();
+
+            const field = schema.components.find(({ key }) => key === "creditor");
+
+            bootstrapPropertiesPanel({
+              container,
+              editField: editFieldSpy,
+              field,
+            });
+
+            // assume
+            const input = screen.getByLabelText("Key", { selector: "#bio-properties-panel-key" });
+
+            expect(input.value).to.equal("creditor");
+
+            // when
+            fireEvent.input(input, { target: { value: "" } });
 
             // then
             expect(editFieldSpy).not.to.have.been.called;
 
-            const error = screen.getByText('Must not contain numerical path segments.');
+            const error = screen.getByText("Must not be empty.");
 
             expect(error).to.exist;
-
           });
 
+          it("should not contain spaces", function () {
+            // given
+            const editFieldSpy = spy();
+
+            const field = schema.components.find(({ key }) => key === "creditor");
+
+            bootstrapPropertiesPanel({
+              container,
+              editField: editFieldSpy,
+              field,
+            });
+
+            // assume
+            const input = screen.getByLabelText("Key", { selector: "#bio-properties-panel-key" });
+
+            expect(input.value).to.equal("creditor");
+
+            // when
+            fireEvent.input(input, { target: { value: "credi tor" } });
+
+            // then
+            expect(editFieldSpy).not.to.have.been.called;
+
+            const error = screen.getByText("Must be a variable or a dot separated path.");
+
+            expect(error).to.exist;
+          });
+
+          it("should not conflict", function () {
+            // given
+            const editFieldSpy = spy();
+
+            const field = schema.components.find(({ key }) => key === "creditor");
+
+            bootstrapPropertiesPanel({
+              container,
+              editField: editFieldSpy,
+              field,
+              claimedPaths: ["amount"],
+              valuePaths: {
+                [field.id]: ["amount"],
+              },
+            });
+
+            // assume
+            const input = screen.getByLabelText("Key", { selector: "#bio-properties-panel-key" });
+
+            expect(input.value).to.equal("creditor");
+
+            // when
+            fireEvent.input(input, { target: { value: "amount" } });
+
+            // then
+            expect(editFieldSpy).not.to.have.been.called;
+
+            const error = screen.getByText("Must not conflict with other key/path assignments.");
+
+            expect(error).to.exist;
+          });
+
+          it("should not allow numerical key segments", function () {
+            // given
+            const editFieldSpy = spy();
+
+            const field = schema.components.find(({ key }) => key === "creditor");
+
+            bootstrapPropertiesPanel({
+              container,
+              editField: editFieldSpy,
+              field,
+            });
+
+            // assume
+            const input = screen.getByLabelText("Key", { selector: "#bio-properties-panel-key" });
+
+            expect(input.value).to.equal("creditor");
+
+            // when
+            fireEvent.input(input, { target: { value: "credi.0.tor" } });
+
+            // then
+            expect(editFieldSpy).not.to.have.been.called;
+
+            const error = screen.getByText("Must not contain numerical path segments.");
+
+            expect(error).to.exist;
+          });
         });
-
       });
-
     });
 
-
-    describe('number', function() {
-
-      it('entries', function() {
-
+    describe("number", function () {
+      it("entries", function () {
         // given
-        const field = schema.components.find(({ key }) => key === 'amount');
+        const field = schema.components.find(({ key }) => key === "amount");
 
         bootstrapPropertiesPanel({
           container,
-          field
+          field,
         });
 
         // then
-        expectGroups(container, [
-          'General',
-          'Condition',
-          'Serialization',
-          'Validation',
-          'Custom properties'
+        expectGroups(container, ["General", "Condition", "Serialization", "Validation", "Custom properties"]);
+
+        expectGroupEntries(container, "General", [
+          "Field label",
+          "Field description",
+          "Key",
+          "Default value",
+          "Decimal digits",
+          "Increment",
+          "Disabled",
+          "Read only",
         ]);
 
-        expectGroupEntries(container, 'General', [
-          'Field label',
-          'Field description',
-          'Key',
-          'Default value',
-          'Decimal digits',
-          'Increment',
-          'Disabled',
-          'Read only'
-        ]);
+        expectGroupEntries(container, "Serialization", ["Output as string"]);
 
-        expectGroupEntries(container, 'Serialization', [
-          'Output as string'
-        ]);
-
-        expectGroupEntries(container, 'Validation', [
-          'Required',
-          'Minimum',
-          'Maximum'
-        ]);
+        expectGroupEntries(container, "Validation", ["Required", "Minimum", "Maximum"]);
       });
 
-
-      describe('default value', function() {
-
-        it('should add default value', function() {
-
+      describe("default value", function () {
+        it("should add default value", function () {
           // given
           const editFieldSpy = spy();
 
-          const field = schema.components.find(({ key }) => key === 'amount');
+          const field = schema.components.find(({ key }) => key === "amount");
 
           bootstrapPropertiesPanel({
             container,
             editField: editFieldSpy,
-            field
+            field,
           });
 
           // assume
-          const input = screen.getByLabelText('Default value');
+          const input = screen.getByLabelText("Default value");
 
-          expect(input.value).to.equal('');
+          expect(input.value).to.equal("");
 
           // when
           fireEvent.input(input, { target: { value: 250 } });
 
           // then
           expect(editFieldSpy).to.have.been.calledOnce;
-          expect(editFieldSpy).to.have.been.calledWith(field, [ 'defaultValue' ], 250);
+          expect(editFieldSpy).to.have.been.calledWith(field, ["defaultValue"], 250);
         });
 
-
-        it('should remove default value', function() {
-
+        it("should remove default value", function () {
           // given
           const editFieldSpy = spy();
 
-          const field = defaultValuesSchema.components.find(({ key }) => key === 'amount');
+          const field = defaultValuesSchema.components.find(({ key }) => key === "amount");
 
           bootstrapPropertiesPanel({
             container,
             editField: editFieldSpy,
             field: {
               ...field,
-              defaultValue: 0
-            }
+              defaultValue: 0,
+            },
           });
 
           // assume
-          const input = screen.getByLabelText('Default value');
+          const input = screen.getByLabelText("Default value");
 
-          expect(input.value).to.equal('0');
+          expect(input.value).to.equal("0");
 
           // when
-          fireEvent.input(input, { target: { value: '' } });
+          fireEvent.input(input, { target: { value: "" } });
 
           // then
           expect(editFieldSpy).to.have.been.calledOnce;
-          expect(editFieldSpy).to.have.been.calledWith(field, [ 'defaultValue' ], undefined);
-
+          expect(editFieldSpy).to.have.been.calledWith(field, ["defaultValue"], undefined);
         });
-
       });
 
-      describe('decimal digits', function() {
-
-        it('should add positive integer values', function() {
-
+      describe("decimal digits", function () {
+        it("should add positive integer values", function () {
           // given
           const editFieldSpy = spy();
 
-          const field = schema.components.find(({ key }) => key === 'amount');
+          const field = schema.components.find(({ key }) => key === "amount");
 
           bootstrapPropertiesPanel({
             container,
             editField: editFieldSpy,
-            field
+            field,
           });
 
           // assume
-          const input = screen.getByLabelText('Decimal digits');
+          const input = screen.getByLabelText("Decimal digits");
 
-          expect(input.value).to.equal('');
+          expect(input.value).to.equal("");
 
           // when
           fireEvent.input(input, { target: { value: 100 } });
 
           // then
           expect(editFieldSpy).to.have.been.calledOnce;
-          expect(editFieldSpy).to.have.been.calledWith(field, [ 'decimalDigits' ], 100);
+          expect(editFieldSpy).to.have.been.calledWith(field, ["decimalDigits"], 100);
         });
 
-
-        it('should add zero', function() {
-
+        it("should add zero", function () {
           // given
           const editFieldSpy = spy();
 
-          const field = schema.components.find(({ key }) => key === 'amount');
+          const field = schema.components.find(({ key }) => key === "amount");
 
           bootstrapPropertiesPanel({
             container,
             editField: editFieldSpy,
-            field
+            field,
           });
 
           // assume
-          const input = screen.getByLabelText('Decimal digits');
+          const input = screen.getByLabelText("Decimal digits");
 
-          expect(input.value).to.equal('');
+          expect(input.value).to.equal("");
 
           // when
           fireEvent.input(input, { target: { value: 0 } });
 
           // then
           expect(editFieldSpy).to.have.been.calledOnce;
-          expect(editFieldSpy).to.have.been.calledWith(field, [ 'decimalDigits' ], 0);
+          expect(editFieldSpy).to.have.been.calledWith(field, ["decimalDigits"], 0);
         });
 
-
-        it('should reject negative values', function() {
-
+        it("should reject negative values", function () {
           // given
           const editFieldSpy = spy();
 
-          const field = schema.components.find(({ key }) => key === 'amount');
+          const field = schema.components.find(({ key }) => key === "amount");
 
           bootstrapPropertiesPanel({
             container,
             editField: editFieldSpy,
-            field
+            field,
           });
 
           // assume
-          const input = screen.getByLabelText('Decimal digits');
+          const input = screen.getByLabelText("Decimal digits");
 
-          expect(input.value).to.equal('');
+          expect(input.value).to.equal("");
 
           // when
           fireEvent.input(input, { target: { value: -1 } });
@@ -2992,24 +2555,22 @@ describe('properties panel', function() {
           expect(editFieldSpy).to.not.have.been.called;
         });
 
-
-        it('should reject decimal values', function() {
-
+        it("should reject decimal values", function () {
           // given
           const editFieldSpy = spy();
 
-          const field = schema.components.find(({ key }) => key === 'amount');
+          const field = schema.components.find(({ key }) => key === "amount");
 
           bootstrapPropertiesPanel({
             container,
             editField: editFieldSpy,
-            field
+            field,
           });
 
           // assume
-          const input = screen.getByLabelText('Decimal digits');
+          const input = screen.getByLabelText("Decimal digits");
 
-          expect(input.value).to.equal('');
+          expect(input.value).to.equal("");
 
           // when
           fireEvent.input(input, { target: { value: -1 } });
@@ -3017,47 +2578,40 @@ describe('properties panel', function() {
           // then
           expect(editFieldSpy).to.not.have.been.called;
         });
-
       });
 
-      describe('validation', function() {
-
-        describe('default value', function() {
-
-          it('should refuse non numeric values', function() {
-
+      describe("validation", function () {
+        describe("default value", function () {
+          it("should refuse non numeric values", function () {
             // given
             const editFieldSpy = spy();
 
-            const field = defaultValuesSchema.components.find(({ key }) => key === 'amount');
+            const field = defaultValuesSchema.components.find(({ key }) => key === "amount");
 
             bootstrapPropertiesPanel({
               container,
               editField: editFieldSpy,
-              field
+              field,
             });
 
             // assume
-            const input = screen.getByLabelText('Default value');
+            const input = screen.getByLabelText("Default value");
 
             // when
-            fireEvent.input(input, { target: { value: 'Joe' } });
+            fireEvent.input(input, { target: { value: "Joe" } });
 
             // then
             expect(editFieldSpy).to.not.have.been.called;
 
-            const error = screen.getByText('Should be a valid number');
+            const error = screen.getByText("Should be a valid number");
             expect(error).to.exist;
-
           });
 
-
-          it('should refuse values not conforming to decimal digits', function() {
-
+          it("should refuse values not conforming to decimal digits", function () {
             // given
             const editFieldSpy = spy();
 
-            const field = defaultValuesSchema.components.find(({ key }) => key === 'amount');
+            const field = defaultValuesSchema.components.find(({ key }) => key === "amount");
 
             bootstrapPropertiesPanel({
               container,
@@ -3065,163 +2619,142 @@ describe('properties panel', function() {
               field: {
                 ...field,
                 decimalDigits: 4,
-              }
+              },
             });
 
             // assume
-            const input = screen.getByLabelText('Default value');
+            const input = screen.getByLabelText("Default value");
 
             // when
-            fireEvent.input(input, { target: { value: '0.00001' } });
+            fireEvent.input(input, { target: { value: "0.00001" } });
 
             // then
             expect(editFieldSpy).to.not.have.been.called;
 
-            const error = screen.getByText('Should not contain more than 4 decimal digits');
+            const error = screen.getByText("Should not contain more than 4 decimal digits");
             expect(error).to.exist;
-
           });
-
-
         });
 
-
-        describe('increment', function() {
-
-          it('should reject non-numeric values', function() {
-
+        describe("increment", function () {
+          it("should reject non-numeric values", function () {
             // given
             const editFieldSpy = spy();
 
-            const field = defaultValuesSchema.components.find(({ key }) => key === 'amount');
+            const field = defaultValuesSchema.components.find(({ key }) => key === "amount");
 
             bootstrapPropertiesPanel({
               container,
               editField: editFieldSpy,
-              field
+              field,
             });
 
             // assume
-            const input = screen.getByLabelText('Increment');
+            const input = screen.getByLabelText("Increment");
 
             // when
-            fireEvent.input(input, { target: { value: 'Joe' } });
+            fireEvent.input(input, { target: { value: "Joe" } });
 
             // then
             expect(editFieldSpy).to.not.have.been.called;
 
-            const error = screen.getByText('Should be a valid number.');
+            const error = screen.getByText("Should be a valid number.");
             expect(error).to.exist;
-
           });
 
-
-          it('should clear', function() {
-
+          it("should clear", function () {
             // given
             const editFieldSpy = spy();
 
-            const field = defaultValuesSchema.components.find(({ key }) => key === 'amount');
+            const field = defaultValuesSchema.components.find(({ key }) => key === "amount");
 
             bootstrapPropertiesPanel({
               container,
               editField: editFieldSpy,
-              field
+              field,
             });
 
             // assume
-            const input = screen.getByLabelText('Increment');
+            const input = screen.getByLabelText("Increment");
 
             // when
-            fireEvent.input(input, { target: { value: '' } });
+            fireEvent.input(input, { target: { value: "" } });
 
             // then
-            expect(editFieldSpy).to.have.been.calledWith(field, [ 'increment' ], undefined);
-
+            expect(editFieldSpy).to.have.been.calledWith(field, ["increment"], undefined);
           });
 
-
-          it('should trim leading zeroes', function() {
-
+          it("should trim leading zeroes", function () {
             // given
             const editFieldSpy = spy();
 
-            const field = defaultValuesSchema.components.find(({ key }) => key === 'amount');
+            const field = defaultValuesSchema.components.find(({ key }) => key === "amount");
 
             bootstrapPropertiesPanel({
               container,
               editField: editFieldSpy,
-              field
+              field,
             });
 
             // assume
-            const input = screen.getByLabelText('Increment');
+            const input = screen.getByLabelText("Increment");
 
             // when
-            fireEvent.input(input, { target: { value: '0005.1000' } });
+            fireEvent.input(input, { target: { value: "0005.1000" } });
 
             // then
-            expect(editFieldSpy).to.have.been.calledWith(field, [ 'increment' ], '5.1000');
-
+            expect(editFieldSpy).to.have.been.calledWith(field, ["increment"], "5.1000");
           });
 
-
-          it('should not trim zero if needed', function() {
-
+          it("should not trim zero if needed", function () {
             // given
             const editFieldSpy = spy();
 
-            const field = defaultValuesSchema.components.find(({ key }) => key === 'amount');
+            const field = defaultValuesSchema.components.find(({ key }) => key === "amount");
 
             bootstrapPropertiesPanel({
               container,
               editField: editFieldSpy,
-              field
+              field,
             });
 
             // assume
-            const input = screen.getByLabelText('Increment');
+            const input = screen.getByLabelText("Increment");
 
             // when
-            fireEvent.input(input, { target: { value: '0.1000' } });
+            fireEvent.input(input, { target: { value: "0.1000" } });
 
             // then
-            expect(editFieldSpy).to.have.been.calledWith(field, [ 'increment' ], '0.1000');
-
+            expect(editFieldSpy).to.have.been.calledWith(field, ["increment"], "0.1000");
           });
 
-
-          it('should not trim decimal point', function() {
-
+          it("should not trim decimal point", function () {
             // given
             const editFieldSpy = spy();
 
-            const field = defaultValuesSchema.components.find(({ key }) => key === 'amount');
+            const field = defaultValuesSchema.components.find(({ key }) => key === "amount");
 
             bootstrapPropertiesPanel({
               container,
               editField: editFieldSpy,
-              field
+              field,
             });
 
             // assume
-            const input = screen.getByLabelText('Increment');
+            const input = screen.getByLabelText("Increment");
 
             // when
-            fireEvent.input(input, { target: { value: '5.' } });
+            fireEvent.input(input, { target: { value: "5." } });
 
             // then
-            expect(editFieldSpy).to.have.been.calledWith(field, [ 'increment' ], '5.');
-
+            expect(editFieldSpy).to.have.been.calledWith(field, ["increment"], "5.");
           });
 
-
-          it('should reject values smaller than the unit of the smallest digit', function() {
-
+          it("should reject values smaller than the unit of the smallest digit", function () {
             // given
             const editFieldSpy = spy();
 
-            const field = defaultValuesSchema.components.find(({ key }) => key === 'amount');
+            const field = defaultValuesSchema.components.find(({ key }) => key === "amount");
 
             bootstrapPropertiesPanel({
               container,
@@ -3229,71 +2762,63 @@ describe('properties panel', function() {
               field: {
                 ...field,
                 decimalDigits: 4,
-              }
+              },
             });
 
             // assume
-            const input = screen.getByLabelText('Increment');
+            const input = screen.getByLabelText("Increment");
 
             // when
-            fireEvent.input(input, { target: { value: '0.00001' } });
+            fireEvent.input(input, { target: { value: "0.00001" } });
 
             // then
             expect(editFieldSpy).to.not.have.been.called;
 
-            const error = screen.getByText('Should be at least 0.0001.');
+            const error = screen.getByText("Should be at least 0.0001.");
             expect(error).to.exist;
-
           });
 
-
-          it('should be greater than zero', function() {
-
+          it("should be greater than zero", function () {
             // given
             const editFieldSpy = spy();
 
-            const field = defaultValuesSchema.components.find(({ key }) => key === 'amount');
+            const field = defaultValuesSchema.components.find(({ key }) => key === "amount");
 
             bootstrapPropertiesPanel({
               container,
               editField: editFieldSpy,
-              field
+              field,
             });
 
             // assume
-            const input = screen.getByLabelText('Increment');
+            const input = screen.getByLabelText("Increment");
 
             // when
-            fireEvent.input(input, { target: { value: '-0.00001' } });
+            fireEvent.input(input, { target: { value: "-0.00001" } });
 
             // then
             expect(editFieldSpy).to.not.have.been.called;
 
-            const error = screen.getByText('Should be greater than zero.');
+            const error = screen.getByText("Should be greater than zero.");
             expect(error).to.exist;
-
           });
-
         });
 
-
-        describe('decimalDigits', function() {
-
-          it('should reject negative values', function() {
-
+        describe("decimalDigits", function () {
+          it("should reject negative values", function () {
             // given
             const editFieldSpy = spy();
 
-            const field = defaultValuesSchema.components.find(({ key }) => key === 'amount');
+            const field = defaultValuesSchema.components.find(({ key }) => key === "amount");
 
             bootstrapPropertiesPanel({
               container,
               editField: editFieldSpy,
-              field
+              field,
             });
 
             // assume
-            const input = screen.getByLabelText('Decimal digits');
+            const input = screen.getByLabelText("Decimal digits");
 
             // when
             fireEvent.input(input, { target: { value: -1 } });
@@ -3301,27 +2826,24 @@ describe('properties panel', function() {
             // then
             expect(editFieldSpy).to.not.have.been.called;
 
-            const error = screen.getByText('Should be greater than or equal to zero.');
+            const error = screen.getByText("Should be greater than or equal to zero.");
             expect(error).to.exist;
-
           });
 
-
-          it('should reject non-integer values', function() {
-
+          it("should reject non-integer values", function () {
             // given
             const editFieldSpy = spy();
 
-            const field = defaultValuesSchema.components.find(({ key }) => key === 'amount');
+            const field = defaultValuesSchema.components.find(({ key }) => key === "amount");
 
             bootstrapPropertiesPanel({
               container,
               editField: editFieldSpy,
-              field
+              field,
             });
 
             // assume
-            const input = screen.getByLabelText('Decimal digits');
+            const input = screen.getByLabelText("Decimal digits");
 
             // when
             fireEvent.input(input, { target: { value: 1.5 } });
@@ -3329,552 +2851,469 @@ describe('properties panel', function() {
             // then
             expect(editFieldSpy).to.not.have.been.called;
 
-            const error = screen.getByText('Should be an integer.');
+            const error = screen.getByText("Should be an integer.");
             expect(error).to.exist;
-
           });
-
         });
 
-        describe('key', function() {
-
-          it('should not be empty', function() {
-
+        describe("key", function () {
+          it("should not be empty", function () {
             // given
             const editFieldSpy = spy();
 
-            const field = schema.components.find(({ key }) => key === 'amount');
-
-            bootstrapPropertiesPanel({
-              container,
-              editField: editFieldSpy,
-              field
-            });
-
-            // assume
-            const input = screen.getByLabelText('Key', { selector: '#bio-properties-panel-key' });
-
-            expect(input.value).to.equal('amount');
-
-            // when
-            fireEvent.input(input, { target: { value: '' } });
-
-            // then
-            expect(editFieldSpy).not.to.have.been.called;
-
-            const error = screen.getByText('Must not be empty.');
-
-            expect(error).to.exist;
-          });
-
-
-          it('should not contain spaces', function() {
-
-            // given
-            const editFieldSpy = spy();
-
-            const field = schema.components.find(({ key }) => key === 'amount');
-
-            bootstrapPropertiesPanel({
-              container,
-              editField: editFieldSpy,
-              field
-            });
-
-            // assume
-            const input = screen.getByLabelText('Key', { selector: '#bio-properties-panel-key' });
-
-            expect(input.value).to.equal('amount');
-
-            // when
-            fireEvent.input(input, { target: { value: 'amou nt' } });
-
-            // then
-            expect(editFieldSpy).not.to.have.been.called;
-
-            const error = screen.getByText('Must be a variable or a dot separated path.');
-
-            expect(error).to.exist;
-          });
-
-
-          it('should not conflict', function() {
-
-            // given
-            const editFieldSpy = spy();
-
-            const field = schema.components.find(({ key }) => key === 'amount');
+            const field = schema.components.find(({ key }) => key === "amount");
 
             bootstrapPropertiesPanel({
               container,
               editField: editFieldSpy,
               field,
-              claimedPaths: [ 'creditor' ],
-              valuePaths: {
-                [ field.id ] : [ 'creditor' ]
-              }
             });
 
             // assume
-            const input = screen.getByLabelText('Key', { selector: '#bio-properties-panel-key' });
+            const input = screen.getByLabelText("Key", { selector: "#bio-properties-panel-key" });
 
-            expect(input.value).to.equal('amount');
-
-            expect(editFieldSpy).not.to.have.been.called;
+            expect(input.value).to.equal("amount");
 
             // when
-            fireEvent.input(input, { target: { value: 'creditor' } });
+            fireEvent.input(input, { target: { value: "" } });
 
             // then
             expect(editFieldSpy).not.to.have.been.called;
 
-            const error = screen.getByText('Must not conflict with other key/path assignments.');
+            const error = screen.getByText("Must not be empty.");
 
             expect(error).to.exist;
           });
 
-
-          it('should not allow numerical key segments', function() {
-
+          it("should not contain spaces", function () {
             // given
             const editFieldSpy = spy();
 
-            const field = schema.components.find(({ key }) => key === 'amount');
+            const field = schema.components.find(({ key }) => key === "amount");
 
             bootstrapPropertiesPanel({
               container,
               editField: editFieldSpy,
-              field
+              field,
             });
 
             // assume
-            const input = screen.getByLabelText('Key', { selector: '#bio-properties-panel-key' });
+            const input = screen.getByLabelText("Key", { selector: "#bio-properties-panel-key" });
 
-            expect(input.value).to.equal('amount');
+            expect(input.value).to.equal("amount");
 
             // when
-            fireEvent.input(input, { target: { value: 'amou.0.nt' } });
+            fireEvent.input(input, { target: { value: "amou nt" } });
 
             // then
             expect(editFieldSpy).not.to.have.been.called;
 
-            const error = screen.getByText('Must not contain numerical path segments.');
+            const error = screen.getByText("Must be a variable or a dot separated path.");
 
             expect(error).to.exist;
-
           });
 
-        });
+          it("should not conflict", function () {
+            // given
+            const editFieldSpy = spy();
 
+            const field = schema.components.find(({ key }) => key === "amount");
+
+            bootstrapPropertiesPanel({
+              container,
+              editField: editFieldSpy,
+              field,
+              claimedPaths: ["creditor"],
+              valuePaths: {
+                [field.id]: ["creditor"],
+              },
+            });
+
+            // assume
+            const input = screen.getByLabelText("Key", { selector: "#bio-properties-panel-key" });
+
+            expect(input.value).to.equal("amount");
+
+            expect(editFieldSpy).not.to.have.been.called;
+
+            // when
+            fireEvent.input(input, { target: { value: "creditor" } });
+
+            // then
+            expect(editFieldSpy).not.to.have.been.called;
+
+            const error = screen.getByText("Must not conflict with other key/path assignments.");
+
+            expect(error).to.exist;
+          });
+
+          it("should not allow numerical key segments", function () {
+            // given
+            const editFieldSpy = spy();
+
+            const field = schema.components.find(({ key }) => key === "amount");
+
+            bootstrapPropertiesPanel({
+              container,
+              editField: editFieldSpy,
+              field,
+            });
+
+            // assume
+            const input = screen.getByLabelText("Key", { selector: "#bio-properties-panel-key" });
+
+            expect(input.value).to.equal("amount");
+
+            // when
+            fireEvent.input(input, { target: { value: "amou.0.nt" } });
+
+            // then
+            expect(editFieldSpy).not.to.have.been.called;
+
+            const error = screen.getByText("Must not contain numerical path segments.");
+
+            expect(error).to.exist;
+          });
+        });
       });
 
-      describe('read only', function() {
-
-        it('should not render when disabled', function() {
-
+      describe("read only", function () {
+        it("should not render when disabled", function () {
           // given
-          const field = schema.components.find(({ key }) => key === 'amount');
+          const field = schema.components.find(({ key }) => key === "amount");
           field.disabled = true;
 
           bootstrapPropertiesPanel({
             container,
-            field
+            field,
           });
 
           // then
-          const readOnlyElement = screen.queryByLabelText('Read only');
+          const readOnlyElement = screen.queryByLabelText("Read only");
           expect(readOnlyElement).to.not.exist;
-
         });
-
       });
-
     });
 
-
-    describe('image', function() {
-
-      it('entries', function() {
-
+    describe("image", function () {
+      it("entries", function () {
         // given
-        const field = schema.components.find(({ source }) => source === '=logo');
+        const field = schema.components.find(({ source }) => source === "=logo");
 
         bootstrapPropertiesPanel({
           container,
-          field
+          field,
         });
 
         // then
-        expectGroups(container, [
-          'General',
-          'Condition',
-          'Custom properties'
-        ]);
+        expectGroups(container, ["General", "Condition", "Custom properties"]);
 
-        expectGroupEntries(container, 'General', [
-          'Image source',
-          'Alternative text',
-        ]);
+        expectGroupEntries(container, "General", ["Image source", "Alternative text"]);
       });
 
-
-      describe('source', function() {
-
-        it('should update source', async function() {
-
+      describe("source", function () {
+        it("should update source", async function () {
           // given
           const editFieldSpy = spy();
 
-          const field = schema.components.find(({ source }) => source === '=logo');
+          const field = schema.components.find(({ source }) => source === "=logo");
 
           bootstrapPropertiesPanel({
             container,
             editField: editFieldSpy,
-            field
+            field,
           });
 
           // assume
           const input = domQuery('[name=source] [role="textbox"]', container);
-          expect(input.textContent).to.equal('logo');
+          expect(input.textContent).to.equal("logo");
 
           // when
-          await setEditorValue(input, 'foo');
+          await setEditorValue(input, "foo");
 
           // then
           expect(editFieldSpy).to.have.been.calledOnce;
-          expect(editFieldSpy).to.have.been.calledWith(field, [ 'source' ], '=foo');
+          expect(editFieldSpy).to.have.been.calledWith(field, ["source"], "=foo");
         });
 
-
-        it('should remove source', async function() {
-
+        it("should remove source", async function () {
           // given
           const editFieldSpy = spy();
 
-          const field = schema.components.find(({ source }) => source === '=logo');
+          const field = schema.components.find(({ source }) => source === "=logo");
 
           bootstrapPropertiesPanel({
             container,
             editField: editFieldSpy,
-            field
+            field,
           });
 
           // assume
           const input = domQuery('[name=source] [role="textbox"]', container);
-          expect(input.textContent).to.equal('logo');
+          expect(input.textContent).to.equal("logo");
 
           // when
-          await setEditorValue(input, '');
+          await setEditorValue(input, "");
 
           // then
           expect(editFieldSpy).to.have.been.calledOnce;
-          expect(editFieldSpy).to.have.been.calledWith(field, [ 'source' ], undefined);
+          expect(editFieldSpy).to.have.been.calledWith(field, ["source"], undefined);
         });
-
       });
 
-
-      describe('alt', function() {
-
-        it('should update alt text', async function() {
-
+      describe("alt", function () {
+        it("should update alt text", async function () {
           // given
           const editFieldSpy = spy();
 
-          const field = schema.components.find(({ source }) => source === '=logo');
+          const field = schema.components.find(({ source }) => source === "=logo");
 
           bootstrapPropertiesPanel({
             container,
             editField: editFieldSpy,
-            field
+            field,
           });
 
           // assume
-          const feelers = findFeelers('alt', container);
-          expect(feelers.textContent).to.equal('The bpmn.io logo');
+          const feelers = findFeelers("alt", container);
+          expect(feelers.textContent).to.equal("The bpmn.io logo");
 
           const input = feelers.querySelector('div[contenteditable="true"]');
 
           // when
-          await setEditorValue(input, 'An image');
+          await setEditorValue(input, "An image");
 
           // then
           expect(editFieldSpy).to.have.been.calledOnce;
-          expect(editFieldSpy).to.have.been.calledWith(field, [ 'alt' ], 'An image');
+          expect(editFieldSpy).to.have.been.calledWith(field, ["alt"], "An image");
         });
 
-
-        it('should remove alt text', async function() {
-
+        it("should remove alt text", async function () {
           // given
           const editFieldSpy = spy();
 
-          const field = schema.components.find(({ source }) => source === '=logo');
+          const field = schema.components.find(({ source }) => source === "=logo");
 
           bootstrapPropertiesPanel({
             container,
             editField: editFieldSpy,
-            field
+            field,
           });
 
           // assume
-          const feelers = findFeelers('alt', container);
-          expect(feelers.textContent).to.equal('The bpmn.io logo');
+          const feelers = findFeelers("alt", container);
+          expect(feelers.textContent).to.equal("The bpmn.io logo");
 
           const input = feelers.querySelector('div[contenteditable="true"]');
 
           // when
-          await setEditorValue(input, '');
+          await setEditorValue(input, "");
 
           // then
           expect(editFieldSpy).to.have.been.calledOnce;
-          expect(editFieldSpy).to.have.been.calledWith(field, [ 'alt' ], undefined);
+          expect(editFieldSpy).to.have.been.calledWith(field, ["alt"], undefined);
         });
-
       });
-
     });
 
-
-    describe('iframe', function() {
-
-      it('entries', function() {
-
+    describe("iframe", function () {
+      it("entries", function () {
         // given
-        const field = iframeSchema.components.find(({ url }) => url === 'https://bpmn.io/');
+        const field = iframeSchema.components.find(({ url }) => url === "https://bpmn.io/");
 
         bootstrapPropertiesPanel({
           container,
-          field
+          field,
         });
 
         // then
-        expectGroups(container, [
-          'General',
-          'Security attributes',
-          'Layout',
-          'Custom properties'
-        ]);
+        expectGroups(container, ["General", "Security attributes", "Layout", "Custom properties"]);
 
-        expectGroupEntries(container, 'General', [
-          'Title',
-          'URL',
-          'Height',
-        ]);
+        expectGroupEntries(container, "General", ["Title", "URL", "Height"]);
       });
 
-
-      describe('url', function() {
-
-        it('should update url', async function() {
-
+      describe("url", function () {
+        it("should update url", async function () {
           // given
           const editFieldSpy = spy();
 
-          const field = iframeSchema.components.find(({ url }) => url === 'https://bpmn.io/');
+          const field = iframeSchema.components.find(({ url }) => url === "https://bpmn.io/");
 
           bootstrapPropertiesPanel({
             container,
             editField: editFieldSpy,
-            field
+            field,
           });
 
           // assume
-          const feelers = findFeelers('url', container);
-          expect(feelers.textContent).to.equal('https://bpmn.io/');
+          const feelers = findFeelers("url", container);
+          expect(feelers.textContent).to.equal("https://bpmn.io/");
 
           const input = feelers.querySelector('div[contenteditable="true"]');
 
           // when
-          await setEditorValue(input, 'https://foo.png');
+          await setEditorValue(input, "https://foo.png");
 
           // then
           expect(editFieldSpy).to.have.been.calledOnce;
-          expect(editFieldSpy).to.have.been.calledWith(field, [ 'url' ], 'https://foo.png');
+          expect(editFieldSpy).to.have.been.calledWith(field, ["url"], "https://foo.png");
         });
 
-
-        it('should remove url', async function() {
-
+        it("should remove url", async function () {
           // given
           const editFieldSpy = spy();
 
-          const field = iframeSchema.components.find(({ url }) => url === 'https://bpmn.io/');
+          const field = iframeSchema.components.find(({ url }) => url === "https://bpmn.io/");
 
           bootstrapPropertiesPanel({
             container,
             editField: editFieldSpy,
-            field
+            field,
           });
 
-          const feelers = findFeelers('url', container);
+          const feelers = findFeelers("url", container);
           const input = feelers.querySelector('div[contenteditable="true"]');
 
           // when
-          await setEditorValue(input, '');
+          await setEditorValue(input, "");
 
           // then
           expect(editFieldSpy).to.have.been.calledOnce;
-          expect(editFieldSpy).to.have.been.calledWith(field, [ 'url' ], undefined);
+          expect(editFieldSpy).to.have.been.calledWith(field, ["url"], undefined);
         });
 
-
-        it('should show error', async function() {
-
+        it("should show error", async function () {
           // given
-          const field = iframeSchema.components.find(({ url }) => url === 'https://bpmn.io/');
+          const field = iframeSchema.components.find(({ url }) => url === "https://bpmn.io/");
 
           bootstrapPropertiesPanel({
             container,
-            field
+            field,
           });
 
-          const feelers = findFeelers('url', container);
-          expect(feelers.textContent).to.equal('https://bpmn.io/');
+          const feelers = findFeelers("url", container);
+          expect(feelers.textContent).to.equal("https://bpmn.io/");
 
           const input = feelers.querySelector('div[contenteditable="true"]');
 
           // when
-          await setEditorValue(input, 'http://foo.png');
+          await setEditorValue(input, "http://foo.png");
 
           // then
           const error = screen.getByText('For security reasons the URL must start with "https".');
 
           expect(error).to.exist;
         });
-
       });
 
-
-      it('should NOT show error for expressions', async function() {
-
+      it("should NOT show error for expressions", async function () {
         // given
-        const field = iframeSchema.components.find(({ url }) => url === 'https://bpmn.io/');
+        const field = iframeSchema.components.find(({ url }) => url === "https://bpmn.io/");
 
         bootstrapPropertiesPanel({
           container,
-          field
+          field,
         });
 
-        const feelers = findFeelers('url', container);
-        expect(feelers.textContent).to.equal('https://bpmn.io/');
+        const feelers = findFeelers("url", container);
+        expect(feelers.textContent).to.equal("https://bpmn.io/");
 
         const input = feelers.querySelector('div[contenteditable="true"]');
 
         // when
-        await setEditorValue(input, '=url');
+        await setEditorValue(input, "=url");
 
         // then
         const error = screen.queryByText('For security reasons the URL must start with "https".');
 
         expect(error).not.to.exist;
       });
-
     });
 
-
-    describe('table', function() {
-
-      it('entries static headers', function() {
-
+    describe("table", function () {
+      it("entries static headers", function () {
         // given
-        const field = tableSchema.components.find(({ label }) => label === 'static-headers-table');
+        const field = tableSchema.components.find(({ label }) => label === "static-headers-table");
 
         bootstrapPropertiesPanel({
           container,
-          field
+          field,
         });
 
         // then
         expectGroups(container, [
-          'General',
-          'Headers source',
-          'Header items',
-          'Condition',
-          'Layout',
-          'Custom properties'
+          "General",
+          "Headers source",
+          "Header items",
+          "Condition",
+          "Layout",
+          "Custom properties",
         ]);
 
-        expectGroupEntries(container, 'General', [
-          'Table label',
-          'Data source',
-          'Pagination',
-          'Number of rows per page'
+        expectGroupEntries(container, "General", [
+          "Table label",
+          "Data source",
+          "Pagination",
+          "Number of rows per page",
         ]);
 
-        expectGroupEntries(container, 'Headers source', [
-          'Type'
-        ]);
+        expectGroupEntries(container, "Headers source", ["Type"]);
 
-        expectGroupEntries(container, 'Header items', [
-          [ 'Label', 3 ],
-          [ 'Key', 3 ]
+        expectGroupEntries(container, "Header items", [
+          ["Label", 3],
+          ["Key", 3],
         ]);
       });
 
-
-      it('entries static headers', function() {
-
+      it("entries static headers", function () {
         // given
-        const field = tableSchema.components.find(({ label }) => label === 'dynamic-headers-table');
+        const field = tableSchema.components.find(({ label }) => label === "dynamic-headers-table");
 
         bootstrapPropertiesPanel({
           container,
-          field
+          field,
         });
 
         // then
-        expectGroups(container, [
-          'General',
-          'Headers source',
-          'Condition',
-          'Layout',
-          'Custom properties'
+        expectGroups(container, ["General", "Headers source", "Condition", "Layout", "Custom properties"]);
+
+        expectGroupEntries(container, "General", [
+          "Table label",
+          "Data source",
+          "Pagination",
+          "Number of rows per page",
         ]);
 
-        expectGroupEntries(container, 'General', [
-          'Table label',
-          'Data source',
-          'Pagination',
-          'Number of rows per page'
-        ]);
-
-        expectGroupEntries(container, 'Headers source', [
-          'Type',
-          'Expression'
-        ]);
+        expectGroupEntries(container, "Headers source", ["Type", "Expression"]);
       });
 
-
-      describe('columns', function() {
-
-        it('should auto focus other entry', async function() {
-
+      describe("columns", function () {
+        it("should auto focus other entry", async function () {
           // given
           let field = {
-            label: 'Table',
-            type: 'table',
-            id: 'Field_0k6resc',
-            dataSource: 'Field_0k6resc',
-            columnsExpression: '=tableHeaders',
+            label: "Table",
+            type: "table",
+            id: "Field_0k6resc",
+            dataSource: "Field_0k6resc",
+            columnsExpression: "=tableHeaders",
           };
 
           const eventBus = new EventBusMock();
 
           const selection = {
-            get: () => field
+            get: () => field,
           };
 
           const editField = () => {
-            const { columnsExpression:_, ...renderedField } = field;
+            const { columnsExpression: _, ...renderedField } = field;
             field = {
               ...renderedField,
-              columns:[
+              columns: [
                 {
-                  label:'Column',
-                  key:'inputVariable'
-                }
-              ]
+                  label: "Column",
+                  key: "inputVariable",
+                },
+              ],
             };
           };
 
@@ -3884,200 +3323,192 @@ describe('properties panel', function() {
             field,
             services: {
               eventBus,
-              selection
-            }
+              selection,
+            },
           });
 
           // assume
-          const input = screen.getByLabelText('Type');
+          const input = screen.getByLabelText("Type");
 
           // when
-          fireEvent.input(input, { target: { value: 'static' } });
-          await act(() => eventBus.fire('changed'));
+          fireEvent.input(input, { target: { value: "static" } });
+          await act(() => eventBus.fire("changed"));
 
           // then
-          const optionLabelInput = screen.getByLabelText('Label');
+          const optionLabelInput = screen.getByLabelText("Label");
 
           await waitFor(() => {
             expect(document.activeElement).to.eql(optionLabelInput);
           });
         });
 
-
-        it('should add value', function() {
-
+        it("should add value", function () {
           // given
           const editFieldSpy = spy();
 
-          const field = tableSchema.components.find(({ label }) => label === 'static-headers-table');
+          const field = tableSchema.components.find(({ label }) => label === "static-headers-table");
 
           bootstrapPropertiesPanel({
             container,
             editField: editFieldSpy,
-            field
+            field,
           });
 
-          const group = findGroup(container, 'Header items');
+          const group = findGroup(container, "Header items");
 
           // when
-          const addEntry = group.querySelector('.bio-properties-panel-add-entry');
+          const addEntry = group.querySelector(".bio-properties-panel-add-entry");
 
           fireEvent.click(addEntry);
 
           // then
-          expect(editFieldSpy).to.have.been.calledWith(field, [ 'columns' ], [
-            ...field.columns,
-            {
-              label: 'Column',
-              key: 'inputVariable',
-            }
-          ]);
+          expect(editFieldSpy).to.have.been.calledWith(
+            field,
+            ["columns"],
+            [
+              ...field.columns,
+              {
+                label: "Column",
+                key: "inputVariable",
+              },
+            ],
+          );
         });
 
-
-        it('should remove value', function() {
-
+        it("should remove value", function () {
           // given
           const editFieldSpy = spy();
 
-          const field = tableSchema.components.find(({ label }) => label === 'static-headers-table');
+          const field = tableSchema.components.find(({ label }) => label === "static-headers-table");
 
           bootstrapPropertiesPanel({
             container,
             editField: editFieldSpy,
-            field
+            field,
           });
 
-          const group = findGroup(container, 'Header items');
+          const group = findGroup(container, "Header items");
 
           // when
-          const removeEntry = group.querySelector('.bio-properties-panel-remove-entry');
+          const removeEntry = group.querySelector(".bio-properties-panel-remove-entry");
 
           fireEvent.click(removeEntry);
 
           // then
-          expect(editFieldSpy).to.have.been.calledWith(field, [ 'columns' ], [
-            {
-              label: 'Name',
-              key: 'name'
-            },
-            {
-              label: 'Date',
-              key: 'date'
-            }
-          ]);
+          expect(editFieldSpy).to.have.been.calledWith(
+            field,
+            ["columns"],
+            [
+              {
+                label: "Name",
+                key: "name",
+              },
+              {
+                label: "Date",
+                key: "date",
+              },
+            ],
+          );
         });
 
-
-        describe('validation', function() {
-
-          describe('key', function() {
-
-            it('should not be empty', function() {
-
+        describe("validation", function () {
+          describe("key", function () {
+            it("should not be empty", function () {
               // given
               const editFieldSpy = spy();
 
-              const field = tableSchema.components.find(({ label }) => label === 'static-headers-table');
+              const field = tableSchema.components.find(({ label }) => label === "static-headers-table");
 
               bootstrapPropertiesPanel({
                 container,
                 editField: editFieldSpy,
-                field
+                field,
               });
 
               // when
-              const input = screen.getByLabelText('Key', { selector: `#bio-properties-panel-${field.id}-columns-0-key` });
+              const input = screen.getByLabelText("Key", {
+                selector: `#bio-properties-panel-${field.id}-columns-0-key`,
+              });
 
-              fireEvent.input(input, { target: { value: '' } });
+              fireEvent.input(input, { target: { value: "" } });
 
               // then
               expect(editFieldSpy).to.not.have.been.called;
 
-              const error = screen.getByText('Must not be empty.');
+              const error = screen.getByText("Must not be empty.");
 
               expect(error).to.exist;
             });
-
           });
-
         });
-
       });
 
-
-      describe('dynamic options (columnsExpression)', function() {
-
-        it('should configure input source', function() {
-
+      describe("dynamic options (columnsExpression)", function () {
+        it("should configure input source", function () {
           // given
           const editFieldSpy = spy();
 
-          const field = tableSchema.components.find(({ label }) => label === 'static-headers-table');
+          const field = tableSchema.components.find(({ label }) => label === "static-headers-table");
 
           bootstrapPropertiesPanel({
             container,
             editField: editFieldSpy,
-            field
+            field,
           });
 
           // assume
-          const input = screen.getByLabelText('Type');
+          const input = screen.getByLabelText("Type");
 
-          expect(input.value).to.equal('static');
+          expect(input.value).to.equal("static");
 
           // when
-          fireEvent.input(input, { target: { value: 'expression' } });
+          fireEvent.input(input, { target: { value: "expression" } });
 
           // then
           expect(editFieldSpy).to.have.been.calledOnce;
           expect(editFieldSpy).to.have.been.calledWith(field, {
-            columnsExpression:'='
+            columnsExpression: "=",
           });
         });
 
-
-        it('should configure columnsExpression', async function() {
-
+        it("should configure columnsExpression", async function () {
           // given
           const editFieldSpy = spy();
 
-          const field = tableSchema.components.find(({ label }) => label === 'dynamic-headers-table');
+          const field = tableSchema.components.find(({ label }) => label === "dynamic-headers-table");
 
           bootstrapPropertiesPanel({
             container,
             editField: editFieldSpy,
-            field
+            field,
           });
 
           // assume
           const input = findTextbox(`${field.id}-columnsExpression`, container);
 
-          expect(input.textContent).to.equal('tableHeaders');
+          expect(input.textContent).to.equal("tableHeaders");
 
           // when
-          await setEditorValue(input, 'newVal');
+          await setEditorValue(input, "newVal");
 
           // then
           expect(editFieldSpy).to.have.been.calledOnce;
-          expect(editFieldSpy).to.have.been.calledWith(field, [ 'columnsExpression' ], '=newVal');
+          expect(editFieldSpy).to.have.been.calledWith(field, ["columnsExpression"], "=newVal");
         });
 
-
-        it('should auto focus other entry', async function() {
-
+        it("should auto focus other entry", async function () {
           // given
-          let field = tableSchema.components.find(({ label }) => label === 'static-headers-table');
+          let field = tableSchema.components.find(({ label }) => label === "static-headers-table");
 
           const eventBus = new EventBusMock();
 
           const selection = {
-            get: () => field
+            get: () => field,
           };
 
           const editField = () => {
-            const { columns:_, ...renderedField } = field;
-            field = { ...renderedField, columnsExpression: '=' };
+            const { columns: _, ...renderedField } = field;
+            field = { ...renderedField, columnsExpression: "=" };
           };
 
           bootstrapPropertiesPanel({
@@ -4086,17 +3517,17 @@ describe('properties panel', function() {
             field,
             services: {
               eventBus,
-              selection
-            }
+              selection,
+            },
           });
 
           // assume
-          const input = screen.getByLabelText('Type');
-          expect(input.value).to.equal('static');
+          const input = screen.getByLabelText("Type");
+          expect(input.value).to.equal("static");
 
           // when
-          fireEvent.input(input, { target: { value: 'expression' } });
-          await act(() => eventBus.fire('changed'));
+          fireEvent.input(input, { target: { value: "expression" } });
+          await act(() => eventBus.fire("changed"));
 
           // then
           const editor = findTextbox(`${field.id}-columnsExpression`, container);
@@ -4105,171 +3536,148 @@ describe('properties panel', function() {
             expect(document.activeElement).to.eql(editor);
           });
         });
-
       });
-
     });
-
   });
 
-
-  describe('custom properties', function() {
-
-    it('should add property', function() {
-
+  describe("custom properties", function () {
+    it("should add property", function () {
       // given
       const editFieldSpy = spy();
 
-      const field = schema.components.find(({ key }) => key === 'creditor');
+      const field = schema.components.find(({ key }) => key === "creditor");
 
       bootstrapPropertiesPanel({
         container,
         editField: editFieldSpy,
-        field
+        field,
       });
 
-      const group = findGroup(container, 'Custom properties');
+      const group = findGroup(container, "Custom properties");
 
       // when
-      const addEntry = group.querySelector('.bio-properties-panel-add-entry');
+      const addEntry = group.querySelector(".bio-properties-panel-add-entry");
 
       fireEvent.click(addEntry);
 
       // then
-      expect(editFieldSpy).to.have.been.calledWith(field, [ 'properties' ], {
+      expect(editFieldSpy).to.have.been.calledWith(field, ["properties"], {
         ...field.properties,
-        key4: 'value'
+        key4: "value",
       });
     });
 
-
-    it('should add property with different index if already used', function() {
-
+    it("should add property with different index if already used", function () {
       // given
       const editFieldSpy = spy();
 
-
-      const field = redundantValuesSchema.components.find(({ key }) => key === 'redundantValues');
+      const field = redundantValuesSchema.components.find(({ key }) => key === "redundantValues");
 
       bootstrapPropertiesPanel({
         container,
         editField: editFieldSpy,
-        field
+        field,
       });
 
-      const group = findGroup(container, 'Custom properties');
+      const group = findGroup(container, "Custom properties");
 
       // when
-      const addEntry = group.querySelector('.bio-properties-panel-add-entry');
+      const addEntry = group.querySelector(".bio-properties-panel-add-entry");
       fireEvent.click(addEntry);
 
       // then
-      expect(editFieldSpy).to.have.been.calledWith(field, [ 'properties' ], {
-        key2: 'value',
-        key3: 'value'
+      expect(editFieldSpy).to.have.been.calledWith(field, ["properties"], {
+        key2: "value",
+        key3: "value",
       });
     });
 
-
-    it('should remove property', function() {
-
+    it("should remove property", function () {
       // given
       const editFieldSpy = spy();
 
-      const field = schema.components.find(({ key }) => key === 'creditor');
+      const field = schema.components.find(({ key }) => key === "creditor");
 
       bootstrapPropertiesPanel({
         container,
         editField: editFieldSpy,
-        field
+        field,
       });
 
-      const group = findGroup(container, 'Custom properties');
+      const group = findGroup(container, "Custom properties");
 
       // when
-      const removeEntry = group.querySelector('.bio-properties-panel-remove-entry');
+      const removeEntry = group.querySelector(".bio-properties-panel-remove-entry");
 
       fireEvent.click(removeEntry);
 
       // then
-      expect(editFieldSpy).to.have.been.calledWith(field, [ 'properties' ], {
-        ...removeKey(field.properties, 'firstName')
+      expect(editFieldSpy).to.have.been.calledWith(field, ["properties"], {
+        ...removeKey(field.properties, "firstName"),
       });
     });
 
-
-    describe('validation', function() {
-
-      describe('custom property key', function() {
-
-        it('should not be empty', function() {
-
+    describe("validation", function () {
+      describe("custom property key", function () {
+        it("should not be empty", function () {
           // given
           const editFieldSpy = spy();
 
-          const field = schema.components.find(({ key }) => key === 'creditor');
+          const field = schema.components.find(({ key }) => key === "creditor");
 
           bootstrapPropertiesPanel({
             container,
             editField: editFieldSpy,
-            field
+            field,
           });
 
           // when
-          const input = screen.getByLabelText('Key', { selector: '#bio-properties-panel-property-0-key' });
+          const input = screen.getByLabelText("Key", { selector: "#bio-properties-panel-property-0-key" });
 
-          fireEvent.input(input, { target: { value: '' } });
+          fireEvent.input(input, { target: { value: "" } });
 
           // then
           expect(editFieldSpy).to.not.have.been.called;
 
-          const error = screen.getByText('Must not be empty.');
+          const error = screen.getByText("Must not be empty.");
 
           expect(error).to.exist;
         });
 
-
-        it('should be unique', function() {
-
+        it("should be unique", function () {
           // given
           const editFieldSpy = spy();
 
-          const field = schema.components.find(({ key }) => key === 'creditor');
+          const field = schema.components.find(({ key }) => key === "creditor");
 
           bootstrapPropertiesPanel({
             container,
             editField: editFieldSpy,
-            field
+            field,
           });
 
           // when
-          const input = screen.getByLabelText('Key', { selector: '#bio-properties-panel-property-0-key' });
+          const input = screen.getByLabelText("Key", { selector: "#bio-properties-panel-property-0-key" });
 
-          fireEvent.input(input, { target: { value: 'middleName' } });
+          fireEvent.input(input, { target: { value: "middleName" } });
 
           // then
           expect(editFieldSpy).to.not.have.been.called;
 
-          const error = screen.getByText('Must be unique.');
+          const error = screen.getByText("Must be unique.");
 
           expect(error).to.exist;
         });
-
       });
-
     });
-
   });
 
-
-  describe('feel popup', function() {
-
-    it('should render feel popup in given container', async function() {
-
+  describe("feel popup", function () {
+    it("should render feel popup in given container", async function () {
       // given
       const editFieldSpy = spy();
 
-      const field = schema.components.find(({ source }) => source === '=logo');
+      const field = schema.components.find(({ source }) => source === "=logo");
 
       bootstrapPropertiesPanel({
         container,
@@ -4278,169 +3686,132 @@ describe('properties panel', function() {
         services: {
           config: {
             propertiesPanel: {
-              feelPopupContainer: container
-            }
-          }
-        }
+              feelPopupContainer: container,
+            },
+          },
+        },
       });
 
-      const openPopupBtn = findOpenFeelPopup('source', container);
+      const openPopupBtn = findOpenFeelPopup("source", container);
 
       // when
       await act(() => {
         fireEvent.click(openPopupBtn);
       });
 
-      const feelPopup = domQuery('.bio-properties-panel-feel-popup', container);
+      const feelPopup = domQuery(".bio-properties-panel-feel-popup", container);
 
       // then
       expect(feelPopup).to.exist;
       expect(feelPopup.parentNode).to.eql(container);
     });
-
   });
 
-
-  describe('extension support', function() {
-
-    it('should render configured propertiesPanelEntries', function() {
-
+  describe("extension support", function () {
+    it("should render configured propertiesPanelEntries", function () {
       // given
       const field = {
-        id: 'Custom_1',
-        type: 'custom'
+        id: "Custom_1",
+        type: "custom",
       };
 
       const extension = {
         config: {
-          propertiesPanelEntries: [
-            'label',
-            'description'
-          ]
-        }
+          propertiesPanelEntries: ["label", "description"],
+        },
       };
 
       const formFields = new FormFields();
-      formFields.register('custom', extension);
+      formFields.register("custom", extension);
 
       bootstrapPropertiesPanel({
         container,
         field,
         services: {
-          formFields
-        }
+          formFields,
+        },
       });
 
       // then
-      expectGroupEntries(container, 'General', [
-        'Field label',
-        'Field description'
-      ]);
-
+      expectGroupEntries(container, "General", ["Field label", "Field description"]);
     });
 
-
-    it('should render configured values groups', function() {
-
+    it("should render configured values groups", function () {
       // given
       const field = {
-        id: 'Custom_1',
-        type: 'custom',
-        values: []
+        id: "Custom_1",
+        type: "custom",
+        values: [],
       };
 
       const extension = {
         config: {
-          propertiesPanelEntries: [
-            'values'
-          ]
-        }
+          propertiesPanelEntries: ["values"],
+        },
       };
 
       const formFields = new FormFields();
-      formFields.register('custom', extension);
+      formFields.register("custom", extension);
 
       bootstrapPropertiesPanel({
         container,
         field,
         services: {
-          formFields
-        }
+          formFields,
+        },
       });
 
       // then
-      expectGroups(container, [
-        'Condition',
-        'Layout',
-        'Options source',
-        'Static options',
-        'Custom properties'
-      ]);
-
+      expectGroups(container, ["Condition", "Layout", "Options source", "Static options", "Custom properties"]);
     });
 
-
-    it('should render from provider', function() {
-
+    it("should render from provider", function () {
       // given
       const propertiesProvider = {
         getGroups(element) {
-          return (groups) => {
-
+          return groups => {
             return [
               ...groups,
               {
-                id: 'custom',
-                label: 'Custom group',
-                entries: []
-              }
+                id: "custom",
+                label: "Custom group",
+                entries: [],
+              },
             ];
           };
-        }
+        },
       };
 
       const field = {
-        id: 'Custom_1',
-        type: 'textfield',
-        values: []
+        id: "Custom_1",
+        type: "textfield",
+        values: [],
       };
 
       bootstrapPropertiesPanel({
         container,
         field,
-        propertiesProviders: [
-          propertiesProvider
-        ]
+        propertiesProviders: [propertiesProvider],
       });
 
       // then
-      expectGroups(container, [
-        'Condition',
-        'Layout',
-        'Custom properties',
-        'Custom group'
-      ]);
-
+      expectGroups(container, ["Condition", "Layout", "Custom properties", "Custom group"]);
     });
-
   });
-
 });
-
 
 // helpers //////////////
 
 function createPropertiesPanel({ services, ...restOptions } = {}, renderFn = render) {
-
   const options = {
     editField: () => {},
     isTemplate: () => false,
-    evaluateTemplate: (value) => `Evaluation of "${value}"`,
+    evaluateTemplate: value => `Evaluation of "${value}"`,
     valuePaths: {},
     claimedPaths: [],
     propertiesProviders: [],
     field: null,
-    ...restOptions
+    ...restOptions,
   };
 
   const defaultedServices = {
@@ -4449,9 +3820,9 @@ function createPropertiesPanel({ services, ...restOptions } = {}, renderFn = ren
     modeling: {
       editFormField(...args) {
         return options.editField(...args);
-      }
+      },
     },
-    ...services
+    ...services,
   };
 
   const injector = createMockInjector(defaultedServices, options);
@@ -4459,19 +3830,15 @@ function createPropertiesPanel({ services, ...restOptions } = {}, renderFn = ren
   const container = options.container;
 
   const getProviders = () => {
-    return [
-      new PropertiesProvider(defaultedServices.propertiesPanel, injector),
-      ...options.propertiesProviders
-    ];
+    return [new PropertiesProvider(defaultedServices.propertiesPanel, injector), ...options.propertiesProviders];
   };
 
-  return renderFn(<PropertiesPanel
-    getProviders={ getProviders }
-    eventBus={ defaultedServices.eventBus }
-    injector={ injector } />,
-  {
-    container
-  });
+  return renderFn(
+    <PropertiesPanel getProviders={getProviders} eventBus={defaultedServices.eventBus} injector={injector} />,
+    {
+      container,
+    },
+  );
 }
 
 function expectGroups(container, groupLabels) {
@@ -4483,7 +3850,7 @@ function expectGroups(container, groupLabels) {
 function expectGroupEntries(container, groupLabel, entryLabels) {
   entryLabels.forEach(entryLabel => {
     if (Array.isArray(entryLabel)) {
-      expect(findEntries(container, groupLabel, entryLabel[ 0 ])).to.have.length(entryLabel[ 1 ]);
+      expect(findEntries(container, groupLabel, entryLabel[0])).to.have.length(entryLabel[1]);
     } else {
       expect(findEntries(container, groupLabel, entryLabel)).to.have.length(1);
     }
@@ -4491,7 +3858,7 @@ function expectGroupEntries(container, groupLabel, entryLabels) {
 }
 
 function findGroup(container, groupLabel) {
-  let groups = container.querySelectorAll('.bio-properties-panel-group');
+  let groups = container.querySelectorAll(".bio-properties-panel-group");
   const groupIndex = findGroupIndex(container, groupLabel);
 
   if (groupIndex >= 0) {
@@ -4500,7 +3867,7 @@ function findGroup(container, groupLabel) {
 }
 
 function findGroupIndex(container, groupLabel) {
-  const groupLabels = container.querySelectorAll('.bio-properties-panel-group-header-title');
+  const groupLabels = container.querySelectorAll(".bio-properties-panel-group-header-title");
   return Array.from(groupLabels).findIndex(group => group.textContent === groupLabel);
 }
 
@@ -4508,7 +3875,7 @@ function findEntries(container, groupLabel, entryLabel) {
   const group = findGroup(container, groupLabel);
 
   if (group) {
-    const entries = group.querySelectorAll('.bio-properties-panel-label');
+    const entries = group.querySelectorAll(".bio-properties-panel-label");
 
     return Array.from(entries).filter(entry => entry.textContent === entryLabel);
   }
@@ -4529,16 +3896,12 @@ function findTextbox(id, container) {
 function getListOrdering(list) {
   let ordering = [];
 
-  const items = list.querySelectorAll('.bio-properties-panel-list-item', list);
+  const items = list.querySelectorAll(".bio-properties-panel-list-item", list);
 
   items.forEach(item => {
-    const collapsible = item.querySelector('.bio-properties-panel-collapsible-entry', item);
+    const collapsible = item.querySelector(".bio-properties-panel-collapsible-entry", item);
 
-    ordering.push(
-      collapsible
-        .querySelector('.bio-properties-panel-collapsible-entry-header-title')
-        .textContent
-    );
+    ordering.push(collapsible.querySelector(".bio-properties-panel-collapsible-entry-header-title").textContent);
   });
 
   return ordering;

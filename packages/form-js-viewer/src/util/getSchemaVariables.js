@@ -1,39 +1,39 @@
-import { FeelExpressionLanguage } from '../features/expressionLanguage/FeelExpressionLanguage.js';
-import { FeelersTemplating } from '../features/expressionLanguage/FeelersTemplating.js';
-import { FormFields } from '../render/FormFields.js';
+import { FeelExpressionLanguage } from "../features/expressionLanguage/FeelExpressionLanguage.js";
+import { FeelersTemplating } from "../features/expressionLanguage/FeelersTemplating.js";
+import { FormFields } from "../render/FormFields.js";
 
-import { get } from 'min-dash';
+import { get } from "min-dash";
 
 const EXPRESSION_PROPERTIES = [
-  'alt',
-  'appearance.prefixAdorner',
-  'appearance.suffixAdorner',
-  'conditional.hide',
-  'description',
-  'label',
-  'source',
-  'readonly',
-  'text',
-  'validate.min',
-  'validate.max',
-  'validate.minLength',
-  'validate.maxLength',
-  'valuesExpression',
-  'url',
-  'dataSource',
-  'columnsExpression'
+  "alt",
+  "appearance.prefixAdorner",
+  "appearance.suffixAdorner",
+  "conditional.hide",
+  "description",
+  "label",
+  "source",
+  "readonly",
+  "text",
+  "validate.min",
+  "validate.max",
+  "validate.minLength",
+  "validate.maxLength",
+  "valuesExpression",
+  "url",
+  "dataSource",
+  "columnsExpression",
 ];
 
 const TEMPLATE_PROPERTIES = [
-  'alt',
-  'appearance.prefixAdorner',
-  'appearance.suffixAdorner',
-  'description',
-  'label',
-  'source',
-  'text',
-  'content',
-  'url'
+  "alt",
+  "appearance.prefixAdorner",
+  "appearance.suffixAdorner",
+  "description",
+  "label",
+  "source",
+  "text",
+  "content",
+  "url",
 ];
 
 /**
@@ -69,20 +69,19 @@ const TEMPLATE_PROPERTIES = [
  * @return {string[]}
  */
 export function getSchemaVariables(schema, options = {}) {
-
   const {
     formFields = new FormFields(),
     expressionLanguage = new FeelExpressionLanguage(null),
     templating = new FeelersTemplating(),
     inputs = true,
-    outputs = true
+    outputs = true,
   } = options;
 
   if (!schema.components) {
     return [];
   }
 
-  const getAllComponents = (node) => {
+  const getAllComponents = node => {
     const components = [];
 
     if (node.components) {
@@ -96,51 +95,45 @@ export function getSchemaVariables(schema, options = {}) {
   };
 
   const variables = getAllComponents(schema).reduce((variables, component) => {
-
-    const {
-      valuesKey
-    } = component;
+    const { valuesKey } = component;
 
     // collect input-only variables
     if (inputs) {
-
       if (valuesKey) {
-        variables = [ ...variables, valuesKey ];
+        variables = [...variables, valuesKey];
       }
 
-      EXPRESSION_PROPERTIES.forEach((prop) => {
-        const property = get(component, prop.split('.'));
+      EXPRESSION_PROPERTIES.forEach(prop => {
+        const property = get(component, prop.split("."));
 
         if (property && expressionLanguage.isExpression(property)) {
+          const expressionVariables = expressionLanguage.getVariableNames(property, { type: "expression" });
 
-          const expressionVariables = expressionLanguage.getVariableNames(property, { type: 'expression' });
-
-          variables = [ ...variables, ...expressionVariables ];
+          variables = [...variables, ...expressionVariables];
         }
       });
 
-      TEMPLATE_PROPERTIES.forEach((prop) => {
-        const property = get(component, prop.split('.'));
+      TEMPLATE_PROPERTIES.forEach(prop => {
+        const property = get(component, prop.split("."));
 
         if (property && !expressionLanguage.isExpression(property) && templating.isTemplate(property)) {
           const templateVariables = templating.getVariableNames(property);
-          variables = [ ...variables, ...templateVariables ];
+          variables = [...variables, ...templateVariables];
         }
       });
-
     }
 
-    return variables.filter(variable => typeof variable === 'string');
+    return variables.filter(variable => typeof variable === "string");
   }, []);
 
-  const getBindingVariables = (node)=> {
+  const getBindingVariables = node => {
     const bindingVariable = [];
     const formField = formFields.get(node.type);
 
     if (formField && formField.config.keyed && node.key) {
-      return [ node.key.split('.')[0] ];
+      return [node.key.split(".")[0]];
     } else if (formField && formField.config.pathed && node.path) {
-      return [ node.path.split('.')[0] ];
+      return [node.path.split(".")[0]];
     } else if (node.components) {
       node.components.forEach(component => {
         bindingVariable.push(...getBindingVariables(component));

@@ -1,40 +1,32 @@
-import { NumberFieldEntry, isNumberFieldEntryEdited } from '@bpmn-io/properties-panel';
+import { NumberFieldEntry, isNumberFieldEntryEdited } from "@bpmn-io/properties-panel";
 
-import { get, isNumber, isNil } from 'min-dash';
+import { get, isNumber, isNil } from "min-dash";
 
-import { useService } from '../hooks';
+import { useService } from "../hooks";
 
-const path = [ 'rowCount' ];
+const path = ["rowCount"];
 
 export function RowCountEntry(props) {
-  const {
-    editField,
-    field
-  } = props;
+  const { editField, field } = props;
 
   const entries = [];
 
   entries.push({
-    id: 'rowCount',
+    id: "rowCount",
     component: RowCount,
     isEdited: isNumberFieldEntryEdited,
     editField,
     field,
-    isDefaultVisible: (field) => field.type === 'table' && isNumber(get(field, path))
+    isDefaultVisible: field => field.type === "table" && isNumber(get(field, path)),
   });
 
   return entries;
 }
 
 function RowCount(props) {
+  const { editField, field, id } = props;
 
-  const {
-    editField,
-    field,
-    id
-  } = props;
-
-  const debounce = useService('debounce');
+  const debounce = useService("debounce");
 
   const getValue = () => get(field, path);
 
@@ -53,38 +45,36 @@ function RowCount(props) {
 
   return NumberFieldEntry({
     debounce,
-    label: 'Number of rows per page',
+    label: "Number of rows per page",
     element: field,
     id,
     getValue,
     setValue,
-    validate
+    validate,
   });
 }
-
 
 // helpers //////////
 
 /**
-   * @param {string|void} value
-   * @returns {string|null}
-   */
-const validate = (value) => {
-
+ * @param {string|void} value
+ * @returns {string|null}
+ */
+const validate = value => {
   if (isNil(value)) {
     return null;
   }
 
   if (!isNumber(value)) {
-    return 'Must be number';
+    return "Must be number";
   }
 
   if (!Number.isInteger(value)) {
-    return 'Should be an integer.';
+    return "Should be an integer.";
   }
 
   if (value < 1) {
-    return 'Should be greater than zero.';
+    return "Should be greater than zero.";
   }
 
   return null;

@@ -1,13 +1,8 @@
-import { PropertiesPanel } from './PropertiesPanel';
+import { PropertiesPanel } from "./PropertiesPanel";
 
-import {
-  render
-} from 'preact';
+import { render } from "preact";
 
-import {
-  domify,
-  query as domQuery
-} from 'min-dom';
+import { domify, query as domQuery } from "min-dom";
 
 const DEFAULT_PRIORITY = 1000;
 
@@ -24,11 +19,8 @@ const DEFAULT_PRIORITY = 1000;
  * @param {EventBus} eventBus
  */
 export class PropertiesPanelRenderer {
-
   constructor(propertiesPanelConfig, injector, eventBus) {
-    const {
-      parent
-    } = propertiesPanelConfig || {};
+    const { parent } = propertiesPanelConfig || {};
 
     this._eventBus = eventBus;
     this._injector = injector;
@@ -39,11 +31,10 @@ export class PropertiesPanelRenderer {
       this.attachTo(parent);
     }
 
-    this._eventBus.once('formEditor.rendered', 500, () => {
+    this._eventBus.once("formEditor.rendered", 500, () => {
       this._render();
     });
   }
-
 
   /**
    * Attach the properties panel to a parent node.
@@ -52,10 +43,10 @@ export class PropertiesPanelRenderer {
    */
   attachTo(container) {
     if (!container) {
-      throw new Error('container required');
+      throw new Error("container required");
     }
 
-    if (typeof container === 'string') {
+    if (typeof container === "string") {
       container = domQuery(container);
     }
 
@@ -66,7 +57,7 @@ export class PropertiesPanelRenderer {
     container.appendChild(this._container);
 
     // (3) notify interested parties
-    this._eventBus.fire('propertiesPanel.attach');
+    this._eventBus.fire("propertiesPanel.attach");
   }
 
   /**
@@ -78,28 +69,28 @@ export class PropertiesPanelRenderer {
     if (parentNode) {
       parentNode.removeChild(this._container);
 
-      this._eventBus.fire('propertiesPanel.detach');
+      this._eventBus.fire("propertiesPanel.detach");
     }
   }
 
   _render() {
     render(
       <PropertiesPanel
-        getProviders={ this._getProviders.bind(this) }
-        eventBus={ this._eventBus }
-        injector={ this._injector }
+        getProviders={this._getProviders.bind(this)}
+        eventBus={this._eventBus}
+        injector={this._injector}
       />,
-      this._container
+      this._container,
     );
 
-    this._eventBus.fire('propertiesPanel.rendered');
+    this._eventBus.fire("propertiesPanel.rendered");
   }
 
   _destroy() {
     if (this._container) {
       render(null, this._container);
 
-      this._eventBus.fire('propertiesPanel.destroyed');
+      this._eventBus.fire("propertiesPanel.destroyed");
     }
   }
 
@@ -110,30 +101,27 @@ export class PropertiesPanelRenderer {
    * @param {Number} [priority]
    */
   registerProvider(provider, priority) {
-
     if (!priority) {
       priority = DEFAULT_PRIORITY;
     }
 
-    if (typeof provider.getGroups !== 'function') {
-      console.error(
-        'Properties provider does not implement #getGroups(element) API'
-      );
+    if (typeof provider.getGroups !== "function") {
+      console.error("Properties provider does not implement #getGroups(element) API");
 
       return;
     }
 
-    this._eventBus.on('propertiesPanel.getProviders', priority, function(event) {
+    this._eventBus.on("propertiesPanel.getProviders", priority, function (event) {
       event.providers.push(provider);
     });
 
-    this._eventBus.fire('propertiesPanel.providersChanged');
+    this._eventBus.fire("propertiesPanel.providersChanged");
   }
 
   _getProviders() {
     const event = this._eventBus.createEvent({
-      type: 'propertiesPanel.getProviders',
-      providers: []
+      type: "propertiesPanel.getProviders",
+      providers: [],
     });
 
     this._eventBus.fire(event);
@@ -142,4 +130,4 @@ export class PropertiesPanelRenderer {
   }
 }
 
-PropertiesPanelRenderer.$inject = [ 'config.propertiesPanel', 'injector', 'eventBus' ];
+PropertiesPanelRenderer.$inject = ["config.propertiesPanel", "injector", "eventBus"];

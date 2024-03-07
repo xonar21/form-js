@@ -1,4 +1,4 @@
-import Ids from 'ids';
+import Ids from "ids";
 
 export class FormFieldRegistry {
   constructor(eventBus) {
@@ -6,37 +6,37 @@ export class FormFieldRegistry {
 
     this._formFields = {};
 
-    eventBus.on('form.clear', () => this.clear());
+    eventBus.on("form.clear", () => this.clear());
 
-    this._ids = new Ids([ 32, 36, 1 ]);
+    this._ids = new Ids([32, 36, 1]);
   }
 
   add(formField) {
     const { id } = formField;
 
-    if (this._formFields[ id ]) {
-      throw new Error(`form field with ID ${ id } already exists`);
+    if (this._formFields[id]) {
+      throw new Error(`form field with ID ${id} already exists`);
     }
 
-    this._eventBus.fire('formField.add', { formField });
+    this._eventBus.fire("formField.add", { formField });
 
-    this._formFields[ id ] = formField;
+    this._formFields[id] = formField;
   }
 
   remove(formField) {
     const { id } = formField;
 
-    if (!this._formFields[ id ]) {
+    if (!this._formFields[id]) {
       return;
     }
 
-    this._eventBus.fire('formField.remove', { formField });
+    this._eventBus.fire("formField.remove", { formField });
 
-    delete this._formFields[ id ];
+    delete this._formFields[id];
   }
 
   get(id) {
-    return this._formFields[ id ];
+    return this._formFields[id];
   }
 
   getAll() {
@@ -44,11 +44,11 @@ export class FormFieldRegistry {
   }
 
   getForm() {
-    return this.getAll().find((formField) => formField.type === 'default');
+    return this.getAll().find(formField => formField.type === "default");
   }
 
   forEach(callback) {
-    this.getAll().forEach((formField) => callback(formField));
+    this.getAll().forEach(formField => callback(formField));
   }
 
   clear() {
@@ -56,7 +56,6 @@ export class FormFieldRegistry {
 
     this._ids.clear();
   }
-
 }
 
-FormFieldRegistry.$inject = [ 'eventBus' ];
+FormFieldRegistry.$inject = ["eventBus"];

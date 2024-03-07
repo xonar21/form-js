@@ -1,52 +1,41 @@
-import { CheckboxEntry, isCheckboxEntryEdited } from '@bpmn-io/properties-panel';
+import { CheckboxEntry, isCheckboxEntryEdited } from "@bpmn-io/properties-panel";
 
-import { get } from 'min-dash';
+import { get } from "min-dash";
 
-import Big from 'big.js';
-
+import Big from "big.js";
 
 export function NumberSerializationEntry(props) {
-  const {
-    editField,
-    field
-  } = props;
+  const { editField, field } = props;
 
   const entries = [];
 
   entries.push({
-    id: 'serialize-to-string',
+    id: "serialize-to-string",
     component: SerializeToString,
     isEdited: isCheckboxEntryEdited,
     editField,
     field,
-    isDefaultVisible: (field) => field.type === 'number'
+    isDefaultVisible: field => field.type === "number",
   });
 
   return entries;
 }
 
 function SerializeToString(props) {
-  const {
-    editField,
-    field,
-    id
-  } = props;
+  const { editField, field, id } = props;
 
-  const {
-    defaultValue
-  } = field;
+  const { defaultValue } = field;
 
-  const path = [ 'serializeToString' ];
+  const path = ["serializeToString"];
 
   const getValue = () => {
-    return get(field, path, '');
+    return get(field, path, "");
   };
 
-  const setValue = (value) => {
-
+  const setValue = value => {
     // Whenever changing the formatting, make sure to change the default value type along with it
     if (defaultValue || defaultValue === 0) {
-      editField(field, [ 'defaultValue' ], value ? Big(defaultValue).toFixed() : Number(defaultValue));
+      editField(field, ["defaultValue"], value ? Big(defaultValue).toFixed() : Number(defaultValue));
     }
 
     return editField(field, path, value);
@@ -56,8 +45,8 @@ function SerializeToString(props) {
     element: field,
     getValue,
     id,
-    label: 'Output as string',
-    description: 'Allows arbitrary precision values',
-    setValue
+    label: "Output as string",
+    description: "Allows arbitrary precision values",
+    setValue,
   });
 }

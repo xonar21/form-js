@@ -1,6 +1,6 @@
-import { evaluate } from 'feelin';
-import { isString } from 'min-dash';
-import { getFlavouredFeelVariableNames } from './variableExtractionHelpers';
+import { evaluate } from "feelin";
+import { isString } from "min-dash";
+import { getFlavouredFeelVariableNames } from "./variableExtractionHelpers";
 
 export class FeelExpressionLanguage {
   constructor(eventBus) {
@@ -14,7 +14,9 @@ export class FeelExpressionLanguage {
    * @returns {boolean}
    *
    */
-  isExpression(value) { return isString(value) && value.startsWith('='); }
+  isExpression(value) {
+    return isString(value) && value.startsWith("=");
+  }
 
   /**
    * Retrieve variable names from a given FEEL expression.
@@ -26,17 +28,14 @@ export class FeelExpressionLanguage {
    * @returns {string[]}
    */
   getVariableNames(expression, options = {}) {
-
-    const {
-      type = 'expression'
-    } = options;
+    const { type = "expression" } = options;
 
     if (!this.isExpression(expression)) {
       return [];
     }
 
-    if (![ 'unaryTest', 'expression' ].includes(type)) {
-      throw new Error('Unknown expression type: ' + type);
+    if (!["unaryTest", "expression"].includes(type)) {
+      throw new Error("Unknown expression type: " + type);
     }
 
     return getFlavouredFeelVariableNames(expression, type);
@@ -55,7 +54,7 @@ export class FeelExpressionLanguage {
       return null;
     }
 
-    if (!isString(expression) || !expression.startsWith('=')) {
+    if (!isString(expression) || !expression.startsWith("=")) {
       return null;
     }
 
@@ -64,12 +63,10 @@ export class FeelExpressionLanguage {
 
       return result;
     } catch (error) {
-      this._eventBus.fire('error', { error });
+      this._eventBus.fire("error", { error });
       return null;
     }
   }
 }
 
-FeelExpressionLanguage.$inject = [
-  'eventBus'
-];
+FeelExpressionLanguage.$inject = ["eventBus"];

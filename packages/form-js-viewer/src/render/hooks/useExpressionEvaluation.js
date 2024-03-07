@@ -1,7 +1,7 @@
-import { useService } from './useService';
-import { LocalExpressionContext } from '../context/LocalExpressionContext';
-import { useContext, useMemo } from 'preact/hooks';
-import { buildExpressionContext } from '../../util/simple';
+import { useService } from "./useService";
+import { LocalExpressionContext } from "../context/LocalExpressionContext";
+import { useContext, useMemo } from "preact/hooks";
+import { buildExpressionContext } from "../../util/simple";
 
 /**
  * Evaluate a string reactively based on the expressionLanguage and form data.
@@ -12,7 +12,7 @@ import { buildExpressionContext } from '../../util/simple';
  * @returns {any} - Evaluated value or the original value if not an expression.
  */
 export function useExpressionEvaluation(value) {
-  const expressionLanguage = useService('expressionLanguage');
+  const expressionLanguage = useService("expressionLanguage");
   const expressionContextInfo = useContext(LocalExpressionContext);
 
   return useMemo(() => {
@@ -20,5 +20,5 @@ export function useExpressionEvaluation(value) {
       return expressionLanguage.evaluate(value, buildExpressionContext(expressionContextInfo));
     }
     return value;
-  }, [ expressionLanguage, expressionContextInfo, value ]);
+  }, [expressionLanguage, expressionContextInfo, value]);
 }

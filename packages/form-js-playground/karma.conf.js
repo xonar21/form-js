@@ -5,8 +5,8 @@ const { NormalModuleReplacementPlugin } = require("webpack");
 const coverage = process.env.COVERAGE;
 
 // configures browsers to run test against
-// any of [ 'ChromeHeadless', 'Chrome', 'Firefox', 'IE', 'PhantomJS' ]
-const browsers = (process.env.TEST_BROWSERS || "ChromeHeadless").split(",");
+// any of [ 'ChromeHeadlessNoSandbox', 'Chrome', 'Firefox', 'IE', 'PhantomJS' ]
+const browsers = (process.env.TEST_BROWSERS || "ChromeHeadlessNoSandbox").split(",");
 
 const singleStart = process.env.SINGLE_START;
 
@@ -44,7 +44,12 @@ module.exports = function (karma) {
     },
 
     browsers,
-
+    customLaunchers: {
+      ChromeHeadlessNoSandbox: {
+        base: 'ChromeHeadless',
+        flags: ['--no-sandbox']
+      }
+    },
     singleRun: true,
     autoWatch: false,
 

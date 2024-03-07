@@ -32,12 +32,12 @@ jobs:
       if: runner.os == 'Linux'
       env:
         COVERAGE: 1
-        TEST_BROWSERS: Firefox,ChromeHeadless
+        TEST_BROWSERS: Firefox,ChromeHeadlessNoSandbox
       run: xvfb-run npm run all
     - name: Build
       if: runner.os != 'Linux'
       env:
-        TEST_BROWSERS: ChromeHeadless
+        TEST_BROWSERS: ChromeHeadlessNoSandbox
       run: npm run all
     - name: Upload coverage
       uses: codecov/codecov-action@v4

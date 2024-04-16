@@ -101,6 +101,11 @@ describe("playground", function () {
                 group: "basic-input",
               },
               {
+                label: "Select",
+                type: "select",
+                group: "basic-input",
+              },
+              {
                 label: "Text field",
                 type: "textfield",
                 group: "basic-input",

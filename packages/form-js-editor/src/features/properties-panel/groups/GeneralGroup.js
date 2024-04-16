@@ -23,6 +23,8 @@ import {
   TableDataSourceEntry,
   PaginationEntry,
   RowCountEntry,
+  IsChildSelectEntry,
+  ParentKeyEntry
 } from "../entries";
 
 export function GeneralGroup(field, editField, getService) {
@@ -32,7 +34,8 @@ export function GeneralGroup(field, editField, getService) {
     ...DescriptionEntry({ field, editField }),
     ...TypeKeyEntry({ field, editField, getService }),
     ...KeyEntry({ field, editField, getService }),
-    ...PathEntry({ field, editField, getService }),
+    ...ParentKeyEntry({ field, editField, getService }),
+    ...IsChildSelectEntry({ field, editField, getService }),
     ...RepeatableEntry({ field, editField, getService }),
     ...DefaultValueEntry({ field, editField }),
     ...ActionEntry({ field, editField }),

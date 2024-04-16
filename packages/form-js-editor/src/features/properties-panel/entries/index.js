@@ -7,6 +7,8 @@ export { DisabledEntry } from "./DisabledEntry";
 export { IdEntry } from "./IdEntry";
 export { TypeKeyEntry } from "./TypeKeyEntry";
 export { KeyEntry } from "./KeyEntry";
+export { ParentKeyEntry } from "./ParentKeyEntry";
+export { IsChildSelectEntry } from "./IsChildSelectEntry";
 export { PathEntry } from "./PathEntry";
 export { GroupAppearanceEntry } from "./GroupAppearanceEntry";
 export { LabelEntry } from "./LabelEntry";

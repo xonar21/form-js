@@ -5,6 +5,7 @@ export { DescriptionEntry } from "./DescriptionEntry";
 export { DefaultValueEntry } from "./DefaultValueEntry";
 export { DisabledEntry } from "./DisabledEntry";
 export { IdEntry } from "./IdEntry";
+export { TypeKeyEntry } from "./TypeKeyEntry";
 export { KeyEntry } from "./KeyEntry";
 export { PathEntry } from "./PathEntry";
 export { GroupAppearanceEntry } from "./GroupAppearanceEntry";

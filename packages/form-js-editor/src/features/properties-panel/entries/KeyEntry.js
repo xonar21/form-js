@@ -4,12 +4,12 @@ import { hasIntegerPathSegment, isValidDotPath } from "../Util";
 
 import { useService } from "../hooks";
 
-import { isSelectEntryEdited, SelectEntry } from "@bpmn-io/properties-panel";
+import { isSelectEntryEdited, SelectEntry, TextFieldEntry, isTextFieldEntryEdited } from "@bpmn-io/properties-panel";
 import { useCallback } from "preact/hooks";
 
 export function KeyEntry(props) {
   const { editField, field, getService } = props;
-
+  const typeKeyValue = get(field, ['typeKey'], "")
   const entries = [];
 
   entries.push({
@@ -17,7 +17,7 @@ export function KeyEntry(props) {
     component: Key,
     editField: editField,
     field: field,
-    isEdited: isSelectEntryEdited,
+    isEdited: !typeKeyValue ? isSelectEntryEdited : isTextFieldEntryEdited
   });
 
   return entries;
@@ -29,6 +29,8 @@ function Key(props) {
   const pathRegistry = useService("pathRegistry");
 
   const debounce = useService("debounce");
+
+  const typeKeyValue = get(field, ['typeKey'], "")
 
   const path = ["key"];
 
@@ -73,7 +75,7 @@ function Key(props) {
       pathRegistry.unclaimPath(oldPath);
       const canClaim = pathRegistry.canClaimPath(newPath, { isClosed: true, claimerId: field.id });
       pathRegistry.claimPath(oldPath, { isClosed: true, claimerId: field.id });
-      console.log("fddfd");
+
       return canClaim ? null : "Must not conflict with other key/path assignments.";
     },
     [field, pathRegistry],
@@ -83,13 +85,24 @@ function Key(props) {
     return useService("keyParameters") ? useService("keyParameters") : [];
   };
 
-  return SelectEntry({
+  return !typeKeyValue ? SelectEntry({
     debounce,
     element: field,
     id,
     label: "Key",
     getOptions,
     getValue,
+    setValue,
+    validate,
+  }) : TextFieldEntry({
+    debounce,
+    description: 'Binds to a form variable',
+    element: field,
+    getValue,
+    id,
+    label: 'Key',
+    tooltip:
+      'Use a unique "key" to link the form element and the related input/output data. When dealing with nested data, break it down in the user task\'s input mapping before using it.',
     setValue,
     validate,
   });

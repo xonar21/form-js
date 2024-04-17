@@ -4,7 +4,7 @@ export function formFieldClasses(type, { errors = [], disabled = false, readonly
   if (!type) {
     throw new Error("type required");
   }
-
+  console.log(disabled, type, '111')
   return classNames("fjs-form-field", `fjs-form-field-${type}`, {
     "fjs-has-errors": errors.length > 0,
     "fjs-disabled": disabled,

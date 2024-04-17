@@ -8,6 +8,7 @@ import { sanitizeSingleSelectValue } from "../util/sanitizerUtil";
 import { createEmptyOptions } from "../util/optionsUtil";
 import { formFieldClasses } from "../Util";
 import { useService } from "../../hooks";
+import { useEffect } from "preact/hooks";
 
 const type = "select";
 
@@ -37,11 +38,24 @@ export function Select(props) {
     "aria-describedby": [descriptionId, errorMessageId].join(" "),
   };
 
-  console.log(useService('form')._getState())
+  // console.log(useService('form')._getState())
+
+
+  useEffect(() => {
+    if (field.parentKey) {
+      if (!data[field.parentKey]) {
+        if (value) {
+          console.log('da')
+          onChange({ value: null, field})
+        }
+
+      }
+    }
+  }, [field, data, value]);
 
   return (
     <div
-      class={formFieldClasses(type, { errors, disabled, readonly })}
+      class={formFieldClasses(type, { errors, disabled: field.parentKey ? !data[field.parentKey] : disabled, readonly })}
       onKeyDown={event => {
         if (event.key === "Enter") {
           event.preventDefault();

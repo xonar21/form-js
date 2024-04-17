@@ -31,10 +31,13 @@ function IsChildSelect(props) {
   };
 
   const setValue = value => {
+    if (!value) {
+      editField(field, ['parentKey'], null)
+    }
     return editField(field, path, value);
   };
 
-  console.log(field)
+
   return field.type === 'select' ? ToggleSwitchEntry({
     element: field,
     getValue,

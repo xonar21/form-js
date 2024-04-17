@@ -3,7 +3,7 @@ import { isString, get } from "min-dash";
 import { useService } from "../hooks";
 
 import { isSelectEntryEdited, SelectEntry, isTextFieldEntryEdited } from "@bpmn-io/properties-panel";
-import { useCallback } from "preact/hooks";
+import { useCallback, useEffect } from "preact/hooks";
 
 export function ParentKeyEntry(props) {
   const { editField, field, getService } = props;

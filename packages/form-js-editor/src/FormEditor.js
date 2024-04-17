@@ -235,6 +235,7 @@ export class FormEditor {
       renderer = {},
       viewComponents,
       keyParameters,
+      referenceTables,
       ...config
     } = options;
 
@@ -251,6 +252,7 @@ export class FormEditor {
       { formEditor: ["value", this] },
       { viewComponents: ["value", viewComponents] },
       { keyParameters: ["value", keyParameters] },
+      { referenceTables: ["value", referenceTables] },
       CoreModule,
       ...modules,
       ...additionalModules,

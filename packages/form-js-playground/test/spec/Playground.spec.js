@@ -132,6 +132,12 @@ describe("playground", function () {
             value: "lastname",
           },
         ],
+        referenceTables: [
+          {
+            label: "Tabletest",
+            value: "Tabletest",
+          },
+        ]
       });
     });
 

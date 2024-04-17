@@ -120,6 +120,7 @@ export function PlaygroundRoot(props) {
       additionalModules: [...additionalModules, ...editorAdditionalModules],
       viewComponents: props.viewComponents,
       keyParameters: props.keyParameters,
+      referenceTables: props.referenceTables
     }));
 
     paletteRef.current = formEditor.get("palette");

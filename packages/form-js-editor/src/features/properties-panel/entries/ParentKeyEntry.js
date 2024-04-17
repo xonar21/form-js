@@ -2,12 +2,12 @@ import { isString, get } from "min-dash";
 
 import { useService } from "../hooks";
 
-import { isSelectEntryEdited, SelectEntry, isTextFieldEntryEdited } from "@bpmn-io/properties-panel";
+import { isSelectEntryEdited, SelectEntry, TextFieldEntry, isTextFieldEntryEdited } from "@bpmn-io/properties-panel";
 import { useCallback, useEffect } from "preact/hooks";
 
 export function ParentKeyEntry(props) {
   const { editField, field, getService } = props;
-  const typeKeyValue = get(field, ['typeKey'], "")
+  const typeParentKeyValue = get(field, ['typeParentKey'], "")
   const entries = [];
 
   entries.push({
@@ -15,7 +15,7 @@ export function ParentKeyEntry(props) {
     component: ParentKey,
     editField: editField,
     field: field,
-    isEdited: !typeKeyValue ? isSelectEntryEdited : isTextFieldEntryEdited
+    isEdited: !typeParentKeyValue ? isSelectEntryEdited : isTextFieldEntryEdited
   });
 
   return entries;
@@ -29,6 +29,8 @@ function ParentKey(props) {
   const debounce = useService("debounce");
 
   const isChildSelectValue = get(field, ['isChildSelect'], "")
+
+  const typeParentKeyValue = get(field, ['typeParentKey'], "")
 
   const path = ["parentKey"];
 
@@ -62,7 +64,7 @@ function ParentKey(props) {
     return useService("keyParameters") ? useService("keyParameters") : [];
   };
 
-  return isChildSelectValue ? SelectEntry({
+  return isChildSelectValue ? (!typeParentKeyValue ? SelectEntry({
     debounce,
     element: field,
     id,
@@ -71,5 +73,16 @@ function ParentKey(props) {
     getValue,
     setValue,
     validate,
-  }) : null;
+  }) : TextFieldEntry({
+    debounce,
+    description: 'Binds to a form variable',
+    element: field,
+    getValue,
+    id,
+    label: 'Key',
+    tooltip:
+      'Use a unique "key" to link the form element and the related input/output data. When dealing with nested data, break it down in the user task\'s input mapping before using it.',
+    setValue,
+    validate,
+  }))  : null;
 }

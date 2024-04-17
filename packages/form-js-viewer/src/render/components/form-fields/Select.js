@@ -38,17 +38,12 @@ export function Select(props) {
     "aria-describedby": [descriptionId, errorMessageId].join(" "),
   };
 
-  // console.log(useService('form')._getState())
-
-
   useEffect(() => {
     if (field.parentKey) {
       if (!data[field.parentKey]) {
         if (value) {
-          console.log('da')
           onChange({ value: null, field})
         }
-
       }
     }
   }, [field, data, value]);

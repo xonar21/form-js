@@ -25,6 +25,7 @@ import { PlaygroundRoot } from "./components/PlaygroundRoot";
  *  viewerProperties?: FormProperties
  *  viewComponents?: { label: string; id: string; entries: { label: string; type: string; group: string; }[]; }[]
  *  keyParameters: { label: string; value: string; }[]
+ *  referenceTables: { label: string; value: string; }[]
  * } } FormPlaygroundOptions
  */
 
@@ -32,7 +33,7 @@ import { PlaygroundRoot } from "./components/PlaygroundRoot";
  * @param {FormPlaygroundOptions} options
  */
 export function Playground(options) {
-  const { container: parent, schema, data, viewComponents, keyParameters, ...rest } = options;
+  const { container: parent, schema, data, viewComponents, keyParameters, referenceTables, ...rest } = options;
 
   const emitter = mitt();
 
@@ -85,6 +86,7 @@ export function Playground(options) {
       schema={schema}
       viewComponents={viewComponents}
       keyParameters={keyParameters}
+      referenceTables={referenceTables}
       {...rest}
     />,
     container,

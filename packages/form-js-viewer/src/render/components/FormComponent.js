@@ -2,7 +2,7 @@ import { FormField } from "./FormField";
 import { PoweredBy } from "./PoweredBy";
 import { LocalExpressionContext } from "../context/LocalExpressionContext";
 
-import { useMemo } from "preact/hooks";
+import { useEffect, useMemo } from "preact/hooks";
 import { useFilteredFormData, useService } from "../hooks";
 
 const noop = () => {};

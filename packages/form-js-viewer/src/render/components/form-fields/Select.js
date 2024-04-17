@@ -7,6 +7,7 @@ import { SimpleSelect } from "./parts/SimpleSelect";
 import { sanitizeSingleSelectValue } from "../util/sanitizerUtil";
 import { createEmptyOptions } from "../util/optionsUtil";
 import { formFieldClasses } from "../Util";
+import { useService } from "../../hooks";
 
 const type = "select";
 
@@ -16,13 +17,14 @@ export function Select(props) {
   const { description, label, searchable = false, validate = {} } = field;
 
   const { required } = validate;
+  const { data } = useService('form')._getState()
 
   const descriptionId = `${domId}-description`;
   const errorMessageId = `${domId}-error-message`;
 
   const selectProps = {
     domId,
-    disabled,
+    disabled: field.parentKey ? !data[field.parentKey] : disabled,
     errors,
     onBlur,
     onFocus,
@@ -34,6 +36,8 @@ export function Select(props) {
     "aria-invalid": errors.length > 0,
     "aria-describedby": [descriptionId, errorMessageId].join(" "),
   };
+
+  console.log(useService('form')._getState())
 
   return (
     <div

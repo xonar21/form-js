@@ -30,7 +30,7 @@ function ReferenceTable(props) {
 
   const path = ["refField"];
 
-  const isSelectField = field.type === 'select'
+  const isSelectField = field.type === 'select' || field.type === 'taglist'
 
   const getValue = () => {
     return get(field, path, "");

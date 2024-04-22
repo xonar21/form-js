@@ -38,7 +38,7 @@ function IsChildSelect(props) {
   };
 
 
-  return field.type === 'select' ? ToggleSwitchEntry({
+  return (field.type === 'select' || field.type === 'taglist') ? ToggleSwitchEntry({
     element: field,
     getValue,
     id,
